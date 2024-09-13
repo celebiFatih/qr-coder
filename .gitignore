@@ -20,6 +20,8 @@ migrate_working_dir/
 *.gif
 *.bmp
 *.svg
+# Exclude only files in screenshots folder
+!screenshots/*.png
 
 # IntelliJ related
 *.iml

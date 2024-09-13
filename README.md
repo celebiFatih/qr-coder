@@ -2,9 +2,9 @@
 
 **QR Coder is a simple and easy-to-use QR code generator app for *Android***
 
----
-
 ### Features
+
+---
 
 - Generate QR codes
 - Save QR codes to the device gallery or database
@@ -15,21 +15,27 @@
 
 ### Screenshots
 
-<img src="https://github.com/celebiFatih/qr_coder/screenshots/1.png" width="200">
-<img src="https://github.com/celebiFatih/qr_coder/screenshots/2.png" width="200">
-<img src="https://github.com/celebiFatih/qr_coder/screenshots/3.png" width="200">
-<img src="https://github.com/celebiFatih/qr_coder/screenshots/4.png" width="200">
-<img src="https://github.com/celebiFatih/qr_coder/screenshots/5.png" width="200">
-<img src="https://github.com/celebiFatih/qr_coder/screenshots/6.png" width="200">
-<img src="https://github.com/celebiFatih/qr_coder/screenshots/6.png" width="200">
+---
+
+<img src="https://github.com/celebiFatih/qr-coder/blob/main/screenshots/1.png?raw=true" width="200">
+<img src="https://github.com/celebiFatih/qr-coder/blob/main/screenshots/2.png?raw=true" width="200">
+<img src="https://github.com/celebiFatih/qr-coder/blob/main/screenshots/3.png?raw=true" width="200">
+<img src="https://github.com/celebiFatih/qr-coder/blob/main/screenshots/4.png?raw=true" width="200">
+<img src="https://github.com/celebiFatih/qr-coder/blob/main/screenshots/5.png?raw=true" width="200">
+<img src="https://github.com/celebiFatih/qr-coder/blob/main/screenshots/6.png?raw=true" width="200">
+<img src="https://github.com/celebiFatih/qr-coder/blob/main/screenshots/7.png?raw=true" width="200">
 
 ### Download
+
+---
 
 [<img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png"
      alt="Get it on Google Play"
      height="80">](https://play.google.com/store/apps/details?id=com.qrcoder.app)
 
 ### Packages
+
+---
 
 #### Main Packages
 - [qr_flutter](https://pub.dev/packages/qr_flutter)
