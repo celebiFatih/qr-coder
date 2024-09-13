@@ -1,0 +1,157 @@
+{
+    "@@locale": "tr",
+    "language": "TR",
+    "login_WelcomeText": "QR Coder'a Hoşgeldiniz!",
+    "login_DescriptionText": "Devam etmek için e-posta ve şifrenizi girin.",
+    "login_label_email": "E-posta",
+    "login_label_password": "Parola",
+    "login_hint_email": "E-postanızı girin",
+    "login_hint_password": "Parolanızı girin",
+    "login_LoginOrRegisterToggle": "Hesabın yok mu? ",
+    "login_LoginOrRegisterToggleAlreadyHaveAccount": "Zaten hesabım var. ",
+    "login_GuestAccessButton": "Kaydolmadan devam et",
+    "login_RememberMeCheckbox": "Beni hatırla",
+    "login_SubmitButtonLogIn": "Giriş yap",
+    "login_SubmitButtonRegister": "Kaydol",
+    "login_ForgotPasswordButton": "Şifremi unuttum",
+    "login_emailValidatorError": "Lütfen geçerli bir e-posta girin",
+    "login_emailValidator": "Lütfen bir e-posta girin",
+    "login_passwordValidator": "Lütfen şifre girin",
+    "login_passwordValidatorError": "Şifre en az 6 karakter uzunluğunda olmalı",
+    "login_emailAlreadyRegistered": "Bu e-posta zaten kayıtlı!",
+    "login_createUserErrorMsg": "Kullanıcı kaydı oluşturulamadı!",
+    "login_signInErrorMsg": "Giriş yapılamadı!",
+    "login_signInSuccessMsg": "Giriş yapıldı!",    
+    "login_invalidCredentialsErrMsg": "Kullanıcı kaydı bulunamadı!",
+
+
+    
+    "qrCodeGenerator_FabSemantic": "QR Kodu oluşturma butonu",
+    "qrCodeGenerator_FabToolTip": "QR Code Oluştur",
+    "qrCodeGenerator_LogOutToolTip": "Oturumu Sonlandır",
+    "qrCodeGenerator_LogOutErrorMsg": "Oturum kapatılamadı!",
+    "qrCodeGenerator_userType": "Misafir",
+    "qrCodeGenerator_textSemantic": "QR kodu oluşturmaya yönelik verileri girmek için metin alanı",
+    "qrCodeGenerator_qrCodeSemantic": "QR kodu görüntüsü",
+    "qrCodeGenerator_receiveErrorMsg": "Veri alınamadı!",
+    "qrCodeGenerator_sharedData": "Paylaşılan veri",
+    "qrCodeGenerator_savePermissionErrorMsg": "Depolama izni gerekli!",
+    "qrCodeGenerator_saveErrorMsg": "QR kodu kaydetme hatası!",
+    "qrCodeGenerator_saveToDbErrorMsg": "QR kod veritabanına kaydedilemedi!",
+    "qrCodeGenerator_sharedTitle": "İşte QR kodunuz",
+    "qrCodeGenerator_sharedErrorMsg": "QR kodu paylaşılamadı!",
+    "qrCodeGenerator_dataEmptyMsg": "QR kod oluşturmak için bir metin girin!",
+    "qrCodeGenerator_qrCodeDefaultTitle": "QR Kod",
+    "qrCodeGenerator_qrCodeGeneratorErrMsg": "QR kod oluşturma hataası!",
+    "qrCodeGenerator_startScanningToolTip": "Tarayıcıyı Başlat",
+    "qrcodeGenerator_qrCodeListToolTip": "Son Kaydedilenler",
+    "qrCodeGenerator_textFieldHintText": "QR kod oluşturulacak metni girin",
+    "qrCodeGenerator_dataTooLongErrMsg": "Metin çok uzun!",
+    "qrCodeGenerator_qrCode": "QR Kod",
+
+    "qrCodeList_title": "Son Oluşturulanlar",
+    "qrCodeList_deleteAllBtn": "Tümünü Sil",
+    "qrCodeList_selectAllBtn": "Tümünü Seç",
+    "qrCodeList_deleteSelectedBtn": "Seçilenleri Sil",
+    "qrCodeList_editBtn": "Düzenle",
+    "qrCodeList_deleteBtn": "Delete",
+    "qrCodeList_defaultQrCode": "QR Coder'a Hoşgeldiniz!",
+    "qrCodeList_fetchListErrorMsg": "QR Kod listesi alınamadı!",
+    "qrCodeList_emptyList": "QR Kod listesi boş...",
+    "qrCodeList_updateDescriptionErrorMsg": "QR Kod tanımlaması güncellenemedi!",
+    "qrCodeList_deleteAllErrorMsg": "Tüm QR Kodlar silinemedi!",
+    "qrCodeList_deleteErrorMsg": "QR Kod silinemedi!",
+    "qrCodeList_qrCodeTitle": "QR Kod: {qrCode}",
+    "@qrCodeList_qrCodeTitle": {
+        "placeholders": {
+            "qrCode": {
+                "type": "String",
+                "example": "QR Kod"
+            }
+        }
+    },
+
+    "qrCodeDetail_Details": "Detaylar",
+    "qrCodeDetail_wifiInfo": "Wi-Fi Bilgileri",
+    "qrCodeDetail_wifiPassw": "Şifre: {password}",
+    "@qrCodeDetail_wifiPassw": {
+        "placeholders": {
+            "password": {
+                "type": "String",
+                "example": "12345678"
+            }
+        }
+    },
+    "qrCodeDetail_wifiEncryption": "Şifreleme: {encryption}",
+    "@qrCodeDetail_wifiEncryption": {
+        "placeholders": {
+            "encryption": {
+                "type": "String",
+                "example": "WPA2"
+            }
+        }
+    },
+    "qrCodeDetail_wifiHidden": "Gizli: {hidden}",
+    "@qrCodeDetail_wifiHidden": {
+        "placeholders": {
+            "hidden": {
+                "type": "String",
+                "example": "false"
+            }
+        }
+    },
+    "qrCodeDetail_wifiConnectTextBtn": "Bağlan",
+    "qrCodeDetail_OpenWifiSettingsButton": "Wi-Fi ayarlarını aç",
+    "qrCodeDetail_homePageNavToolTip": "Ana Sayfa",
+    "qrCodeDetail_listPageNavToolTip": "Kaydedilenler",
+    "qrCodeDetail_createdDateTime": "Oluşturma Tarihi: {createdAt}",
+    "@qrCodeDetail_createdDateTime": {
+        "placeholders": {
+            "createdAt": {
+                "type": "String",
+                "example": "2023-03-23 12:00:00"
+            }
+        }
+    },
+    "qrCodeDetail_saveQrCodeButtonToolTip": "İndir",
+    "qrCodeDetail_saveSuccessMsg": "QR kodu başarılı bir şekilde indirildi!",
+    "qrCodeDetail_openSavedQrCode": "Aç",
+    "qrCodeDetail_shareQrCodeBtnToolTip": "Paylaş",
+
+    "verificationPage_description": "Doğrulama Bekleniyor.\nLütfen e-postanızı kontrol edin.",
+    "verificationPage_emailVerifiedMsg": "Kullanıcı doğrulaması tamamlandı!\nQR Coder'a Hoşgeldiniz!",
+    "verificationPage_emailVerificationErrorMsg": "Kullanıcı doğrulaması tamamlanamadı!",
+    "verificationPage_sendMailErrorMsg": "Doğrulama e-postası gönderilemedi!\nLütfen yeniden deneyin.",
+    "verificationPage_sendAgainBtn": "Yeniden gönderi",
+    "verificationPage_weolcomeTitle": "QR Coder'a Hoşgeldiniz!",
+    "verificationPage_sendAgainMsg": "Yeni bir doğrulama e-postası gönderildi. Lütfen 24 saat içinde doğrulayın.",
+
+    "forgotPasswordPage_description": "Lütfen sıfırlama isteğiniz için e-posta adresinizi girin.",
+    "forgotPasswordPage_emailValidatorError": "Lütfen geçerli bir e-posta girin",
+    "forgotPasswordPage_emailValidator": "Lütfen bir e-posta girin",
+    "forgotPasswordPage_textFieldLabelText": "E-posta",
+    "forgotPasswordPage_textFieldHintText": "E-postanızı girin",
+    "forgotPasswordPage_sendEmailSuccessMsg": "Parola sıfırlama e-postası gönderildi.\nGiriş sayfasına yönlendiriliyorsunuz.",
+    "forgotPasswordPage_sendMailErrorMsg": "Parola sıfırlama e-postası gönderilemedi!\nLütfen yeniden deneyin.",
+    "forgotPasswordPage_btnSend": "Gönder",
+
+    "scannerPage_title": "Barkod Tarayıcısı",
+    "scannerPage_cleanScannedListBtn": "Temizle",
+    "scannerPage_emptyScannedList": "Bir şeyler tarayın!",
+    "scannerPage_scannedData": "Taranan veri",
+    "scannerPage_unkonwnBarcode": "Tanımlanamayan barkod",
+    "scannerPage_savedToListMsg": "QR kodu listeye kaydedildi",
+    "scannerPage_saveErrorMsg": "QR kod kaydedilemedi!",
+    "scannerErrorWidget_controllerUninitialized": "Denetleyici hazır değil.",
+    "scannerErrorWidget_permissionDenied": "İzin reddedildi",
+    "scannerErrorWidget_unsupported": "Tarayıcı bu cihazda desteklenmiyor.",
+    "scannerErrorWidget_unknown": "Genel Hata. Lütfen tekrar deneyin.",
+    "scannerPage_cameraStartError": "Kamera başlatılamadı. Lütfen tekrar deneyin.",
+    "scannerPage_refreshBtnToolTip": "Kamerayı Yenile",
+
+    "wrapper_LoginPageToolTip": "Beklenmeyen Bir Hata oluştu!",
+    "qrcodeDisplay_pageTitle": "A a! Bir şeyler ters gitti..."
+
+
+
+}

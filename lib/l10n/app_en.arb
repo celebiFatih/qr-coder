@@ -1,0 +1,158 @@
+{
+    "@@locale": "en",
+    "language": "EN",
+    "login_WelcomeText": "Welcome to QR Coder!",
+    "login_DescriptionText": "Please enter your email and password to continue.",
+    "login_label_email": "Email",
+    "login_label_password": "Password",
+    "login_hint_email": "Enter your email",
+    "login_hint_password": "Enter your password",
+    "login_LoginOrRegisterToggle": "Don't have an account? ",
+    "login_LoginOrRegisterToggleAlreadyHaveAccount": "Already have an account. ",
+    "login_GuestAccessButton": "Continue without an account",
+    "login_RememberMeCheckbox": "Remember me",
+    "login_SubmitButtonLogIn": "Sign in",
+    "login_SubmitButtonRegister": "Register",
+    "login_ForgotPasswordButton": "Forgot password",
+    "login_emailValidatorError": "Please enter a valid email",
+    "login_emailValidator": "Please enter an email",
+    "login_passwordValidator": "Please enter a password",
+    "login_passwordValidatorError": "Password must be at least 6 characters long",
+    "login_emailAlreadyRegistered": "This email is already registered!",
+    "login_createUserErrorMsg": "Failed to create user!",
+    "login_signInErrorMsg": "Failed to sign in!",
+    "login_signInSuccessMsg": "Sign in successful!",
+    "login_invalidCredentialsErrMsg": "User not found!",
+
+
+
+    "qrCodeGenerator_FabSemantic": "QR Code Generator Button",
+    "qrCodeGenerator_FabToolTip": "Generate QR Code",
+    "qrCodeGenerator_LogOutToolTip": "Log Out",
+    "qrCodeGenerator_LogOutErrorMsg": "Failed to log out!",
+    "qrCodeGenerator_userType": "Guest",
+    "qrCodeGenerator_textSemantic": "Text field for entering data to be encoded",
+    "qrCodeGenerator_qrCodeSemantic": "QR Code Preview",
+    "qrCodeGenerator_receiveErrorMsg": "Failed to receive data!",
+    "qrCodeGenerator_sharedData": "Shared data",
+    "qrCodeGenerator_savePermissionErrorMsg": "Storage permission required!",
+    "qrCodeGenerator_saveErrorMsg": "Failed to save QR Code!",
+    "qrCodeGenerator_saveToDbErrorMsg": "Failed to save QR Code to database!",
+    "qrCodeGenerator_sharedTitle": "Here is your QR Code",
+    "qrCodeGenerator_sharedErrorMsg": "Failed to share QR Code!",
+    "qrCodeGenerator_dataEmptyMsg": "Please enter some text to generate a QR Code!",
+    "qrCodeGenerator_qrCodeDefaultTitle": "QR Code",
+    "qrCodeGenerator_qrCodeGeneratorErrMsg": "Failed to generate QR Code!",
+    "qrCodeGenerator_startScanningToolTip": "Start Barcode Scanner",
+    "qrcodeGenerator_qrCodeListToolTip": "Saved QR Codes",
+    "qrCodeGenerator_textFieldHintText": "Enter some text to generate a QR Code",
+    "qrCodeGenerator_dataTooLongErrMsg": "Text is too long!",
+    "qrCodeGenerator_qrCode": "QR Code",
+
+
+    "qrCodeList_title": "Saved QR Codes",
+    "qrCodeList_deleteAllBtn": "Delete All",
+    "qrCodeList_selectAllBtn": "Select All",
+    "qrCodeList_deleteSelectedBtn": "Delete Selected",
+    "qrCodeList_editBtn": "Edit",
+    "qrCodeList_deleteBtn": "Delete",
+    "qrCodeList_defaultQrCode": "Welcome to QR Coder!",
+    "qrCodeList_fetchListErrorMsg": "Failed to fetch QR Code list!",
+    "qrCodeList_emptyList": "QR Code list is empty...",
+    "qrCodeList_updateDescriptionErrorMsg": "Failed to update QR Code description!",
+    "qrCodeList_deleteAllErrorMsg": "Failed to delete all QR Codes!",
+    "qrCodeList_deleteErrorMsg": "Failed to delete QR Code!",
+    "qrCodeList_qrCodeTitle": "QR Code: {qrCode}",
+    "@qrCodeList_qrCodeTitle": {
+        "placeholders": {
+            "qrCode": {
+                "type": "String",
+                "example": "QR Code"
+            }
+        }
+    },
+
+
+    "qrCodeDetail_Details": "Details",
+    "qrCodeDetail_wifiInfo": "Wi-Fi Information",
+    "qrCodeDetail_wifiPassw": "Password: {password}",
+    "@qrCodeDetail_wifiPassw": {
+        "placeholders": {
+            "password": {
+                "type": "String",
+                "example": "12345678"
+            }
+        }
+    },
+    "qrCodeDetail_wifiEncryption": "Encryption: {encryption}",
+    "@qrCodeDetail_wifiEncryption": {
+        "placeholders": {
+            "encryption": {
+                "type": "String",
+                "example": "WPA2"
+            }
+        }
+    },
+    "qrCodeDetail_wifiHidden": "Hidden: {hidden}",
+    "@qrCodeDetail_wifiHidden": {
+        "placeholders": {
+            "hidden": {
+                "type": "String",
+                "example": "false"
+            }
+        }
+    },
+    "qrCodeDetail_wifiConnectTextBtn": "Connect",
+    "qrCodeDetail_OpenWifiSettingsButton": "Open Wi-Fi Settings",
+    "qrCodeDetail_CreatedAt": "Created At",    
+    "qrCodeDetail_homePageNavToolTip": "Home Page",
+    "qrCodeDetail_listPageNavToolTip": "Saved QR Codes",
+    "qrCodeDetail_createdDateTime": "Created At: {createdAt}",
+    "@qrCodeDetail_createdDateTime": {
+        "placeholders": {
+            "createdAt": {
+                "type": "String",
+                "example": "2023-03-23 12:00:00"
+            }
+        }
+    },
+    "qrCodeDetail_saveQrCodeButtonToolTip": "Save QR Code",
+    "qrCodeDetail_saveSuccessMsg": "QR Code saved successfully!",
+    "qrCodeDetail_openSavedQrCode": "Open",
+    "qrCodeDetail_shareQrCodeBtnToolTip": "Share QR Code",
+
+    "verificationPage_description": "Please enter your email and password to continue.",
+    "verificationPage_emailVerifiedMsg": "User verification completed!\nWelcome to QR Coder!",
+    "verificationPage_emailVerificationErrorMsg": "User verification failed!",
+    "verificationPage_sendMailErrorMsg": "Failed to send verification email!\nPlease try again.",
+    "verificationPage_sendAgainBtn": "Send Again",
+    "verificationPage_welcomeTitle": "Welcome to QR Coder!",
+    "verificationPage_sendAgainMsg": "New verification email sent. Please verify your account within 24 hours.",
+
+    "forgotPasswordPage_description": "Please enter your email to reset your password.",
+    "forgotPasswordPage_emailValidatorError": "Please enter a valid email",
+    "forgotPasswordPage_emailValidator": "Please enter an email",
+    "forgotPasswordPage_textFieldLabelText": "Email",
+    "forgotPasswordPage_textFieldHintText": "Enter your email",
+    "forgotPasswordPage_sendMailErrorMsg": "Failed to send password reset email!\nPlease try again.",
+    "forgotPasswordPage_sendEmailSuccessMsg": "Password reset email sent.\nYou are directed to the login page.",
+    "forgotPasswordPage_btnSend": "Send",
+
+    "scannerPage_title": "Barcode Scanner",
+    "scannerPage_cleanScannedListBtn": "Clean",
+    "scannerPage_emptyScannedList": "Let's scan something!",
+    "scannerPage_scannedData": "Saved QR codes",
+    "scannerPage_unkonwnBarcode": "Unknown Barcode",
+    "scannerPage_savedToListMsg": "QR Code saved successfully!",
+    "scannerPage_saveErrorMsg": "Failed to save QR Code!",
+    "scannerErrorWidget_controllerUninitialized": "Controller is not ready.",
+    "scannerErrorWidget_permissionDenied": "Permission denied",
+    "scannerErrorWidget_unsupported": "Browser does not support this device.",
+    "scannerErrorWidget_unknown": "Unknown Error. Please try again.",
+    "scannerPage_cameraStartError": "Camera could not be started. Please try again.",
+    "scannerPage_refreshBtnToolTip": "Refresh Camera",
+
+    "wrapper_LoginPageToolTip": "Unexpected Error Occurred!",
+    "qrcodeDisplay_pageTitle": "A a! Bir şeyler ters gitti..."
+
+}
