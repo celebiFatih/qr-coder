@@ -17,8 +17,6 @@
 
 ---
 
-### Screenshots
-
 <p align="center">
   <img src="https://github.com/celebiFatih/qr-coder/blob/main/screenshots/1.png?raw=true" width="200" />
   <img src="https://github.com/celebiFatih/qr-coder/blob/main/screenshots/8.png?raw=true" width="200" />
