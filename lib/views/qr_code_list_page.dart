@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_coder/models/qr_code_model.dart';
-import 'package:qr_coder/repository/main_qrcode_rapository.dart';
+import 'package:qr_coder/repository/main_qrcode_repository.dart';
 import 'package:qr_coder/services/auth_service.dart';
 import 'package:qr_coder/viewmodels/qr_code_list_page_viewmodel.dart';
 import 'package:qr_coder/views/qr_code_detail_page.dart';

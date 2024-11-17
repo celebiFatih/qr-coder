@@ -9,7 +9,7 @@ import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_coder/models/qr_code_model.dart';
-import 'package:qr_coder/repository/main_qrcode_rapository.dart';
+import 'package:qr_coder/repository/main_qrcode_repository.dart';
 import 'package:qr_coder/utils/constants.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
