@@ -27,6 +27,7 @@ class QRCodeViewModel extends ChangeNotifier {
   QRCodeModel? qrCodeModel;
   List<QRCodeModel> qrCodes = [];
   String errorMsg = '';
+  double _selectedResolution = 2.0;
 
   QRCodeViewModel({required bool isFirebaseUser, required String? uid})
       : repository =
@@ -50,6 +51,14 @@ class QRCodeViewModel extends ChangeNotifier {
     controller.dispose();
     focusNode.dispose();
     super.dispose();
+  }
+
+  double get selectedResolution => _selectedResolution;
+  set selectedResolution(double value) {
+    if (_selectedResolution != value) {
+      _selectedResolution = value;
+      notifyListeners();
+    }
   }
 
   /// Receive the shared text
@@ -78,11 +87,13 @@ class QRCodeViewModel extends ChangeNotifier {
   }
 
   /// Save the QR code to the device
-  Future<String?> saveQrCode(GlobalKey repaintKey, BuildContext context) async {
+  Future<String?> saveQrCode(
+      GlobalKey repaintKey, BuildContext context, double pixelRatio) async {
     errorMsg = '';
     isDownloading = true;
     String filePath = '';
     notifyListeners();
+
     try {
       final plugin = DeviceInfoPlugin();
       final androidInfo = await plugin.androidInfo;
@@ -110,7 +121,7 @@ class QRCodeViewModel extends ChangeNotifier {
       // Catch the QR code and save it
       final boundary = repaintKey.currentContext!.findRenderObject()
           as RenderRepaintBoundary;
-      final image = await boundary.toImage();
+      final image = await boundary.toImage(pixelRatio: pixelRatio);
       final byteData = await image.toByteData(format: ImageByteFormat.png);
       final pngBytes = byteData!.buffer.asUint8List();
 

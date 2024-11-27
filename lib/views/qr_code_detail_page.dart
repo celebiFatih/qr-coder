@@ -116,9 +116,12 @@ class QRCodeDetailPage extends StatelessWidget {
                 tooltip: AppLocalizations.of(context)!
                     .qrCodeDetail_saveQrCodeButtonToolTip,
                 onPressed: () async {
-                  final filePath =
-                      await viewModel.saveQrCode(repaintKey, context);
-                  _handleSaveResult(context, viewModel, filePath);
+                  _showResolutionPicker(context,
+                      (double selectedResolution) async {
+                    final filePath = await viewModel.saveQrCode(
+                        repaintKey, context, selectedResolution);
+                    _handleSaveResult(context, viewModel, filePath);
+                  });
                 },
                 child: const Icon(Icons.save_alt_rounded),
               );
@@ -186,5 +189,101 @@ class QRCodeDetailPage extends StatelessWidget {
         ),
       );
     }
+  }
+
+  void _showResolutionPicker(
+      BuildContext context, Function(double) onDownload) {
+    List<double> resolutions = [1.0, 2.0, 3.0]; // Çözünürlük seçenekleri
+    double selectedResolution = 2.0; // Varsayılan çözünürlük
+    List<String> resolutionLabels = [
+      AppLocalizations.of(context)!.qrCodeDetail_resolutionStandard,
+      AppLocalizations.of(context)!.qrCodeDetail_resolutionHigh,
+      AppLocalizations.of(context)!.qrCodeDetail_resolutionUltra
+    ];
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Theme.of(context).colorScheme.secondary,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                AppLocalizations.of(context)!.qrCodeDetail_resolution,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+              ),
+              Divider(
+                color: Theme.of(context).colorScheme.onSurface,
+                thickness: 1.0,
+                indent: 16.0, // Başlangıç boşluğu
+                endIndent: 16.0, // Bitiş boşluğu
+              ),
+              Consumer<QRCodeViewModel>(
+                builder: (context, viewModel, child) {
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: resolutions.length,
+                    itemBuilder: (context, index) {
+                      final resolution = resolutions[index];
+                      final isSelected =
+                          resolution == viewModel.selectedResolution;
+
+                      return Card(
+                        margin: const EdgeInsets.symmetric(vertical: 5),
+                        child: ListTile(
+                          onTap: () {
+                            viewModel.selectedResolution = resolution;
+                          },
+                          tileColor: isSelected
+                              ? Theme.of(context).colorScheme.primaryContainer
+                              : Theme.of(context).colorScheme.surface,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          title: Text(
+                            resolutionLabels[index],
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge
+                                ?.copyWith(
+                                  color: isSelected
+                                      ? Theme.of(context)
+                                          .colorScheme
+                                          .onPrimaryContainer
+                                      : Theme.of(context).colorScheme.onSurface,
+                                ),
+                          ),
+                          trailing: isSelected
+                              ? ElevatedButton.icon(
+                                  label: Text(AppLocalizations.of(context)!
+                                      .qrCodeDetail_download),
+                                  icon: const Icon(
+                                      Icons.download_for_offline_rounded),
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                    onDownload(selectedResolution);
+                                  },
+                                  style:
+                                      ElevatedButton.styleFrom(elevation: 4.0),
+                                )
+                              : null,
+                        ),
+                      );
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }

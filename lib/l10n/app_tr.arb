@@ -113,10 +113,15 @@
             }
         }
     },
-    "qrCodeDetail_saveQrCodeButtonToolTip": "İndir",
+    "qrCodeDetail_saveQrCodeButtonToolTip": "QR kodu indir",
     "qrCodeDetail_saveSuccessMsg": "QR kodu başarılı bir şekilde indirildi!",
     "qrCodeDetail_openSavedQrCode": "Aç",
     "qrCodeDetail_shareQrCodeBtnToolTip": "Paylaş",
+    "qrCodeDetail_resolution": "Çözünürlük",
+    "qrCodeDetail_download": "İndir",
+    "qrCodeDetail_resolutionStandard": "Standart Çözünürlük",
+    "qrCodeDetail_resolutionHigh": "Yüksek Çözünürlük",    
+    "qrCodeDetail_resolutionUltra": "Ultra Çözünürlük",
 
     "verificationPage_description": "Doğrulama Bekleniyor.\nLütfen e-postanızı kontrol edin.",
     "verificationPage_emailVerifiedMsg": "Kullanıcı doğrulaması tamamlandı!\nQR Coder'a Hoşgeldiniz!",

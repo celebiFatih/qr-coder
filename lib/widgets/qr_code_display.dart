@@ -17,6 +17,8 @@ class QRcodeDisplay extends StatelessWidget {
         data: data,
         version: QrVersions.auto,
         size: MediaQuery.of(context).size.width * 0.6,
+        embeddedImage: const AssetImage('assets/img/logo.png'),
+        embeddedImageStyle: const QrEmbeddedImageStyle(size: Size(80, 80)),
         errorStateBuilder: (cxt, err) {
           return Center(
             child: Text(
