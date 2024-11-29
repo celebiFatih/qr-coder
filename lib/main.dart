@@ -13,9 +13,11 @@ import 'package:qr_coder/viewmodels/barcode_scanner_viewmodel.dart';
 import 'package:qr_coder/viewmodels/forgot_passw_page_viewmodel.dart';
 import 'package:qr_coder/viewmodels/lcoale_provider.dart';
 import 'package:qr_coder/viewmodels/login_page_viewmodel.dart';
+import 'package:qr_coder/viewmodels/qr_code_display_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_list_page_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_viewmodel.dart';
 import 'package:qr_coder/viewmodels/verification_page_viewmodel.dart';
+import 'package:qr_coder/widgets/award_winning_ad_widget.dart';
 import 'package:qr_coder/widgets/theme_data.dart';
 import 'package:qr_coder/widgets/wrapper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -24,6 +26,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await dotenv.load(fileName: '.env');
+  final rewardedAdService = RewardedAdService();
   unawaited(MobileAds.instance.initialize());
   runApp(
     MultiProvider(
@@ -46,6 +49,8 @@ Future<void> main() async {
         ChangeNotifierProvider(
             create: (context) => VerificationPageViewModel()),
         ChangeNotifierProvider(create: (context) => ForgotPasswPageViewmodel()),
+        ChangeNotifierProvider(
+            create: (context) => QRCodeDisplayViewModel(rewardedAdService)),
       ],
       child: const MainApp(),
     ),

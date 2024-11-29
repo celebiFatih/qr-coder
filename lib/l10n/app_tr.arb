@@ -128,7 +128,7 @@
     "verificationPage_emailVerificationErrorMsg": "Kullanıcı doğrulaması tamamlanamadı!",
     "verificationPage_sendMailErrorMsg": "Doğrulama e-postası gönderilemedi!\nLütfen yeniden deneyin.",
     "verificationPage_sendAgainBtn": "Yeniden gönderi",
-    "verificationPage_weolcomeTitle": "QR Coder'a Hoşgeldiniz!",
+    "verificationPage_welcomeTitle": "QR Coder'a Hoşgeldiniz!",
     "verificationPage_sendAgainMsg": "Yeni bir doğrulama e-postası gönderildi. Lütfen 24 saat içinde doğrulayın.",
 
     "forgotPasswordPage_description": "Lütfen sıfırlama isteğiniz için e-posta adresinizi girin.",
@@ -156,7 +156,4 @@
 
     "wrapper_LoginPageToolTip": "Beklenmeyen Bir Hata oluştu!",
     "qrcodeDisplay_pageTitle": "A a! Bir şeyler ters gitti..."
-
-
-
 }

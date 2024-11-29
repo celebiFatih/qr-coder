@@ -104,7 +104,6 @@
     },
     "qrCodeDetail_wifiConnectTextBtn": "Connect",
     "qrCodeDetail_OpenWifiSettingsButton": "Open Wi-Fi Settings",
-    "qrCodeDetail_CreatedAt": "Created At",    
     "qrCodeDetail_homePageNavToolTip": "Home Page",
     "qrCodeDetail_listPageNavToolTip": "Saved QR Codes",
     "qrCodeDetail_createdDateTime": "Created At: {createdAt}",
