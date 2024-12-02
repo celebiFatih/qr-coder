@@ -135,14 +135,12 @@ class _VerificationPageState extends State<VerificationPage> {
         ),
         child: Padding(
           padding: const EdgeInsets.all(10.0),
-          child: viewModel.isLoading
-              ? const CircularProgressIndicator()
-              : Text(
-                  AppLocalizations.of(context)!.verificationPage_sendAgainBtn,
-                  style: isSmallScreen
-                      ? Theme.of(context).textTheme.bodyLarge
-                      : Theme.of(context).textTheme.headlineSmall,
-                ),
+          child: Text(
+            AppLocalizations.of(context)!.verificationPage_sendAgainBtn,
+            style: isSmallScreen
+                ? Theme.of(context).textTheme.bodyLarge
+                : Theme.of(context).textTheme.headlineSmall,
+          ),
         ),
         onPressed: () => _handleSendVerification(context, viewModel),
       ),
@@ -176,8 +174,12 @@ class _VerificationPageState extends State<VerificationPage> {
   }
 
   Widget _buildVerificationIndicator(VerificationPageViewModel viewModel) {
-    return viewModel.isLoading
-        ? const CircularProgressIndicator()
-        : const Icon(Icons.mark_email_unread_outlined, size: 100);
+    return !viewModel.emailVerified
+        ? CircularProgressIndicator(
+            color: Theme.of(context).colorScheme.onSecondaryContainer,
+            strokeWidth: 3.0,
+            // strokeAlign: -5,
+          )
+        : const Icon(Icons.done_all_rounded, size: 100);
   }
 }

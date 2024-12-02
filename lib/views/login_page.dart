@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_coder/utils/constants.dart';
-import 'package:qr_coder/viewmodels/lcoale_provider.dart';
+import 'package:qr_coder/viewmodels/locale_provider.dart';
 import 'package:qr_coder/viewmodels/login_page_viewmodel.dart';
 import 'package:qr_coder/views/forgot_passw_page.dart';
 import 'package:qr_coder/views/qr_code_generator_page.dart';
@@ -230,20 +230,34 @@ class LoginPage extends StatelessWidget {
             },
           ),
         ),
-        onPressed: () async => await _loginControl(viewModel, context),
+        onPressed: () async {
+          // "Giriş yapılamadı!"
+
+          await _loginControl(viewModel, context);
+        },
       ),
     );
   }
 
   Future<void> _loginControl(
-      LoginPageViewmodel viewModel, BuildContext context) async {
+    LoginPageViewmodel viewModel,
+    BuildContext context,
+  ) async {
     final scaffoldContext = ScaffoldMessenger.of(context);
     final navigatorContext = Navigator.of(context);
+    final emailNotVerifiedMsg = AppLocalizations.of(context)!
+        .login_emailNotVerifiedMsg; // "E-posta doğrulaması yapılmadı. Lütfen e-postanızı kontrol edin."
+    final signInErrorMsg = AppLocalizations.of(context)!.login_signInErrorMsg;
+    final sendVerificationEmailMsg = AppLocalizations.of(context)!
+        .verificationPage_sendAgainMsg; // "Kullanıcı doğrulaması tamamlanamadı!"
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
     if (_formKey.currentState?.validate() ?? false) {
       if (!viewModel.isLogin) {
-        await viewModel.signIn(context);
+        await viewModel.signIn(
+            context, emailNotVerifiedMsg, signInErrorMsg, scaffoldMessenger);
       } else {
-        await viewModel.createUser(context);
+        await viewModel.createUser(
+            context, scaffoldMessenger, sendVerificationEmailMsg);
       }
       if (viewModel.errorMsg.isNotEmpty) {
         scaffoldContext.showSnackBar(

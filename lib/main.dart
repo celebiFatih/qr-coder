@@ -9,14 +9,16 @@ import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_coder/services/auth_service.dart';
 import 'package:qr_coder/services/firebase_options.dart';
+import 'package:qr_coder/utils/constants.dart';
 import 'package:qr_coder/viewmodels/barcode_scanner_viewmodel.dart';
 import 'package:qr_coder/viewmodels/forgot_passw_page_viewmodel.dart';
-import 'package:qr_coder/viewmodels/lcoale_provider.dart';
+import 'package:qr_coder/viewmodels/locale_provider.dart';
 import 'package:qr_coder/viewmodels/login_page_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_display_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_list_page_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_viewmodel.dart';
 import 'package:qr_coder/viewmodels/verification_page_viewmodel.dart';
+import 'package:qr_coder/views/verification_page.dart';
 import 'package:qr_coder/widgets/award_winning_ad_widget.dart';
 import 'package:qr_coder/widgets/theme_data.dart';
 import 'package:qr_coder/widgets/wrapper.dart';
@@ -26,6 +28,8 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await dotenv.load(fileName: '.env');
+  final prefs = await Constants().prefs;
+  final isVerificationPending = prefs.getBool('isVerificationPending') ?? false;
   final rewardedAdService = RewardedAdService();
   unawaited(MobileAds.instance.initialize());
   runApp(
@@ -52,13 +56,16 @@ Future<void> main() async {
         ChangeNotifierProvider(
             create: (context) => QRCodeDisplayViewModel(rewardedAdService)),
       ],
-      child: const MainApp(),
+      child: MainApp(
+        initialRoute:
+            isVerificationPending ? const VerificationPage() : const Wrapper(),
+      ),
     ),
   );
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key});
+  const MainApp({super.key, required initialRoute});
 
   @override
   Widget build(BuildContext context) {

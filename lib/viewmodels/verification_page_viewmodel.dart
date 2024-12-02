@@ -38,13 +38,22 @@ class VerificationPageViewModel extends ChangeNotifier {
       isLoading = true;
       notifyListeners();
       await Auth().sendEmailVerification();
-      isLoading = false;
-      notifyListeners();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            AppLocalizations.of(context)!
+                .verificationPage_verificationEmailResentMsg,
+            textAlign:
+                TextAlign.center, // "Doğrulama bağlantısı tekrar gönderildi."
+          ),
+        ),
+      );
     } catch (e) {
-      isLoading = false;
       errorMessage =
           AppLocalizations.of(context)!.verificationPage_sendMailErrorMsg;
       print(e);
+    } finally {
+      isLoading = false;
       notifyListeners();
     }
   }

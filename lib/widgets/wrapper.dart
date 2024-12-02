@@ -56,10 +56,14 @@ class _WrapperState extends State<Wrapper> {
           );
         } else {
           if (snapshot.hasData) {
-            if (snapshot.data!.emailVerified) {
+            final user = snapshot.data!;
+            if (user.emailVerified) {
               return const QRCodeGenerator();
+            } else {
+              // Kullanıcı doğrulama aşamasında ise durumu kaydet
+              _saveVerificationState(true);
+              return const VerificationPage();
             }
-            return const VerificationPage();
           } else if (isGuest) {
             return const QRCodeGenerator();
           } else {
@@ -68,5 +72,10 @@ class _WrapperState extends State<Wrapper> {
         }
       },
     );
+  }
+
+  Future<void> _saveVerificationState(bool isVerificationPending) async {
+    final prefs = await Constants().prefs;
+    await prefs.setBool('isVerificationPending', isVerificationPending);
   }
 }

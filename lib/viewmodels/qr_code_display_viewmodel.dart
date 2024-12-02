@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:qr_coder/widgets/award_winning_ad_widget.dart';
 
 class QRCodeDisplayViewModel extends ChangeNotifier {
   bool _isLogoRemoved = false;
   // RewardedAd? _rewardedAd;
-  bool _isAdReady = false;
+  // bool _isAdReady = false;
   final RewardedAdService _rewardedAdService;
 
   bool get isLogoRemoved => _isLogoRemoved;
