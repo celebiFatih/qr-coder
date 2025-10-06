@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/widgets/award_winning_ad_widget.dart';
