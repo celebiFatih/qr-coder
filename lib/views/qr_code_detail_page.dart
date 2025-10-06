@@ -1,34 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/models/qr_code_model.dart';
 import 'package:qr_coder/viewmodels/qr_code_viewmodel.dart';
 import 'package:qr_coder/views/qr_code_list_page.dart';
 import 'package:qr_coder/widgets/banner_ad_widget.dart';
 import 'package:qr_coder/widgets/build_content.dart';
 import 'package:qr_coder/widgets/qr_code_display.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-class QRCodeDetailPage extends StatelessWidget {
+class QRCodeDetailPage extends StatefulWidget {
   final QRCodeModel qrCode;
   const QRCodeDetailPage({super.key, required this.qrCode});
 
   @override
+  State<QRCodeDetailPage> createState() => _QRCodeDetailPageState();
+}
+
+class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
+  final GlobalKey repaintKey = GlobalKey();
+
+  @override
   Widget build(BuildContext context) {
-    final GlobalKey repaintKey = GlobalKey();
     final viewModel = Provider.of<QRCodeViewModel>(context, listen: false);
-    repaintKey.currentContext?.findRenderObject()?.dispose();
 
     return Scaffold(
       appBar: _buildAppBar(context),
-      body: _buildBody(context, repaintKey),
-      floatingActionButton: _buildFabs(context, repaintKey, viewModel),
+      body: _buildBody(context),
+      floatingActionButton: _buildFabs(context, viewModel),
     );
   }
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
-      title: Text(qrCode.name),
+      title: Text(widget.qrCode.name),
       actions: [
         IconButton(
           onPressed: () =>
@@ -48,15 +53,15 @@ class QRCodeDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildBody(BuildContext context, GlobalKey repaintKey) {
+  Widget _buildBody(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _buildQRCodeCard(context, repaintKey),
+          _buildQRCodeCard(context),
           const SizedBox(height: 16),
-          Expanded(flex: 3, child: BuildContent(qrCode: qrCode)),
+          Expanded(flex: 3, child: BuildContent(qrCode: widget.qrCode)),
           const SizedBox(height: 8),
           _buildCreateDateTime(context),
           const BannerAdWidget(),
@@ -65,48 +70,48 @@ class QRCodeDetailPage extends StatelessWidget {
     );
   }
 
-  Widget _buildQRCodeCard(BuildContext context, GlobalKey repaintKey) {
+  Widget _buildQRCodeCard(BuildContext context) {
     return Center(
       child: Hero(
-        tag: qrCode,
+        tag: widget.qrCode,
         child: Card(
             elevation: 8,
             child: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: QRcodeDisplay(data: qrCode.data, repaintKey: repaintKey),
+              child: QRcodeDisplay(
+                  data: widget.qrCode.data, repaintKey: repaintKey),
             )),
       ),
     );
   }
 
   Widget _buildCreateDateTime(BuildContext context) {
+    final created =
+        DateFormat('dd.MM.yyyy HH:mm').parse(widget.qrCode.createdAt);
+    final isEn = AppLocalizations.of(context)!.localeName == 'en';
+    final fmt =
+        isEn ? DateFormat('MM.dd.yyyy HH:mm') : DateFormat('dd.MM.yyyy HH:mm');
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text(AppLocalizations.of(context)!.qrCodeDetail_createdDateTime(
-            AppLocalizations.of(context)!.localeName == 'en'
-                ? DateFormat('MM.dd.yyyy HH:mm').format(
-                    DateFormat('dd.MM.yyyy HH:mm').parse(qrCode.createdAt))
-                : DateFormat('dd.MM.yyyy HH:mm').format(
-                    DateFormat('dd.MM.yyyy HH:mm').parse(qrCode.createdAt)))),
+        Text(AppLocalizations.of(context)!
+            .qrCodeDetail_createdDateTime(fmt.format(created))),
       ],
     );
   }
 
-  Widget _buildFabs(
-      BuildContext context, GlobalKey repaintKey, QRCodeViewModel viewModel) {
+  Widget _buildFabs(BuildContext context, QRCodeViewModel viewModel) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        _buildSaveButton(context, repaintKey, viewModel),
+        _buildSaveButton(context, viewModel),
         const SizedBox(height: 16),
-        _buildShareButton(context, repaintKey, viewModel),
+        _buildShareButton(context, viewModel),
       ],
     );
   }
 
-  Widget _buildSaveButton(
-      BuildContext context, GlobalKey repaintKey, QRCodeViewModel viewModel) {
+  Widget _buildSaveButton(BuildContext context, QRCodeViewModel viewModel) {
     return Consumer<QRCodeViewModel>(
       builder: (context, value, child) {
         return value.isDownloading
@@ -119,7 +124,10 @@ class QRCodeDetailPage extends StatelessWidget {
                   _showResolutionPicker(context,
                       (double selectedResolution) async {
                     final filePath = await viewModel.saveQrCode(
-                        repaintKey, context, selectedResolution);
+                      repaintKey,
+                      context,
+                      viewModel.selectedResolution, // gerçekten seçilen
+                    );
                     _handleSaveResult(context, viewModel, filePath);
                   });
                 },
@@ -161,8 +169,7 @@ class QRCodeDetailPage extends StatelessWidget {
     }
   }
 
-  Widget _buildShareButton(
-      BuildContext context, GlobalKey repaintKey, QRCodeViewModel viewModel) {
+  Widget _buildShareButton(BuildContext context, QRCodeViewModel viewModel) {
     return Consumer<QRCodeViewModel>(
       builder: (context, value, child) {
         return value.isSharing
@@ -192,13 +199,14 @@ class QRCodeDetailPage extends StatelessWidget {
   }
 
   void _showResolutionPicker(
-      BuildContext context, Function(double) onDownload) {
-    List<double> resolutions = [1.0, 2.0, 3.0]; // Çözünürlük seçenekleri
-    double selectedResolution = 2.0; // Varsayılan çözünürlük
-    List<String> resolutionLabels = [
+    BuildContext context,
+    Function(double) onDownload,
+  ) {
+    final resolutions = [1.0, 2.0, 3.0];
+    final labels = [
       AppLocalizations.of(context)!.qrCodeDetail_resolutionStandard,
       AppLocalizations.of(context)!.qrCodeDetail_resolutionHigh,
-      AppLocalizations.of(context)!.qrCodeDetail_resolutionUltra
+      AppLocalizations.of(context)!.qrCodeDetail_resolutionUltra,
     ];
 
     showModalBottomSheet(
@@ -208,7 +216,7 @@ class QRCodeDetailPage extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (context) {
-        return Container(
+        return Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -226,21 +234,18 @@ class QRCodeDetailPage extends StatelessWidget {
                 endIndent: 16.0, // Bitiş boşluğu
               ),
               Consumer<QRCodeViewModel>(
-                builder: (context, viewModel, child) {
+                builder: (context, vm, child) {
                   return ListView.builder(
                     shrinkWrap: true,
                     itemCount: resolutions.length,
                     itemBuilder: (context, index) {
-                      final resolution = resolutions[index];
-                      final isSelected =
-                          resolution == viewModel.selectedResolution;
+                      final res = resolutions[index];
+                      final isSelected = res == vm.selectedResolution;
 
                       return Card(
                         margin: const EdgeInsets.symmetric(vertical: 5),
                         child: ListTile(
-                          onTap: () {
-                            viewModel.selectedResolution = resolution;
-                          },
+                          onTap: () => vm.selectedResolution = res,
                           tileColor: isSelected
                               ? Theme.of(context).colorScheme.primaryContainer
                               : Theme.of(context).colorScheme.surface,
@@ -248,7 +253,7 @@ class QRCodeDetailPage extends StatelessWidget {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           title: Text(
-                            resolutionLabels[index],
+                            labels[index],
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyLarge
@@ -268,10 +273,8 @@ class QRCodeDetailPage extends StatelessWidget {
                                       Icons.download_for_offline_rounded),
                                   onPressed: () {
                                     Navigator.of(context).pop();
-                                    onDownload(selectedResolution);
+                                    onDownload(vm.selectedResolution);
                                   },
-                                  style:
-                                      ElevatedButton.styleFrom(elevation: 4.0),
                                 )
                               : null,
                         ),

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/models/qr_code_model.dart';
 import 'package:qr_coder/repository/main_qrcode_repository.dart';
 import 'package:qr_coder/services/auth_service.dart';
@@ -10,7 +11,6 @@ import 'package:qr_coder/viewmodels/qr_code_list_page_viewmodel.dart';
 import 'package:qr_coder/views/qr_code_detail_page.dart';
 import 'package:qr_coder/widgets/banner_ad_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class QRCodeListPage extends StatelessWidget {
   const QRCodeListPage({super.key});

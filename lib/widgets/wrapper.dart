@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/services/auth_service.dart';
 import 'package:qr_coder/utils/constants.dart';
 import 'package:qr_coder/views/login_page.dart';
 import 'package:qr_coder/views/qr_code_generator_page.dart';
 import 'package:qr_coder/views/verification_page.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class Wrapper extends StatefulWidget {
   const Wrapper({super.key});
@@ -18,13 +18,17 @@ class Wrapper extends StatefulWidget {
 
 class _WrapperState extends State<Wrapper> {
   StreamSubscription<User?>? _authStateSubscription;
-  late bool isGuest;
+  bool isGuest = false;
+
+  // Aynı frame içinde tekrar tekrar yazmayı önlemek için:
+  bool _savedPendingTrue = false;
+  bool _savedPendingFalse = false;
 
   @override
   void initState() {
     super.initState();
-    _authStateSubscription = Auth().authStateChanges.listen((User? user) {
-      setState(() {});
+    _authStateSubscription = Auth().authStateChanges.listen((_) {
+      if (mounted) setState(() {});
     });
     _checkIfGuest();
   }
@@ -37,6 +41,7 @@ class _WrapperState extends State<Wrapper> {
 
   Future<void> _checkIfGuest() async {
     final prefs = await Constants().prefs;
+    if (!mounted) return;
     setState(() {
       isGuest = prefs.getBool('isGuest') ?? false;
     });
@@ -49,27 +54,37 @@ class _WrapperState extends State<Wrapper> {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
+        }
+        if (snapshot.hasError) {
           print(snapshot.error);
           return Center(
             child: Text(AppLocalizations.of(context)!.wrapper_LoginPageToolTip),
           );
-        } else {
-          if (snapshot.hasData) {
-            final user = snapshot.data!;
-            if (user.emailVerified) {
-              return const QRCodeGenerator();
-            } else {
-              // Kullanıcı doğrulama aşamasında ise durumu kaydet
-              _saveVerificationState(true);
-              return const VerificationPage();
+        }
+        if (snapshot.hasData) {
+          final user = snapshot.data!;
+          if (user.emailVerified) {
+            if (!_savedPendingFalse) {
+              _savedPendingFalse = true;
+              _savedPendingTrue = false;
+              WidgetsBinding.instance.addPostFrameCallback((_) async {
+                await _saveVerificationState(false);
+              });
             }
-          } else if (isGuest) {
             return const QRCodeGenerator();
           } else {
-            return LoginPage();
+            if (!_savedPendingTrue) {
+              _savedPendingTrue = true;
+              _savedPendingFalse = false;
+              WidgetsBinding.instance.addPostFrameCallback((_) async {
+                await _saveVerificationState(true);
+              });
+            }
+            return const VerificationPage();
           }
         }
+        if (isGuest) return const QRCodeGenerator();
+        return LoginPage();
       },
     );
   }

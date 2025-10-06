@@ -1,44 +1,93 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 class RewardedAdService {
   RewardedAd? _rewardedAd;
+  bool _isLoading = false;
 
-  void loadRewardedAd() {
-    RewardedAd.load(
-      adUnitId: dotenv.env['AWARD_WINNING_UNIT_ID'] ??
-          '', // AdMob'dan aldığınız reklam birimi ID
-      request: const AdRequest(),
-      rewardedAdLoadCallback: RewardedAdLoadCallback(
-        onAdLoaded: (ad) {
-          _rewardedAd = ad;
-          print('Ödüllü reklam yüklendi.');
-        },
-        onAdFailedToLoad: (error) {
-          print('Ödüllü reklam yüklenemedi: $error');
-        },
-      ),
-    );
+  /// Dışarıda UI göstermek için okunabilir durum
+  bool get isAdReady => _rewardedAd != null;
+  bool get isLoading => _isLoading;
+
+  Future<void> loadRewardedAd() async {
+    if (_isLoading || _rewardedAd != null) return;
+    _isLoading = true;
+    try {
+      await RewardedAd.load(
+        adUnitId: dotenv.env['AWARD_WINNING_UNIT_ID'] ?? '',
+        request: const AdRequest(),
+        rewardedAdLoadCallback: RewardedAdLoadCallback(
+          onAdLoaded: (ad) {
+            _rewardedAd = ad;
+            _isLoading = false;
+            debugPrint('Rewarded loaded');
+          },
+          onAdFailedToLoad: (error) {
+            _rewardedAd = null;
+            _isLoading = false;
+            debugPrint('Rewarded failed to load: $error');
+          },
+        ),
+      );
+    } catch (e) {
+      _isLoading = false;
+      debugPrint('Rewarded load exception: $e');
+    }
   }
 
-  void showRewardedAd(Function onRewardEarned) {
-    if (_rewardedAd != null) {
+  /// Reklamı gösterir; kullanıcı ödül kazanırsa true döner.
+  Future<bool> showRewardedAd() async {
+    if (_rewardedAd == null) {
+      // Yedek: hemen yeniden yüklemeyi dene
+      await loadRewardedAd();
+      if (_rewardedAd == null) {
+        return false; // hâlâ yok -> başarısız
+      }
+    }
+
+    final completer = Completer<bool>();
+    bool earned = false;
+
+    try {
       _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
-        onAdDismissedFullScreenContent: (ad) {
-          ad.dispose();
-          loadRewardedAd(); // Yeni bir reklam yükleyin
+        onAdShowedFullScreenContent: (ad) {
+          debugPrint('Rewarded showed');
         },
         onAdFailedToShowFullScreenContent: (ad, error) {
+          debugPrint('Rewarded failed to show: $error');
           ad.dispose();
-          print('Reklam gösterimi başarısız: $error');
+          _rewardedAd = null;
+          // Gösterim hatasında tekrar preload dene
+          unawaited(loadRewardedAd());
+          if (!completer.isCompleted) completer.complete(false);
+        },
+        onAdDismissedFullScreenContent: (ad) {
+          debugPrint('Rewarded dismissed');
+          ad.dispose();
+          _rewardedAd = null;
+          // Kullanıcı kapattı; ödül almadıysa earned=false kalır
+          unawaited(loadRewardedAd());
+          if (!completer.isCompleted) completer.complete(earned);
         },
       );
+
       _rewardedAd!.show(onUserEarnedReward: (ad, reward) {
-        onRewardEarned();
+        earned = true; // ödül anı
       });
-      _rewardedAd = null; // Reklamı sıfırlayın
-    } else {
-      print('Reklam hazır değil.');
+
+      // Ad nesnesini sıfırla; yeni bir tane yüklenecek
+      _rewardedAd = null;
+    } catch (e) {
+      debugPrint('Rewarded show exception: $e');
+      _rewardedAd?.dispose();
+      _rewardedAd = null;
+      unawaited(loadRewardedAd());
+      if (!completer.isCompleted) completer.complete(false);
     }
+
+    return completer.future;
   }
 }

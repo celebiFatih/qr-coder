@@ -1,6 +1,8 @@
 {
     "@@locale": "en",
     "language": "EN",
+    "yes": "Yes",
+    "no": "No",
     "login_WelcomeText": "Welcome to QR Coder!",
     "login_DescriptionText": "Please enter your email and password to continue.",
     "login_label_email": "Email",
@@ -24,9 +26,6 @@
     "login_signInErrorMsg": "Failed to sign in!",
     "login_signInSuccessMsg": "Sign in successful!",
     "login_invalidCredentialsErrMsg": "User not found!",
-
-
-
     "qrCodeGenerator_FabSemantic": "QR Code Generator Button",
     "qrCodeGenerator_FabToolTip": "Generate QR Code",
     "qrCodeGenerator_LogOutToolTip": "Log Out",
@@ -49,8 +48,6 @@
     "qrCodeGenerator_textFieldHintText": "Enter some text to generate a QR Code",
     "qrCodeGenerator_dataTooLongErrMsg": "Text is too long!",
     "qrCodeGenerator_qrCode": "QR Code",
-
-
     "qrCodeList_title": "Saved QR Codes",
     "qrCodeList_deleteAllBtn": "Delete All",
     "qrCodeList_selectAllBtn": "Select All",
@@ -72,8 +69,6 @@
             }
         }
     },
-
-
     "qrCodeDetail_Details": "Details",
     "qrCodeDetail_wifiInfo": "Wi-Fi Information",
     "qrCodeDetail_wifiPassw": "Password: {password}",
@@ -125,7 +120,6 @@
     "qrCodeDetail_resolutionStandard": "Standard Resolution",
     "qrCodeDetail_resolutionHigh": "High Resolution",
     "qrCodeDetail_resolutionUltra": "Ultra Resolution",
-
     "verificationPage_description": "Pending Verification.\nPlease check your email.",
     "verificationPage_emailVerifiedMsg": "User verification completed!\nWelcome to QR Coder!",
     "verificationPage_emailVerificationErrorMsg": "User verification failed!",
@@ -135,7 +129,6 @@
     "verificationPage_welcomeTitle": "Welcome to QR Coder!",
     "verificationPage_sendAgainMsg": "New verification email sent. Please verify your account within 24 hours.",
     "verificationPage_sendVerificationEmail": "Verification email sent.\nPlease check your email.",
-
     "forgotPasswordPage_description": "Please enter your email to reset your password.",
     "forgotPasswordPage_emailValidatorError": "Please enter a valid email",
     "forgotPasswordPage_emailValidator": "Please enter an email",
@@ -144,7 +137,6 @@
     "forgotPasswordPage_sendMailErrorMsg": "Failed to send password reset email!\nPlease try again.",
     "forgotPasswordPage_sendEmailSuccessMsg": "Password reset email sent.\nYou are directed to the login page.",
     "forgotPasswordPage_btnSend": "Send",
-
     "scannerPage_title": "Barcode Scanner",
     "scannerPage_cleanScannedListBtn": "Clean",
     "scannerPage_emptyScannedList": "Let's scan something!",
@@ -158,8 +150,11 @@
     "scannerErrorWidget_unknown": "Unknown Error. Please try again.",
     "scannerPage_cameraStartError": "Camera could not be started. Please try again.",
     "scannerPage_refreshBtnToolTip": "Refresh Camera",
-
     "wrapper_LoginPageToolTip": "Unexpected Error Occurred!",
-    "qrcodeDisplay_pageTitle": "A a! Bir şeyler ters gitti..."
-
+    "qrcodeDisplay_pageTitle": "A a! Bir şeyler ters gitti...",
+    "qrcodeDisplay_remove_logo": "Remove Logo",
+    "qrcodeDisplay_removed_logo": "Logo removed.",
+    "qrcodeDisplay_error_ad": "Ad failed to load.",
+    "qrcodeDisplay_loading_ad": "Ad is loading, please try again.",
+    "qrcodeDisplay_permission_remove_logo": "You need to watch a rewarded ad to remove the logo. Do you want to continue?"
 }

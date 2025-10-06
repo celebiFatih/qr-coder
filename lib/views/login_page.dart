@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/utils/constants.dart';
 import 'package:qr_coder/viewmodels/locale_provider.dart';
 import 'package:qr_coder/viewmodels/login_page_viewmodel.dart';
 import 'package:qr_coder/views/forgot_passw_page.dart';
 import 'package:qr_coder/views/qr_code_generator_page.dart';
 import 'package:qr_coder/widgets/wrapper.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -14,65 +14,99 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
     final viewModel = Provider.of<LoginPageViewmodel>(context, listen: false);
 
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primary,
-      body: Form(
-        key: _formKey,
-        child: Stack(
-          children: [
-            _buildMainContent(context, isSmallScreen, viewModel),
-            _buildLanguageChoice(context),
-          ],
+    final mq = MediaQuery.of(context);
+
+// Mevcut ölçek katsayısını hesapla (1.0'ı ölçekleyip sonucu katsayı olarak kullanıyoruz)
+    final currentFactor = mq.textScaler.scale(1.0);
+
+// 1.0–1.2 aralığına sabitle
+    final clampedFactor = currentFactor.clamp(1.0, 1.2).toDouble();
+
+// Yeni TextScaler oluştur
+    final clampedScaler = TextScaler.linear(clampedFactor);
+
+// MediaQuery'yi textScaler ile kopyala
+    final media = mq.copyWith(textScaler: clampedScaler);
+
+    return MediaQuery(
+      data: media,
+      child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        body: SafeArea(
+          child: Stack(
+            children: [
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final w = constraints.maxWidth;
+                  final h = constraints.maxHeight;
+
+                  // kırılımlar
+                  final isPhone = w < 600;
+                  final cardMaxWidth = isPhone
+                      ? w.clamp(320.0, 420.0) // telefonlar
+                      : w.clamp(520.0, 560.0); // tablet/desktop
+
+                  return Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: cardMaxWidth,
+                        // Dikey taşma olmasın
+                        maxHeight: h, // Center + scroll ile birlikte çalışır
+                      ),
+                      child: _buildMainContent(context, isPhone, viewModel),
+                    ),
+                  );
+                },
+              ),
+              _buildLanguageChoice(context),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildMainContent(
-      BuildContext context, bool isSmallScreen, LoginPageViewmodel viewModel) {
-    return Center(
-      child: Card(
-        elevation: 8,
-        child: Container(
-          padding: const EdgeInsets.all(32.0),
-          constraints: BoxConstraints(maxWidth: isSmallScreen ? 300 : 500),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildLogo(isSmallScreen),
-                _gap(),
-                _buildWelcomeText(context, isSmallScreen),
-                _buildDescriptionText(context, isSmallScreen),
-                _gap(),
-                _buildEmailField(viewModel, context),
-                _gap(),
-                _buildPasswordField(context),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: _buildForgotPasswordButton(context),
-                ),
-                _gap(),
-                _buildRememberMeCheckbox(context, isSmallScreen),
-                _gap(),
-                Consumer<LoginPageViewmodel>(
-                  builder: (context, value, child) {
-                    return viewModel.isLoading
-                        ? const CircularProgressIndicator()
-                        : _buildSubmitButton(context, isSmallScreen, viewModel);
-                  },
-                ),
-                _gap(),
-                _buildLoginOrRegisterToggle(context),
-                _gap(),
-                _buildGuestAccessButton(context),
-              ],
+      BuildContext context, bool isPhone, LoginPageViewmodel viewModel) {
+    final pad = EdgeInsets.symmetric(
+      horizontal: isPhone ? 20 : 32,
+      vertical: isPhone ? 20 : 28,
+    );
+    return Card(
+      elevation: 8,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      child: SingleChildScrollView(
+        padding: pad,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _buildLogo(isPhone),
+            _gap(),
+            _buildWelcomeText(context, isPhone),
+            _buildDescriptionText(context, isPhone),
+            _gap(),
+            _buildEmailField(viewModel, context),
+            _gap(),
+            _buildPasswordField(context),
+            Align(
+              alignment: Alignment.centerRight,
+              child: _buildForgotPasswordButton(context),
             ),
-          ),
+            _gap(),
+            _buildRememberMeCheckbox(context, isPhone),
+            _gap(),
+            Consumer<LoginPageViewmodel>(
+              builder: (context, value, child) => viewModel.isLoading
+                  ? const CircularProgressIndicator()
+                  : _buildSubmitButton(context, isPhone, viewModel),
+            ),
+            _gap(),
+            _buildLoginOrRegisterToggle(context),
+            _gap(),
+            _buildGuestAccessButton(context),
+          ],
         ),
       ),
     );
@@ -104,31 +138,34 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget _buildLogo(bool isSmallScreen) {
-    return Image.asset('assets/img/logo.png', width: isSmallScreen ? 100 : 200);
+  Widget _buildLogo(bool isPhone) {
+    return Image.asset('assets/img/logo.png', width: isPhone ? 84 : 120);
   }
 
-  Widget _buildWelcomeText(BuildContext context, bool isSmallScreen) {
+  Widget _buildWelcomeText(BuildContext context, bool isPhone) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Text(
         AppLocalizations.of(context)!.login_WelcomeText,
-        style: isSmallScreen
-            ? Theme.of(context).textTheme.headlineLarge
-            : Theme.of(context).textTheme.displayMedium,
+        // telefonlarda headlineMedium, büyüklerde headlineLarge
+        style: isPhone
+            ? Theme.of(context).textTheme.headlineMedium
+            : Theme.of(context).textTheme.headlineLarge,
         textAlign: TextAlign.center,
+        maxLines: 2,
+        softWrap: true,
       ),
     );
   }
 
-  Widget _buildDescriptionText(BuildContext context, bool isSmallScreen) {
+  Widget _buildDescriptionText(BuildContext context, bool isPhone) {
     return Padding(
       padding: const EdgeInsets.only(top: 8.0),
       child: Text(
         AppLocalizations.of(context)!.login_DescriptionText,
-        style: isSmallScreen
-            ? Theme.of(context).textTheme.bodyMedium
-            : Theme.of(context).textTheme.bodyLarge,
+        style: isPhone
+            ? Theme.of(context).textTheme.bodyLarge
+            : Theme.of(context).textTheme.titleMedium,
         textAlign: TextAlign.center,
       ),
     );
@@ -181,7 +218,7 @@ class LoginPage extends StatelessWidget {
     );
   }
 
-  Widget _buildRememberMeCheckbox(BuildContext context, bool isSmallScreen) {
+  Widget _buildRememberMeCheckbox(BuildContext context, bool isPhone) {
     return Consumer<LoginPageViewmodel>(
       builder: (context, viewModel, child) {
         return CheckboxListTile(
@@ -192,7 +229,7 @@ class LoginPage extends StatelessWidget {
           },
           title: Text(
             AppLocalizations.of(context)!.login_RememberMeCheckbox,
-            style: isSmallScreen
+            style: isPhone
                 ? Theme.of(context).textTheme.bodyMedium
                 : Theme.of(context).textTheme.bodyLarge,
           ),
@@ -205,7 +242,7 @@ class LoginPage extends StatelessWidget {
   }
 
   Widget _buildSubmitButton(
-      BuildContext context, bool isSmallScreen, LoginPageViewmodel viewModel) {
+      BuildContext context, bool isPhone, LoginPageViewmodel viewModel) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -223,7 +260,7 @@ class LoginPage extends StatelessWidget {
                 !viewModel.isLogin
                     ? AppLocalizations.of(context)!.login_SubmitButtonLogIn
                     : AppLocalizations.of(context)!.login_SubmitButtonRegister,
-                style: isSmallScreen
+                style: isPhone
                     ? Theme.of(context).textTheme.bodyLarge
                     : Theme.of(context).textTheme.headlineSmall,
               );

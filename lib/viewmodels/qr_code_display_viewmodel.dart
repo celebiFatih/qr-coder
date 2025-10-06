@@ -1,10 +1,11 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/widgets/award_winning_ad_widget.dart';
 
 class QRCodeDisplayViewModel extends ChangeNotifier {
   bool _isLogoRemoved = false;
-  // RewardedAd? _rewardedAd;
-  // bool _isAdReady = false;
   final RewardedAdService _rewardedAdService;
 
   bool get isLogoRemoved => _isLogoRemoved;
@@ -18,77 +19,49 @@ class QRCodeDisplayViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // void _loadRewardedAd() {
-  //   RewardedAd.load(
-  //     adUnitId: dotenv.env['AWARD_WINNING_UNIT_ID'] ?? '',
-  //     request: const AdRequest(),
-  //     rewardedAdLoadCallback: RewardedAdLoadCallback(
-  //       onAdLoaded: (ad) {
-  //         _rewardedAd = ad;
-  //         _isAdReady = true;
-  //       },
-  //       onAdFailedToLoad: (error) {
-  //         debugPrint('Rewarded ad failed to load: $error');
-  //         _isAdReady = false;
-  //       },
-  //     ),
-  //   );
-  // }
+  Future<void> promptRemoveLogo(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
 
-  void promptRemoveLogo(BuildContext context) {
-    showDialog(
+    final confirmed = await showDialog<bool>(
       context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('Logoyu Kaldır'),
-          content: Text(
-              'Logoyu kaldırmak için bir reklam izlemeniz gerekiyor. Devam etmek istiyor musunuz?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Hayır'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _rewardedAdService.showRewardedAd(() {
-                  _isLogoRemoved = true;
-                  notifyListeners();
-                });
-              },
-              child: const Text('Evet'),
-            ),
-          ],
-        );
-      },
+      builder: (context) => AlertDialog(
+        title: Text(l10n.qrcodeDisplay_remove_logo),
+        content: Text(l10n.qrcodeDisplay_permission_remove_logo),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.no),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(l10n.yes),
+          ),
+        ],
+      ),
     );
-  }
 
-  // void _showRewardedAd(
-  //   BuildContext context,
-  // ) {
-  //   if (_isAdReady && _rewardedAd != null) {
-  //     _rewardedAd!.fullScreenContentCallback = FullScreenContentCallback(
-  //       onAdDismissedFullScreenContent: (ad) {
-  //         ad.dispose();
-  //         _loadRewardedAd();
-  //       },
-  //       onAdFailedToShowFullScreenContent: (ad, error) {
-  //         ad.dispose();
-  //         debugPrint('Reklam gösterimi başarısız');
-  //       },
-  //     );
-  //     _rewardedAd!.show(
-  //       onUserEarnedReward: (ad, reward) {
-  //         _isLogoRemoved = true;
-  //         notifyListeners();
-  //       },
-  //     );
-  //   } else {
-  //     ScaffoldMessenger.of(context).showSnackBar(
-  //       const SnackBar(
-  //           content: Text('Reklam yüklenemedi, lütfen tekrar deneyin.')),
-  //     );
-  //   }
-  // }
+    if (confirmed != true) return;
+
+    // Reklam hazır değilse kullanıcıyı bilgilendir
+    if (!_rewardedAdService.isAdReady && _rewardedAdService.isLoading) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.qrcodeDisplay_loading_ad)),
+      );
+      return;
+    }
+
+    final ok = await _rewardedAdService.showRewardedAd();
+
+    if (ok) {
+      _isLogoRemoved = true;
+      notifyListeners();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.qrcodeDisplay_removed_logo)),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.qrcodeDisplay_error_ad)),
+      );
+    }
+  }
 }

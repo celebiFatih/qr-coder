@@ -7,6 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/services/auth_service.dart';
 import 'package:qr_coder/services/firebase_options.dart';
 import 'package:qr_coder/utils/constants.dart';
@@ -22,7 +23,6 @@ import 'package:qr_coder/views/verification_page.dart';
 import 'package:qr_coder/widgets/award_winning_ad_widget.dart';
 import 'package:qr_coder/widgets/theme_data.dart';
 import 'package:qr_coder/widgets/wrapper.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,7 +57,7 @@ Future<void> main() async {
             create: (context) => QRCodeDisplayViewModel(rewardedAdService)),
       ],
       child: MainApp(
-        initialRoute:
+        homeWidget:
             isVerificationPending ? const VerificationPage() : const Wrapper(),
       ),
     ),
@@ -65,7 +65,8 @@ Future<void> main() async {
 }
 
 class MainApp extends StatelessWidget {
-  const MainApp({super.key, required initialRoute});
+  final Widget homeWidget;
+  const MainApp({super.key, required this.homeWidget});
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +76,7 @@ class MainApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           locale: localeProvider.locale ??
               Locale(Platform.localeName.split('_').first),
-          supportedLocales: const [Locale('en'), Locale('tr')],
+          supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
@@ -84,7 +85,7 @@ class MainApp extends StatelessWidget {
           ],
           title: 'QR Code Generator',
           theme: AppTheme.lightTheme,
-          home: const Wrapper(),
+          home: homeWidget,
         );
       },
     );

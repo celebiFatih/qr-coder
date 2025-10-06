@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/viewmodels/verification_page_viewmodel.dart';
 import 'package:qr_coder/views/qr_code_generator_page.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class VerificationPage extends StatefulWidget {
   const VerificationPage({super.key});

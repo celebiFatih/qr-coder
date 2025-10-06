@@ -4,16 +4,16 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
-import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/models/qr_code_model.dart';
 import 'package:qr_coder/repository/main_qrcode_repository.dart';
 import 'package:qr_coder/utils/constants.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class QRCodeViewModel extends ChangeNotifier {
   MainQrCodeRepository repository;
@@ -88,7 +88,10 @@ class QRCodeViewModel extends ChangeNotifier {
 
   /// Save the QR code to the device
   Future<String?> saveQrCode(
-      GlobalKey repaintKey, BuildContext context, double pixelRatio) async {
+    GlobalKey repaintKey,
+    BuildContext context,
+    double pixelRatio,
+  ) async {
     errorMsg = '';
     isDownloading = true;
     String filePath = '';
@@ -114,11 +117,13 @@ class QRCodeViewModel extends ChangeNotifier {
         }
         errorMsg = AppLocalizations.of(context)!
             .qrCodeGenerator_savePermissionErrorMsg;
-        print(errorMsg);
+        // print(errorMsg);
         return null;
       }
 
       // Catch the QR code and save it
+      await WidgetsBinding
+          .instance.endOfFrame; // UI güncellensin, logo kaldırıldıysa yansısın
       final boundary = repaintKey.currentContext!.findRenderObject()
           as RenderRepaintBoundary;
       final image = await boundary.toImage(pixelRatio: pixelRatio);
@@ -126,19 +131,19 @@ class QRCodeViewModel extends ChangeNotifier {
       final pngBytes = byteData!.buffer.asUint8List();
 
       // Save the PNG file to the device gallery
-      final result = await ImageGallerySaver.saveImage(pngBytes,
+      final result = await ImageGallerySaverPlus.saveImage(pngBytes,
           quality: 100,
           name: "qr_code_${DateTime.now().millisecondsSinceEpoch}");
+
       if (result['isSuccess']) {
         filePath = result['filePath'];
-        print('QR kodu galeriye kaydedildi: ${result['filePath']}');
+        // print('QR kodu galeriye kaydedildi: ${result['filePath']}');
       } else {
         errorMsg = AppLocalizations.of(context)!.qrCodeGenerator_saveErrorMsg;
-        print(errorMsg);
+        return null;
       }
     } catch (e) {
       errorMsg = AppLocalizations.of(context)!.qrCodeGenerator_saveErrorMsg;
-      print(e);
       return null;
     } finally {
       isDownloading = false;
@@ -166,9 +171,11 @@ class QRCodeViewModel extends ChangeNotifier {
     notifyListeners();
     try {
       // Get the QR code image
+      await WidgetsBinding
+          .instance.endOfFrame; // UI güncellensin, logo kaldırıldıysa yansısın
       final boundary = repaintKey.currentContext!.findRenderObject()
           as RenderRepaintBoundary;
-      final image = await boundary.toImage(pixelRatio: 3.0);
+      final image = await boundary.toImage(pixelRatio: selectedResolution);
       final byteData = await image.toByteData(format: ImageByteFormat.png);
       final Uint8List pngBytes = byteData!.buffer.asUint8List();
 
@@ -184,7 +191,6 @@ class QRCodeViewModel extends ChangeNotifier {
           text: AppLocalizations.of(context)!.qrCodeGenerator_sharedTitle);
     } catch (e) {
       errorMsg = AppLocalizations.of(context)!.qrCodeGenerator_sharedErrorMsg;
-      print(e);
     } finally {
       isSharing = false;
       notifyListeners();

@@ -1,6 +1,8 @@
 {
     "@@locale": "tr",
     "language": "TR",
+    "yes": "Evet",
+    "no": "Hayır",
     "login_WelcomeText": "QR Coder'a Hoşgeldiniz!",
     "login_DescriptionText": "Devam etmek için e-posta ve şifrenizi girin.",
     "login_label_email": "E-posta",
@@ -22,11 +24,8 @@
     "login_emailNotVerifiedMsg": "E-posta doğrulaması yapılmadı. Lütfen e-postanızı kontrol edin.",
     "login_createUserErrorMsg": "Kullanıcı kaydı oluşturulamadı!",
     "login_signInErrorMsg": "Giriş yapılamadı!",
-    "login_signInSuccessMsg": "Giriş yapıldı!",    
+    "login_signInSuccessMsg": "Giriş yapıldı!",
     "login_invalidCredentialsErrMsg": "Kullanıcı kaydı bulunamadı!",
-
-
-    
     "qrCodeGenerator_FabSemantic": "QR Kodu oluşturma butonu",
     "qrCodeGenerator_FabToolTip": "QR Code Oluştur",
     "qrCodeGenerator_LogOutToolTip": "Oturumu Sonlandır",
@@ -49,7 +48,6 @@
     "qrCodeGenerator_textFieldHintText": "QR kod oluşturulacak metni girin",
     "qrCodeGenerator_dataTooLongErrMsg": "Metin çok uzun!",
     "qrCodeGenerator_qrCode": "QR Kod",
-
     "qrCodeList_title": "Son Oluşturulanlar",
     "qrCodeList_deleteAllBtn": "Tümünü Sil",
     "qrCodeList_selectAllBtn": "Tümünü Seç",
@@ -71,7 +69,6 @@
             }
         }
     },
-
     "qrCodeDetail_Details": "Detaylar",
     "qrCodeDetail_wifiInfo": "Wi-Fi Bilgileri",
     "qrCodeDetail_wifiPassw": "Şifre: {password}",
@@ -121,9 +118,8 @@
     "qrCodeDetail_resolution": "Çözünürlük",
     "qrCodeDetail_download": "İndir",
     "qrCodeDetail_resolutionStandard": "Standart Çözünürlük",
-    "qrCodeDetail_resolutionHigh": "Yüksek Çözünürlük",    
+    "qrCodeDetail_resolutionHigh": "Yüksek Çözünürlük",
     "qrCodeDetail_resolutionUltra": "Ultra Çözünürlük",
-
     "verificationPage_description": "Doğrulama bekleniyor.\nLütfen e-postanızı kontrol edin.",
     "verificationPage_emailVerifiedMsg": "Kullanıcı doğrulaması tamamlandı!\nQR Coder'a Hoşgeldiniz!",
     "verificationPage_emailVerificationErrorMsg": "Kullanıcı doğrulaması tamamlanamadı!",
@@ -133,7 +129,6 @@
     "verificationPage_welcomeTitle": "QR Coder'a Hoşgeldiniz!",
     "verificationPage_sendAgainMsg": "Yeni bir doğrulama e-postası gönderildi. Lütfen 24 saat içinde doğrulayın.",
     "verificationPage_sendVerificationEmail": "Doğrulama e-postası gönderildi.\nLütfen e-postanızı kontrol edin.",
-
     "forgotPasswordPage_description": "Lütfen sıfırlama isteğiniz için e-posta adresinizi girin.",
     "forgotPasswordPage_emailValidatorError": "Lütfen geçerli bir e-posta girin",
     "forgotPasswordPage_emailValidator": "Lütfen bir e-posta girin",
@@ -142,7 +137,6 @@
     "forgotPasswordPage_sendEmailSuccessMsg": "Parola sıfırlama e-postası gönderildi.\nGiriş sayfasına yönlendiriliyorsunuz.",
     "forgotPasswordPage_sendMailErrorMsg": "Parola sıfırlama e-postası gönderilemedi!\nLütfen yeniden deneyin.",
     "forgotPasswordPage_btnSend": "Gönder",
-
     "scannerPage_title": "Barkod Tarayıcısı",
     "scannerPage_cleanScannedListBtn": "Temizle",
     "scannerPage_emptyScannedList": "Bir şeyler tarayın!",
@@ -156,7 +150,11 @@
     "scannerErrorWidget_unknown": "Genel Hata. Lütfen tekrar deneyin.",
     "scannerPage_cameraStartError": "Kamera başlatılamadı. Lütfen tekrar deneyin.",
     "scannerPage_refreshBtnToolTip": "Kamerayı Yenile",
-
     "wrapper_LoginPageToolTip": "Beklenmeyen Bir Hata oluştu!",
-    "qrcodeDisplay_pageTitle": "A a! Bir şeyler ters gitti..."
+    "qrcodeDisplay_pageTitle": "A a! Bir şeyler ters gitti...",
+    "qrcodeDisplay_remove_logo": "Logoyu Kaldır",
+    "qrcodeDisplay_removed_logo": "Logo kaldırıldı.",
+    "qrcodeDisplay_error_ad": "Reklam yüklenemedi",
+    "qrcodeDisplay_loading_ad": "Reklam yükleniyor, lütfen tekrar deneyin.",
+    "qrcodeDisplay_permission_remove_logo": "Logoyu kaldırmak için bir reklam izlemeniz gerekiyor. Devam etmek istiyor musunuz?"
 }
