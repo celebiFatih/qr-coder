@@ -1,7 +1,7 @@
 name: qr_coder
 description: "QR Code Generator"
 publish_to: 'none'
-version: 3.2.0+120
+version: 3.2.1+121
 
 environment:
   sdk: '>=3.4.1 <4.0.0'
