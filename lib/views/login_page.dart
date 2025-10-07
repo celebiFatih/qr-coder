@@ -35,33 +35,36 @@ class LoginPage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.primary,
         body: SafeArea(
-          child: Stack(
-            children: [
-              LayoutBuilder(
-                builder: (context, constraints) {
-                  final w = constraints.maxWidth;
-                  final h = constraints.maxHeight;
+          child: Form(
+            key: _formKey,
+            child: Stack(
+              children: [
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final w = constraints.maxWidth;
+                    final h = constraints.maxHeight;
 
-                  // kırılımlar
-                  final isPhone = w < 600;
-                  final cardMaxWidth = isPhone
-                      ? w.clamp(320.0, 420.0) // telefonlar
-                      : w.clamp(520.0, 560.0); // tablet/desktop
+                    // kırılımlar
+                    final isPhone = w < 600;
+                    final cardMaxWidth = isPhone
+                        ? w.clamp(320.0, 420.0) // telefonlar
+                        : w.clamp(520.0, 560.0); // tablet/desktop
 
-                  return Center(
-                    child: ConstrainedBox(
-                      constraints: BoxConstraints(
-                        maxWidth: cardMaxWidth,
-                        // Dikey taşma olmasın
-                        maxHeight: h, // Center + scroll ile birlikte çalışır
+                    return Center(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          maxWidth: cardMaxWidth,
+                          // Dikey taşma olmasın
+                          maxHeight: h, // Center + scroll ile birlikte çalışır
+                        ),
+                        child: _buildMainContent(context, isPhone, viewModel),
                       ),
-                      child: _buildMainContent(context, isPhone, viewModel),
-                    ),
-                  );
-                },
-              ),
-              _buildLanguageChoice(context),
-            ],
+                    );
+                  },
+                ),
+                _buildLanguageChoice(context),
+              ],
+            ),
           ),
         ),
       ),
