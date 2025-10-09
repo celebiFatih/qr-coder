@@ -149,7 +149,7 @@ class LoginPageViewmodel extends ChangeNotifier {
         final existingUser = await Auth().signIn(
             email: emailController.text.trim(),
             password: passwordController.text.trim());
-        if (existingUser != null && !existingUser.user!.emailVerified) {
+        if (!existingUser.user!.emailVerified) {
           await existingUser.user!.sendEmailVerification();
           throw FirebaseAuthException(
             code: 'email-not-verified',

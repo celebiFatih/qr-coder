@@ -112,7 +112,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
             ? const Center(child: CircularProgressIndicator())
             : MobileScanner(
                 controller: controller,
-                errorBuilder: (context, error, child) {
+                errorBuilder: (context, error) {
                   return viewModel.isCameraLoading
                       ? const Center(child: CircularProgressIndicator())
                       : ScannerErrorWidget(error: error);
