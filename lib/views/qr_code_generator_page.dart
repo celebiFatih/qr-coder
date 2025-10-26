@@ -58,7 +58,7 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
       uid: user?.uid,
     );
     return Scaffold(
-      resizeToAvoidBottomInset: true,
+      resizeToAvoidBottomInset: false,
       appBar: _buildAppBar(context, user),
       body: _buildBody(context),
       floatingActionButton: _buildFab(context),
@@ -244,9 +244,12 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
                               elevation: 8,
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: QRcodeDisplay(
-                                    data: viewModel.qrData,
-                                    repaintKey: repaintKey),
+                                child: AspectRatio(
+                                  aspectRatio: 1,
+                                  child: QRcodeDisplay(
+                                      data: viewModel.qrData,
+                                      repaintKey: repaintKey),
+                                ),
                               ),
                             ),
                           ),

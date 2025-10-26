@@ -155,6 +155,6 @@
     "qrcodeDisplay_remove_logo": "Remove Logo",
     "qrcodeDisplay_removed_logo": "Logo removed.",
     "qrcodeDisplay_error_ad": "Ad failed to load.",
-    "qrcodeDisplay_loading_ad": "Ad is loading, please try again.",
+    "qrcodeDisplay_loading_ad": "Ad is loading, please try again...",
     "qrcodeDisplay_permission_remove_logo": "You need to watch a rewarded ad to remove the logo. Do you want to continue?"
 }

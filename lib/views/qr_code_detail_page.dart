@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/models/qr_code_model.dart';
+import 'package:qr_coder/viewmodels/qr_code_display_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_viewmodel.dart';
 import 'package:qr_coder/views/qr_code_list_page.dart';
 import 'package:qr_coder/widgets/banner_ad_widget.dart';
@@ -21,10 +22,21 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
   final GlobalKey repaintKey = GlobalKey();
 
   @override
+  void initState() {
+    super.initState();
+    // Sayfaya her gelişte logo açık başlasın
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<QRCodeDisplayViewModel>().resetLogo();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     final viewModel = Provider.of<QRCodeViewModel>(context, listen: false);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: _buildAppBar(context),
       body: _buildBody(context),
       floatingActionButton: _buildFabs(context, viewModel),
@@ -54,36 +66,102 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
   }
 
   Widget _buildBody(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          _buildQRCodeCard(context),
-          const SizedBox(height: 16),
-          Expanded(flex: 3, child: BuildContent(qrCode: widget.qrCode)),
-          const SizedBox(height: 8),
-          _buildCreateDateTime(context),
-          const BannerAdWidget(),
-        ],
-      ),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // QR alanı — Generator ile aynı mantık
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    // Generator'daki gibi, ekrana göre esneyen bir aralık
+                    minHeight: constraints.maxHeight * 0.35,
+                    maxHeight: constraints.maxHeight * 0.60,
+                  ),
+                  child: Card(
+                    elevation: 8,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: AspectRatio(
+                        aspectRatio: 1,
+                        child: QRcodeDisplay(
+                          data: widget.qrCode.data,
+                          repaintKey: repaintKey,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 16),
+            // Alt kısım (detaylar) Generator’daki gibi Expanded + scroll
+            Expanded(
+              child: BuildContent(qrCode: widget.qrCode),
+            ),
+            const SizedBox(height: 8),
+            _buildCreateDateTime(context),
+            const BannerAdWidget(),
+          ],
+        );
+      },
     );
   }
 
-  Widget _buildQRCodeCard(BuildContext context) {
-    return Center(
-      child: Hero(
-        tag: widget.qrCode,
-        child: Card(
-            elevation: 8,
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: QRcodeDisplay(
-                  data: widget.qrCode.data, repaintKey: repaintKey),
-            )),
-      ),
-    );
-  }
+  // Widget _buildQRCodeSquare() {
+  //   return Card(
+  //     elevation: 8,
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(8.0),
+  //       child: RepaintBoundary(
+  //         key: repaintKey,
+  //         child: LayoutBuilder(
+  //           builder: (context, constraints) {
+  //             final side = constraints.biggest.shortestSide;
+  //             final logoSide = side * 0.12;
+  //             return SizedBox.expand(
+  //               child: Consumer<QRCodeDisplayViewModel>(
+  //                 builder: (context, vm, child) =>
+  //                     Stack(fit: StackFit.expand, children: [
+  //                   QrImageView(
+  //                     data: widget.qrCode.data,
+  //                     backgroundColor: Colors.white,
+  //                     version: QrVersions.auto,
+  //                     errorCorrectionLevel: QrErrorCorrectLevel.H,
+  //                     embeddedImage: vm.isLogoRemoved
+  //                         ? null
+  //                         : const AssetImage('assets/img/logo.png'),
+  //                     embeddedImageStyle:
+  //                         QrEmbeddedImageStyle(size: Size(logoSide, logoSide)),
+  //                     errorStateBuilder: (cxt, err) => Center(
+  //                       child: Text(AppLocalizations.of(context)!
+  //                           .qrcodeDisplay_pageTitle),
+  //                     ),
+  //                   ),
+  //                   if (!vm.isLogoRemoved)
+  //                     Center(
+  //                       child: SizedBox(
+  //                         width: logoSide,
+  //                         height: logoSide,
+  //                         child: GestureDetector(
+  //                           onTap: () => vm.promptRemoveLogo(context),
+  //                           behavior: HitTestBehavior.opaque,
+  //                         ),
+  //                       ),
+  //                     )
+  //                 ]),
+  //               ),
+  //             );
+  //           },
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _buildCreateDateTime(BuildContext context) {
     final created =
@@ -149,7 +227,8 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            spacing: 5.0,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(AppLocalizations.of(context)!.qrCodeDetail_saveSuccessMsg),
               GestureDetector(

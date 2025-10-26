@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -20,7 +21,7 @@ import 'package:qr_coder/viewmodels/qr_code_list_page_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_viewmodel.dart';
 import 'package:qr_coder/viewmodels/verification_page_viewmodel.dart';
 import 'package:qr_coder/views/verification_page.dart';
-import 'package:qr_coder/widgets/award_winning_ad_widget.dart';
+import 'package:qr_coder/widgets/rewarded_add_service.dart';
 import 'package:qr_coder/widgets/theme_data.dart';
 import 'package:qr_coder/widgets/wrapper.dart';
 
@@ -28,10 +29,29 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await dotenv.load(fileName: '.env');
+  await MobileAds.instance.initialize();
+
+  if (!kReleaseMode) {
+    // sadece debug
+    // TEST CİHAZI BİLDİR
+    final testId = dotenv.env['TEST_DEVICE_ID'];
+    if (testId != null && testId.isNotEmpty) {
+      await MobileAds.instance.updateRequestConfiguration(
+          RequestConfiguration(testDeviceIds: [testId]));
+    }
+  } else {
+    // release'da testDeviceId yok
+    await MobileAds.instance.updateRequestConfiguration(
+      RequestConfiguration(testDeviceIds: []),
+    );
+  }
+
+  final rewardedAdService = RewardedAdService(
+    addUnitId: dotenv.env['REWARDED_AD_UNIT_ID'],
+  );
+
   final prefs = await Constants().prefs;
   final isVerificationPending = prefs.getBool('isVerificationPending') ?? false;
-  final rewardedAdService = RewardedAdService();
-  unawaited(MobileAds.instance.initialize());
   runApp(
     MultiProvider(
       providers: [

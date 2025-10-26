@@ -390,7 +390,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qrcodeDisplay_error_ad => 'Ad failed to load.';
 
   @override
-  String get qrcodeDisplay_loading_ad => 'Ad is loading, please try again.';
+  String get qrcodeDisplay_loading_ad => 'Ad is loading, please try again...';
 
   @override
   String get qrcodeDisplay_permission_remove_logo =>

@@ -791,7 +791,7 @@ abstract class AppLocalizations {
   /// No description provided for @qrcodeDisplay_loading_ad.
   ///
   /// In en, this message translates to:
-  /// **'Ad is loading, please try again.'**
+  /// **'Ad is loading, please try again...'**
   String get qrcodeDisplay_loading_ad;
 
   /// No description provided for @qrcodeDisplay_permission_remove_logo.

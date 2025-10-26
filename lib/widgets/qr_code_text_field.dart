@@ -16,7 +16,7 @@ class QRCodeTextField extends StatelessWidget {
     return TextField(
       controller: controller,
       focusNode: focusNode,
-      autofocus: true,
+      autofocus: false,
       decoration: InputDecoration(
         hintText:
             AppLocalizations.of(context)!.qrCodeGenerator_textFieldHintText,

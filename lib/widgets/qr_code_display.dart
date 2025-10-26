@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/viewmodels/qr_code_display_viewmodel.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'dart:math' as math;
 
 class QRcodeDisplay extends StatefulWidget {
   const QRcodeDisplay(
@@ -27,32 +28,56 @@ class _QRcodeDisplayState extends State<QRcodeDisplay> {
 
   @override
   Widget build(BuildContext context) {
-    return RepaintBoundary(
-      key: widget.repaintKey,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          QrImageView(
-            backgroundColor: Colors.white,
-            data: widget.data,
-            version: QrVersions.auto,
-            size: MediaQuery.of(context).size.width * 0.6,
-            errorStateBuilder: (cxt, err) => Center(
-              child:
-                  Text(AppLocalizations.of(context)!.qrcodeDisplay_pageTitle),
-            ),
-          ),
-          Consumer<QRCodeDisplayViewModel>(
-            builder: (_, vm, __) => vm.isLogoRemoved
-                ? const SizedBox.shrink()
-                : GestureDetector(
-                    onTap: () => vm.promptRemoveLogo(context),
-                    child: Image.asset('assets/img/logo.png',
-                        width: 80, height: 80),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final side =
+            math.min(constraints.maxWidth, constraints.maxHeight) * 0.85;
+        final logoRatio = 0.12;
+        final logoSide = side * logoRatio;
+
+        return Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              RepaintBoundary(
+                key: widget.repaintKey,
+                child: SizedBox.square(
+                  dimension: side,
+                  child: Consumer<QRCodeDisplayViewModel>(
+                    builder: (context, vm, child) => Stack(children: [
+                      QrImageView(
+                        data: widget.data,
+                        backgroundColor: Colors.white,
+                        version: QrVersions.auto,
+                        errorCorrectionLevel: QrErrorCorrectLevel.H,
+                        embeddedImage: vm.isLogoRemoved
+                            ? null
+                            : const AssetImage('assets/img/logo.png'),
+                        embeddedImageStyle: QrEmbeddedImageStyle(
+                            size: Size(logoSide, logoSide)),
+                        errorStateBuilder: (cxt, err) => Center(
+                          child: Text(AppLocalizations.of(context)!
+                              .qrcodeDisplay_pageTitle),
+                        ),
+                      ),
+                      if (!vm.isLogoRemoved)
+                        Center(
+                          child: SizedBox(
+                            width: logoSide,
+                            height: logoSide,
+                            child: GestureDetector(
+                              onTap: () => vm.promptRemoveLogo(context),
+                              // Görünmez; sadece hit-test için
+                              behavior: HitTestBehavior.opaque,
+                            ),
+                          ),
+                        )
+                    ]),
                   ),
-          )
-        ],
-      ),
+                ),
+              ),
+            ]);
+      },
     );
   }
 }
