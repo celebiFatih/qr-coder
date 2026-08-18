@@ -118,7 +118,7 @@ class QRCodeListPage extends StatelessWidget {
               isEditing,
               context,
             ),
-            leading: _buildQRCodePreview(qrCode, context),
+            leading: _buildQRCodePreview(qrCode),
             onTap: () => Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => QRCodeDetailPage(qrCode: qrCode),
@@ -202,7 +202,7 @@ class QRCodeListPage extends StatelessWidget {
     );
   }
 
-  Widget _buildQRCodePreview(QRCodeModel qrCode, BuildContext context) {
+  Widget _buildQRCodePreview(QRCodeModel qrCode) {
     return Hero(
       tag: qrCode,
       child: Container(
@@ -210,12 +210,7 @@ class QRCodeListPage extends StatelessWidget {
           border: Border.all(color: const Color(0xFFCDDC39), width: 2),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: QrImageView(
-          data: AppLocalizations.of(context)!.qrCodeList_defaultQrCode,
-          version: QrVersions.auto,
-          size: 50,
-          padding: const EdgeInsets.all(4),
-        ),
+        child: QrCodePreviewImage(data: qrCode.data),
       ),
     );
   }
@@ -272,6 +267,22 @@ class QRCodeListPage extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class QrCodePreviewImage extends StatelessWidget {
+  const QrCodePreviewImage({super.key, required this.data});
+
+  final String data;
+
+  @override
+  Widget build(BuildContext context) {
+    return QrImageView(
+      data: data,
+      version: QrVersions.auto,
+      size: 50,
+      padding: const EdgeInsets.all(4),
     );
   }
 }
