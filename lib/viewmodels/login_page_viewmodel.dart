@@ -26,16 +26,23 @@ class LoginPageViewmodel extends ChangeNotifier {
   TextEditingController get passwordController => _passwordController;
 
   void clearAll() {
+    // Oturum kapandığında parola her durumda bellekten temizlenir.
+    // "E-postamı hatırla" açıksa yalnızca e-posta alanı korunur.
     if (!rememberMe) {
       _emailController.clear();
-      _passwordController.clear();
-      _isPasswordVisible = false;
-      _rememberMe = false;
-      _isLogin = false;
-      _isLoading = false;
-      _errorMsg = '';
-      notifyListeners();
     }
+    _passwordController.clear();
+    _isPasswordVisible = false;
+    _isLogin = false;
+    _isLoading = false;
+    _errorMsg = '';
+    notifyListeners();
+  }
+
+  void clearPasswordField() {
+    _passwordController.clear();
+    _isPasswordVisible = false;
+    notifyListeners();
   }
 
   void clearLoginForm() {
@@ -181,26 +188,34 @@ class LoginPageViewmodel extends ChangeNotifier {
   Future<void> loadSavedCredentials() async {
     final prefs = await Constants().prefs;
     final savedEmail = prefs.getString('email') ?? '';
-    final savedPassword = prefs.getString('password') ?? '';
     rememberMe = prefs.getBool('rememberMe') ?? false;
 
+    // Eski sürümler parolayı SharedPreferences içinde düz metin olarak
+    // saklıyordu. Uygulama bu sürüme yükseltildiğinde legacy değeri hemen
+    // siliyoruz ve parola alanını hiçbir zaman diskten doldurmuyoruz.
+    await prefs.remove('password');
+    _passwordController.clear();
+
     if (rememberMe) {
-      emailController.text = savedEmail;
-      passwordController.text = savedPassword;
-      rememberMe = true;
-      notifyListeners();
+      _emailController.text = savedEmail;
+    } else {
+      _emailController.clear();
     }
+    notifyListeners();
   }
 
-  Future<void> saveCredentials() async {
+  Future<void> saveRememberedEmail() async {
     final prefs = await Constants().prefs;
+
+    // Güvenlik migrasyonu: hangi durumda olursa olsun eski parola anahtarını
+    // kalıcı depolamadan temiz tut.
+    await prefs.remove('password');
+
     if (rememberMe) {
       await prefs.setString('email', emailController.text.trim());
-      await prefs.setString('password', passwordController.text.trim());
       await prefs.setBool('rememberMe', true);
     } else {
       await prefs.remove('email');
-      await prefs.remove('password');
       await prefs.setBool('rememberMe', false);
     }
   }

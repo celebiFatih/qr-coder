@@ -47,7 +47,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get login_GuestAccessButton => 'Continue without an account';
 
   @override
-  String get login_RememberMeCheckbox => 'Remember me';
+  String get login_RememberMeCheckbox => 'Remember my email';
 
   @override
   String get login_SubmitButtonLogIn => 'Sign in';

@@ -318,9 +318,14 @@ class LoginPage extends StatelessWidget {
       // Hem başarılı giriş hem de başarılı kayıt akışında oturum artık
       // Firebase tarafında oluşturulmuştur. Guest bayrağını temizliyoruz;
       // doğrulanmış/doğrulanmamış kullanıcı yönlendirmesini Wrapper yönetir.
-      await viewModel.saveCredentials();
+      await viewModel.saveRememberedEmail();
       final prefs = await Constants().prefs;
       await prefs.setBool('isGuest', false);
+
+      // Firebase oturumu oluşturulduktan sonra parolaya artık ihtiyaç yok.
+      // ViewModel uygulama ömrü boyunca Provider içinde yaşayabildiği için
+      // hassas değeri bellekten de temizliyoruz.
+      viewModel.clearPasswordField();
 
       // Başarılı giriş/kayıt sonrasında route değiştirmiyoruz.
       // Wrapper, Firebase userChanges akışını dinlediği için kullanıcı

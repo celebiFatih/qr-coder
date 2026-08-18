@@ -12,7 +12,7 @@
     "login_LoginOrRegisterToggle": "Hesabın yok mu? ",
     "login_LoginOrRegisterToggleAlreadyHaveAccount": "Zaten hesabım var. ",
     "login_GuestAccessButton": "Kaydolmadan devam et",
-    "login_RememberMeCheckbox": "Beni hatırla",
+    "login_RememberMeCheckbox": "E-postamı hatırla",
     "login_SubmitButtonLogIn": "Giriş yap",
     "login_SubmitButtonRegister": "Kaydol",
     "login_ForgotPasswordButton": "Şifremi unuttum",

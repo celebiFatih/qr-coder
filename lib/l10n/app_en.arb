@@ -12,7 +12,7 @@
     "login_LoginOrRegisterToggle": "Don't have an account? ",
     "login_LoginOrRegisterToggleAlreadyHaveAccount": "Already have an account. ",
     "login_GuestAccessButton": "Continue without an account",
-    "login_RememberMeCheckbox": "Remember me",
+    "login_RememberMeCheckbox": "Remember my email",
     "login_SubmitButtonLogIn": "Sign in",
     "login_SubmitButtonRegister": "Register",
     "login_ForgotPasswordButton": "Forgot password",
