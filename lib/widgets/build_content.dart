@@ -53,18 +53,29 @@ class BuildContent extends StatelessWidget {
     return wifiRegExp.hasMatch(data);
   }
 
+  String _valueForPrefix(
+    List<String> parts,
+    String prefix, {
+    String defaultValue = '',
+  }) {
+    final normalizedPrefix = prefix.toUpperCase();
+
+    for (final part in parts) {
+      if (part.length >= prefix.length &&
+          part.substring(0, prefix.length).toUpperCase() == normalizedPrefix) {
+        return part.substring(prefix.length);
+      }
+    }
+
+    return defaultValue;
+  }
+
   Widget _buildWifi(BuildContext context, String wifiData) {
     final parts = wifiData.replaceFirst('WIFI:', '').split(';');
-    final ssid = parts.firstWhere((part) => part.startsWith('S:')).substring(2);
-    final password = parts
-        .firstWhere((part) => part.startsWith('P:'))
-        .substring(2);
-    final encryption = parts
-        .firstWhere((part) => part.startsWith('T:'))
-        .substring(2);
-    final hidden = parts
-        .firstWhere((part) => part.startsWith('H:'))
-        .substring(2);
+    final ssid = _valueForPrefix(parts, 'S:');
+    final password = _valueForPrefix(parts, 'P:');
+    final encryption = _valueForPrefix(parts, 'T:');
+    final hidden = _valueForPrefix(parts, 'H:', defaultValue: 'false');
 
     return GestureDetector(
       onTap: () async {
