@@ -24,7 +24,9 @@ class BarcodeScannerPage extends StatefulWidget {
 
 class _BarcodeScannerPageState extends State<BarcodeScannerPage>
     with WidgetsBindingObserver {
-  final MobileScannerController controller = MobileScannerController();
+  final MobileScannerController controller = MobileScannerController(
+    autoStart: false,
+  );
   StreamSubscription<Object>? _streamSubscription;
   bool _isCameraStarted = false;
   late BarcodeScannerViewmodel provider;
@@ -115,21 +117,27 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
   Widget _buildCameraView(BuildContext context) {
     return Consumer<BarcodeScannerViewmodel>(
       builder: (context, viewModel, child) {
-        return viewModel.isCameraLoading
-            ? const Center(child: CircularProgressIndicator())
-            : MobileScanner(
-                controller: controller,
-                errorBuilder: (context, error) {
-                  return viewModel.isCameraLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : ScannerErrorWidget(error: error);
-                },
-                onDetect: (barcodes) {
-                  if (!viewModel.isBottomSheetOpen) {
-                    _showBottomSheet(context, viewModel);
-                  }
-                },
-              );
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            MobileScanner(
+              controller: controller,
+              errorBuilder: (context, error) {
+                return ScannerErrorWidget(error: error);
+              },
+              onDetect: (barcodes) {
+                if (!viewModel.isBottomSheetOpen) {
+                  _showBottomSheet(context, viewModel);
+                }
+              },
+            ),
+            if (viewModel.isCameraLoading)
+              const ColoredBox(
+                color: Colors.black,
+                child: Center(child: CircularProgressIndicator()),
+              ),
+          ],
+        );
       },
     );
   }
@@ -245,37 +253,55 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
         onTap: () async {
           await _stopCamera(provider);
           if (!mounted) return;
-          final scaffoldMsg = ScaffoldMessenger.of(context);
+          if (!context.mounted) {
+            await _startCamera(provider);
+            return;
+          }
+
           await viewModel.saveQrCodeToDb(viewModel.barcodes[index], context);
           if (!mounted) return;
+          if (!context.mounted) {
+            await _startCamera(provider);
+            return;
+          }
+
+          final scaffoldMsg = ScaffoldMessenger.of(context);
           if (viewModel.errorMsg.isNotEmpty) {
             scaffoldMsg.showSnackBar(
               SnackBar(
                 content: Text(viewModel.errorMsg, textAlign: TextAlign.center),
               ),
             );
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => QRCodeDetailPage(
-                  qrCode: QRCodeModel(
-                    id: '',
-                    data: viewModel.barcodes[index].rawValue ?? '',
-                    name: scannedDataName,
-                    createdAt: DateFormat(
-                      'dd.MM.yyyy HH:mm',
-                    ).format(DateTime.now()),
-                  ),
+
+            // Kayıt başarısız olduğunda kullanıcı taramaya devam edebilsin.
+            await _startCamera(provider);
+            return;
+          }
+
+          scaffoldMsg.showSnackBar(
+            SnackBar(
+              content: Text(savedToListMsg, textAlign: TextAlign.center),
+            ),
+          );
+
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => QRCodeDetailPage(
+                qrCode: QRCodeModel(
+                  id: '',
+                  data: viewModel.barcodes[index].rawValue ?? '',
+                  name: scannedDataName,
+                  createdAt: DateFormat(
+                    'dd.MM.yyyy HH:mm',
+                  ).format(DateTime.now()),
                 ),
               ),
-            ).then((value) => _startCamera(provider));
-            scaffoldMsg.showSnackBar(
-              SnackBar(
-                content: Text(savedToListMsg, textAlign: TextAlign.center),
-              ),
-            );
-          }
+            ),
+          );
+
+          if (!mounted) return;
+          await _startCamera(provider);
         },
       ),
     );
@@ -283,6 +309,11 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
 
   // Kamerayı başlatma
   Future<void> _startCamera(BarcodeScannerViewmodel provider) async {
+    if (_isCameraStarted) {
+      provider.isCameraLoading = false;
+      return;
+    }
+
     provider.isCameraLoading = true;
     final l10n = AppLocalizations.of(context)!;
     final cameraStartError = l10n.scannerPage_cameraStartError;
@@ -326,18 +357,55 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
 
   // Kamerayı durdurma
   Future<void> _stopCamera(BarcodeScannerViewmodel provider) async {
-    provider.isCameraLoading = true;
-    unawaited(_streamSubscription?.cancel());
+    final streamSubscription = _streamSubscription;
     _streamSubscription = null;
-    unawaited(controller.stop());
-    _isCameraStarted = false;
+
+    if (streamSubscription != null) {
+      try {
+        await streamSubscription.cancel();
+      } catch (error) {
+        debugPrint('Barcode stream cancellation failed: $error');
+      }
+    }
+
+    try {
+      await controller.stop();
+    } catch (error) {
+      debugPrint('Camera stop failed: $error');
+    } finally {
+      _isCameraStarted = false;
+    }
   }
 
   // Kamerayı yenileme
   Future<void> _refreshCamera(BarcodeScannerViewmodel provider) async {
-    await _stopCamera(provider);
-    await Future.delayed(const Duration(milliseconds: 300));
-    _startCamera(provider);
+    if (provider.isCameraLoading) {
+      return;
+    }
+
+    // Refresh süresince MobileScanner widget tree'de kalır; kullanıcıya yalnızca
+    // kamera görünümünün üzerinde bir loading overlay gösterilir.
+    provider.isCameraLoading = true;
+
+    try {
+      await _stopCamera(provider);
+
+      if (!mounted) {
+        return;
+      }
+
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+
+      if (!mounted) {
+        return;
+      }
+
+      await _startCamera(provider);
+    } finally {
+      if (mounted) {
+        provider.isCameraLoading = false;
+      }
+    }
   }
 
   // Barkodları işleme
