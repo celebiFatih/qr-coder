@@ -126,6 +126,7 @@
     "verificationPage_sendMailErrorMsg": "Doğrulama e-postası gönderilemedi!\nLütfen yeniden deneyin.",
     "verificationPage_verificationEmailResentMsg": "Doğrulama bağlantısı tekrar gönderildi.",
     "verificationPage_sendAgainBtn": "Yeniden gönderin",
+    "verificationPage_useDifferentAccountBtn": "Farklı hesapla giriş yap",
     "verificationPage_welcomeTitle": "QR Coder'a Hoşgeldiniz!",
     "verificationPage_sendAgainMsg": "Yeni bir doğrulama e-postası gönderildi. Lütfen 24 saat içinde doğrulayın.",
     "verificationPage_sendVerificationEmail": "Doğrulama e-postası gönderildi.\nLütfen e-postanızı kontrol edin.",

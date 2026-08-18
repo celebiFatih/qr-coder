@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/services/auth_service.dart';
 
 class VerificationPageViewModel extends ChangeNotifier {
@@ -15,37 +14,42 @@ class VerificationPageViewModel extends ChangeNotifier {
     isLoading = false;
     emailVerified = false;
     _timer?.cancel();
+    _timer = null;
     notifyListeners();
   }
 
   void startEmailVerificationCheckTimer() {
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 5), (timer) async {
-      await Auth().reloadAndCheckEmailVerfication();
-      final user = Auth().currentUser;
-      if (user != null && user.emailVerified) {
-        emailVerified = true;
-        _timer?.cancel();
-        notifyListeners();
+      try {
+        await Auth().reloadAndCheckEmailVerfication();
+        final user = Auth().currentUser;
+        if (user != null && user.emailVerified) {
+          emailVerified = true;
+          _timer?.cancel();
+          _timer = null;
+          notifyListeners();
+        }
+      } catch (e) {
+        // Geçici ağ hatalarında doğrulama ekranında kalıp bir sonraki
+        // periyodik kontrolde yeniden deniyoruz.
+        debugPrint('E-posta doğrulama kontrolü başarısız: $e');
       }
     });
   }
 
-  Future<void> sendVerificationEmail(BuildContext context) async {
-    final l10n = AppLocalizations.of(context)!;
-    final resentMessage = l10n.verificationPage_verificationEmailResentMsg;
-    final sendMailErrorMsg = l10n.verificationPage_sendMailErrorMsg;
+  Future<bool> sendVerificationEmail({required String sendMailErrorMsg}) async {
+    errorMessage = '';
+    isLoading = true;
+    notifyListeners();
 
     try {
-      isLoading = true;
-      notifyListeners();
       await Auth().sendEmailVerification();
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(resentMessage, textAlign: TextAlign.center)),
-      );
+      return true;
     } catch (e) {
       errorMessage = sendMailErrorMsg;
       debugPrint('Verification email failed: $e');
+      return false;
     } finally {
       isLoading = false;
       notifyListeners();

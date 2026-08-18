@@ -117,97 +117,61 @@ class LoginPageViewmodel extends ChangeNotifier {
     return null;
   }
 
-  Future<void> createUser(
-    BuildContext context,
-    ScaffoldMessengerState scaffoldMessenger,
-    String sendVerificationEmailMsg,
-  ) async {
+  Future<void> createUser({
+    required String createUserErrorMsg,
+    required String emailAlreadyRegisteredMsg,
+  }) async {
     errorMsg = '';
     isLoading = true;
-    final l10n = AppLocalizations.of(context)!;
-    final emailNotVerifiedMsg = l10n.login_emailNotVerifiedMsg;
-    final createUserErrorMsg = l10n.login_createUserErrorMsg;
 
     try {
       final userCredential = await Auth().createUser(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      await userCredential.user!.sendEmailVerification();
-      if (scaffoldMessenger.mounted) {
-        scaffoldMessenger.showSnackBar(
-          SnackBar(
-            content: Text(
-              sendVerificationEmailMsg,
-              textAlign: TextAlign.center,
-            ),
-          ),
-        );
+
+      try {
+        await userCredential.user?.sendEmailVerification();
+      } catch (e) {
+        // Hesap başarıyla oluşturulmuş durumda. Doğrulama e-postasının ilk
+        // gönderimi başarısız olursa kullanıcı VerificationPage üzerinden
+        // yeniden gönderebilir; hesabı başarısız saymıyoruz.
+        debugPrint('Initial verification email failed: $e');
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
-        final existingUser = await Auth().signIn(
-          email: emailController.text.trim(),
-          password: passwordController.text.trim(),
-        );
-        if (!existingUser.user!.emailVerified) {
-          await existingUser.user!.sendEmailVerification();
-          throw FirebaseAuthException(
-            code: 'email-not-verified',
-            message: emailNotVerifiedMsg,
-          );
-        }
+        errorMsg = emailAlreadyRegisteredMsg;
+      } else {
+        errorMsg = createUserErrorMsg;
       }
+      debugPrint('Firebase create-user error: ${e.code}');
+    } catch (e) {
       errorMsg = createUserErrorMsg;
+      debugPrint('Create-user error: $e');
     } finally {
       isLoading = false;
+      notifyListeners();
     }
   }
 
-  Future<void> signIn(
-    BuildContext context,
-    String emailNotVerifiedMsg,
-    String signInErrorMsg,
-    ScaffoldMessengerState scaffoldMessenger,
-  ) async {
+  Future<void> signIn({required String signInErrorMsg}) async {
     errorMsg = '';
     isLoading = true;
 
     try {
-      final userCredential = await Auth().signIn(
+      await Auth().signIn(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-
-      if (!userCredential.user!.emailVerified) {
-        await userCredential.user!.sendEmailVerification();
-        await Auth().signOut();
-        throw FirebaseAuthException(
-          code: 'email-not-verified',
-          message: emailNotVerifiedMsg,
-        );
-      }
-      // isLogin = true;
+      // E-posta doğrulama durumuna burada müdahale etmiyoruz. Başarılı
+      // oturumdan sonra Wrapper, userChanges üzerinden doğrulanmış kullanıcıyı
+      // QRCodeGenerator'a; doğrulanmamış kullanıcıyı VerificationPage'e yollar.
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'email-not-verified') {
-        errorMsg = e.message ?? 'E-posta doğrulaması yapılmadı.';
-        if (scaffoldMessenger.mounted) {
-          scaffoldMessenger.showSnackBar(
-            SnackBar(content: Text(emailNotVerifiedMsg)),
-          );
-        }
-      } else {
-        errorMsg = signInErrorMsg;
-        // scaffoldMessenger.showSnackBar(
-        //   SnackBar(
-        //     content: Text(errorMsg),
-        //   ),
-        // );
-      }
-      // errorMsg = e.code == 'invalid-credential'
-      //     ? AppLocalizations.of(context)!.login_invalidCredentialsErrMsg
-      //     : AppLocalizations.of(context)!.login_signInErrorMsg;
+      errorMsg = signInErrorMsg;
       debugPrint('Firebase sign-in error: ${e.code}');
+    } catch (e) {
+      errorMsg = signInErrorMsg;
+      debugPrint('Sign-in error: $e');
     } finally {
       isLoading = false;
       notifyListeners();

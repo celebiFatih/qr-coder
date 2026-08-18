@@ -293,6 +293,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get verificationPage_sendAgainBtn => 'Yeniden gönderin';
 
   @override
+  String get verificationPage_useDifferentAccountBtn =>
+      'Farklı hesapla giriş yap';
+
+  @override
   String get verificationPage_welcomeTitle => 'QR Coder\'a Hoşgeldiniz!';
 
   @override

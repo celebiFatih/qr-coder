@@ -290,29 +290,19 @@ class LoginPage extends StatelessWidget {
     BuildContext context,
   ) async {
     final scaffoldContext = ScaffoldMessenger.of(context);
-    final emailNotVerifiedMsg = AppLocalizations.of(
-      context,
-    )!.login_emailNotVerifiedMsg; // "E-posta doğrulaması yapılmadı. Lütfen e-postanızı kontrol edin."
-    final signInErrorMsg = AppLocalizations.of(context)!.login_signInErrorMsg;
-    final sendVerificationEmailMsg = AppLocalizations.of(
-      context,
-    )!.verificationPage_sendAgainMsg; // "Kullanıcı doğrulaması tamamlanamadı!"
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final signInErrorMsg = l10n.login_signInErrorMsg;
+    final createUserErrorMsg = l10n.login_createUserErrorMsg;
+    final emailAlreadyRegisteredMsg = l10n.login_emailAlreadyRegistered;
     if (_formKey.currentState?.validate() ?? false) {
       FocusScope.of(context).unfocus();
 
       if (!viewModel.isLogin) {
-        await viewModel.signIn(
-          context,
-          emailNotVerifiedMsg,
-          signInErrorMsg,
-          scaffoldMessenger,
-        );
+        await viewModel.signIn(signInErrorMsg: signInErrorMsg);
       } else {
         await viewModel.createUser(
-          context,
-          scaffoldMessenger,
-          sendVerificationEmailMsg,
+          createUserErrorMsg: createUserErrorMsg,
+          emailAlreadyRegisteredMsg: emailAlreadyRegisteredMsg,
         );
       }
       if (viewModel.errorMsg.isNotEmpty) {

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
+import 'package:qr_coder/services/auth_service.dart';
+import 'package:qr_coder/utils/constants.dart';
+import 'package:qr_coder/viewmodels/login_page_viewmodel.dart';
 import 'package:qr_coder/viewmodels/verification_page_viewmodel.dart';
+import 'package:qr_coder/widgets/wrapper.dart';
 
 class VerificationPage extends StatefulWidget {
   const VerificationPage({super.key});
@@ -60,8 +64,11 @@ class _VerificationPageState extends State<VerificationPage> {
                 _gap(),
                 _buildVerificationIndicator(viewModel),
                 _gap(),
-                _buildSubmitButton(context, isSmallScreen, viewModel),
-                _gap(),
+                _buildResendButton(context, isSmallScreen, viewModel),
+                const SizedBox(height: 12),
+                _buildDifferentAccountButton(context, isSmallScreen, viewModel),
+                const SizedBox(height: 8),
+                _buildGuestAccessButton(context, isSmallScreen, viewModel),
               ],
             ),
           ),
@@ -102,7 +109,7 @@ class _VerificationPageState extends State<VerificationPage> {
     );
   }
 
-  Widget _buildSubmitButton(
+  Widget _buildResendButton(
     BuildContext context,
     bool isSmallScreen,
     VerificationPageViewModel viewModel,
@@ -116,16 +123,70 @@ class _VerificationPageState extends State<VerificationPage> {
             borderRadius: BorderRadius.circular(10),
           ),
         ),
+        onPressed: viewModel.isLoading
+            ? null
+            : () => _handleSendVerification(context, viewModel),
         child: Padding(
           padding: const EdgeInsets.all(10.0),
+          child: viewModel.isLoading
+              ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(strokeWidth: 2.5),
+                )
+              : Text(
+                  AppLocalizations.of(context)!.verificationPage_sendAgainBtn,
+                  style: isSmallScreen
+                      ? Theme.of(context).textTheme.bodyLarge
+                      : Theme.of(context).textTheme.headlineSmall,
+                ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDifferentAccountButton(
+    BuildContext context,
+    bool isSmallScreen,
+    VerificationPageViewModel viewModel,
+  ) {
+    return SizedBox(
+      width: double.infinity,
+      child: OutlinedButton.icon(
+        onPressed: viewModel.isLoading
+            ? null
+            : () => _handleUseDifferentAccount(context, viewModel),
+        icon: const Icon(Icons.switch_account_rounded),
+        label: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 10.0),
           child: Text(
-            AppLocalizations.of(context)!.verificationPage_sendAgainBtn,
+            AppLocalizations.of(
+              context,
+            )!.verificationPage_useDifferentAccountBtn,
             style: isSmallScreen
-                ? Theme.of(context).textTheme.bodyLarge
-                : Theme.of(context).textTheme.headlineSmall,
+                ? Theme.of(context).textTheme.bodyMedium
+                : Theme.of(context).textTheme.bodyLarge,
           ),
         ),
-        onPressed: () => _handleSendVerification(context, viewModel),
+      ),
+    );
+  }
+
+  Widget _buildGuestAccessButton(
+    BuildContext context,
+    bool isSmallScreen,
+    VerificationPageViewModel viewModel,
+  ) {
+    return TextButton.icon(
+      onPressed: viewModel.isLoading
+          ? null
+          : () => _handleContinueAsGuest(context, viewModel),
+      icon: const Icon(Icons.person_outline_rounded),
+      label: Text(
+        AppLocalizations.of(context)!.login_GuestAccessButton,
+        style: isSmallScreen
+            ? Theme.of(context).textTheme.bodyMedium
+            : Theme.of(context).textTheme.bodyLarge,
       ),
     );
   }
@@ -134,22 +195,85 @@ class _VerificationPageState extends State<VerificationPage> {
     BuildContext context,
     VerificationPageViewModel viewModel,
   ) async {
-    final scaffoldContext = ScaffoldMessenger.of(context);
-    final sendAgainMessage = AppLocalizations.of(
-      context,
-    )!.verificationPage_sendAgainMsg;
-    await viewModel.sendVerificationEmail(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final successMessage = l10n.verificationPage_verificationEmailResentMsg;
+    final errorMessage = l10n.verificationPage_sendMailErrorMsg;
+
+    final sent = await viewModel.sendVerificationEmail(
+      sendMailErrorMsg: errorMessage,
+    );
     if (!context.mounted) return;
-    if (viewModel.errorMessage.isNotEmpty) {
-      scaffoldContext.showSnackBar(
+
+    scaffoldMessenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          sent ? successMessage : viewModel.errorMessage,
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+
+  Future<void> _handleUseDifferentAccount(
+    BuildContext context,
+    VerificationPageViewModel viewModel,
+  ) async {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final logoutErrorMessage = AppLocalizations.of(
+      context,
+    )!.qrCodeGenerator_LogOutErrorMsg;
+
+    try {
+      final prefs = await Constants().prefs;
+      await prefs.setBool('isGuest', false);
+      await Auth().signOut();
+
+      viewModel.clearAll();
+      if (!context.mounted) return;
+      context.read<LoginPageViewmodel>().clearLoginForm();
+      // Wrapper, Firebase userChanges sign-out olayını dinlediği için
+      // LoginPage'e otomatik olarak geçer.
+    } catch (e) {
+      debugPrint('Farklı hesap akışında oturum kapatma hatası: $e');
+      if (!context.mounted) return;
+      scaffoldMessenger.showSnackBar(
         SnackBar(
-          content: Text(viewModel.errorMessage, textAlign: TextAlign.center),
+          content: Text(logoutErrorMessage, textAlign: TextAlign.center),
         ),
       );
-      viewModel.errorMessage = '';
-    } else {
-      scaffoldContext.showSnackBar(
-        SnackBar(content: Text(sendAgainMessage, textAlign: TextAlign.center)),
+    }
+  }
+
+  Future<void> _handleContinueAsGuest(
+    BuildContext context,
+    VerificationPageViewModel viewModel,
+  ) async {
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    final logoutErrorMessage = AppLocalizations.of(
+      context,
+    )!.qrCodeGenerator_LogOutErrorMsg;
+
+    try {
+      final prefs = await Constants().prefs;
+      await prefs.setBool('isGuest', true);
+      await Auth().signOut();
+      viewModel.clearAll();
+
+      if (!context.mounted) return;
+      // Mevcut Wrapper'ın isGuest değeri bellekte tutulduğu için guest flag'ini
+      // yeniden okuyacak temiz bir Wrapper ile kök akışı yeniliyoruz.
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (context) => const Wrapper()),
+        (Route<dynamic> route) => false,
+      );
+    } catch (e) {
+      debugPrint('Misafir moda geçiş hatası: $e');
+      if (!context.mounted) return;
+      scaffoldMessenger.showSnackBar(
+        SnackBar(
+          content: Text(logoutErrorMessage, textAlign: TextAlign.center),
+        ),
       );
     }
   }
@@ -159,7 +283,6 @@ class _VerificationPageState extends State<VerificationPage> {
         ? CircularProgressIndicator(
             color: Theme.of(context).colorScheme.onSecondaryContainer,
             strokeWidth: 3.0,
-            // strokeAlign: -5,
           )
         : const Icon(Icons.done_all_rounded, size: 100);
   }

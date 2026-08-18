@@ -614,6 +614,12 @@ abstract class AppLocalizations {
   /// **'Send Again'**
   String get verificationPage_sendAgainBtn;
 
+  /// No description provided for @verificationPage_useDifferentAccountBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in with a different account'**
+  String get verificationPage_useDifferentAccountBtn;
+
   /// No description provided for @verificationPage_welcomeTitle.
   ///
   /// In en, this message translates to:

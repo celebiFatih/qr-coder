@@ -294,6 +294,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get verificationPage_sendAgainBtn => 'Send Again';
 
   @override
+  String get verificationPage_useDifferentAccountBtn =>
+      'Sign in with a different account';
+
+  @override
   String get verificationPage_welcomeTitle => 'Welcome to QR Coder!';
 
   @override

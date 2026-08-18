@@ -126,6 +126,7 @@
     "verificationPage_sendMailErrorMsg": "Failed to send verification email!\nPlease try again.",
     "verificationPage_verificationEmailResentMsg": "Verification link sent again.",
     "verificationPage_sendAgainBtn": "Send Again",
+    "verificationPage_useDifferentAccountBtn": "Sign in with a different account",
     "verificationPage_welcomeTitle": "Welcome to QR Coder!",
     "verificationPage_sendAgainMsg": "New verification email sent. Please verify your account within 24 hours.",
     "verificationPage_sendVerificationEmail": "Verification email sent.\nPlease check your email.",
