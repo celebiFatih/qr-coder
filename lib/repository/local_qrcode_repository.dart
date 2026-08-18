@@ -22,7 +22,8 @@ class LocalQrCodeRepository implements QRCodeRepository {
 
   void _createDatabase(Database db, int version) async {
     await db.execute(
-        '''CREATE TABLE qr_codes (id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT NOT NULL, name TEXT, created_at TEXT NOT NULL)''');
+      '''CREATE TABLE qr_codes (id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT NOT NULL, name TEXT, created_at TEXT NOT NULL)''',
+    );
   }
 
   @override
@@ -45,17 +46,25 @@ class LocalQrCodeRepository implements QRCodeRepository {
 
   @override
   Future<void> updateQRCodeName(
-      String id, Map<String, dynamic> updatedData) async {
+    String id,
+    Map<String, dynamic> updatedData,
+  ) async {
     final db = await database;
-    await db.update('qr_codes', {'name': updatedData['name']},
-        where: 'id = ?', whereArgs: [int.parse(id)]);
+    await db.update(
+      'qr_codes',
+      {'name': updatedData['name']},
+      where: 'id = ?',
+      whereArgs: [int.parse(id)],
+    );
   }
 
   @override
   Future<List<QRCodeModel>> fetchAllQRCodes() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps =
-        await db.query('qr_codes', orderBy: 'created_at ASC');
+    final List<Map<String, dynamic>> maps = await db.query(
+      'qr_codes',
+      orderBy: 'created_at ASC',
+    );
 
     if (maps.isEmpty) {
       return [];

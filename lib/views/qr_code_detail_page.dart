@@ -39,6 +39,7 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
       resizeToAvoidBottomInset: false,
       appBar: _buildAppBar(context),
       body: _buildBody(context),
+      bottomNavigationBar: const BannerAdWidget(),
       floatingActionButton: _buildFabs(context, viewModel),
     );
   }
@@ -51,15 +52,18 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
           onPressed: () =>
               Navigator.of(context).popUntil((route) => route.isFirst),
           icon: const Icon(Icons.home_rounded),
-          tooltip:
-              AppLocalizations.of(context)!.qrCodeDetail_homePageNavToolTip,
+          tooltip: AppLocalizations.of(
+            context,
+          )!.qrCodeDetail_homePageNavToolTip,
         ),
         IconButton(
           onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const QRCodeListPage())),
+            MaterialPageRoute(builder: (context) => const QRCodeListPage()),
+          ),
           icon: const Icon(Icons.format_list_bulleted_rounded),
-          tooltip:
-              AppLocalizations.of(context)!.qrCodeDetail_listPageNavToolTip,
+          tooltip: AppLocalizations.of(
+            context,
+          )!.qrCodeDetail_listPageNavToolTip,
         ),
       ],
     );
@@ -100,12 +104,10 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
 
             const SizedBox(height: 16),
             // Alt kısım (detaylar) Generator’daki gibi Expanded + scroll
-            Expanded(
-              child: BuildContent(qrCode: widget.qrCode),
-            ),
+            Expanded(child: BuildContent(qrCode: widget.qrCode)),
             const SizedBox(height: 8),
             _buildCreateDateTime(context),
-            const BannerAdWidget(),
+            const SizedBox(height: 8),
           ],
         );
       },
@@ -164,16 +166,21 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
   // }
 
   Widget _buildCreateDateTime(BuildContext context) {
-    final created =
-        DateFormat('dd.MM.yyyy HH:mm').parse(widget.qrCode.createdAt);
+    final created = DateFormat(
+      'dd.MM.yyyy HH:mm',
+    ).parse(widget.qrCode.createdAt);
     final isEn = AppLocalizations.of(context)!.localeName == 'en';
-    final fmt =
-        isEn ? DateFormat('MM.dd.yyyy HH:mm') : DateFormat('dd.MM.yyyy HH:mm');
+    final fmt = isEn
+        ? DateFormat('MM.dd.yyyy HH:mm')
+        : DateFormat('dd.MM.yyyy HH:mm');
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text(AppLocalizations.of(context)!
-            .qrCodeDetail_createdDateTime(fmt.format(created))),
+        Text(
+          AppLocalizations.of(
+            context,
+          )!.qrCodeDetail_createdDateTime(fmt.format(created)),
+        ),
       ],
     );
   }
@@ -196,16 +203,19 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
             ? const CircularProgressIndicator()
             : FloatingActionButton(
                 heroTag: 'saverFab',
-                tooltip: AppLocalizations.of(context)!
-                    .qrCodeDetail_saveQrCodeButtonToolTip,
+                tooltip: AppLocalizations.of(
+                  context,
+                )!.qrCodeDetail_saveQrCodeButtonToolTip,
                 onPressed: () async {
-                  _showResolutionPicker(context,
-                      (double selectedResolution) async {
+                  _showResolutionPicker(context, (
+                    double selectedResolution,
+                  ) async {
                     final filePath = await viewModel.saveQrCode(
                       repaintKey,
                       context,
                       viewModel.selectedResolution, // gerçekten seçilen
                     );
+                    if (!context.mounted) return;
                     _handleSaveResult(context, viewModel, filePath);
                   });
                 },
@@ -216,7 +226,10 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
   }
 
   void _handleSaveResult(
-      BuildContext context, QRCodeViewModel viewModel, String? filePath) {
+    BuildContext context,
+    QRCodeViewModel viewModel,
+    String? filePath,
+  ) {
     if (filePath == null && viewModel.errorMsg.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -236,9 +249,10 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
                 child: Text(
                   AppLocalizations.of(context)!.qrCodeDetail_openSavedQrCode,
                   style: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      decoration: TextDecoration.underline),
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    decoration: TextDecoration.underline,
+                  ),
                 ),
               ),
             ],
@@ -255,10 +269,12 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
             ? const CircularProgressIndicator()
             : FloatingActionButton(
                 heroTag: 'sharerFab',
-                tooltip: AppLocalizations.of(context)!
-                    .qrCodeDetail_shareQrCodeBtnToolTip,
+                tooltip: AppLocalizations.of(
+                  context,
+                )!.qrCodeDetail_shareQrCodeBtnToolTip,
                 onPressed: () async {
                   await viewModel.shareQrCode(repaintKey, context);
+                  if (!context.mounted) return;
                   _handleShareResult(context, viewModel);
                 },
                 child: const Icon(Icons.share_rounded),
@@ -303,8 +319,8 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
               Text(
                 AppLocalizations.of(context)!.qrCodeDetail_resolution,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
               Divider(
                 color: Theme.of(context).colorScheme.onSurface,
@@ -333,23 +349,25 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
                           ),
                           title: Text(
                             labels[index],
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyLarge
+                            style: Theme.of(context).textTheme.bodyLarge
                                 ?.copyWith(
                                   color: isSelected
-                                      ? Theme.of(context)
-                                          .colorScheme
-                                          .onPrimaryContainer
+                                      ? Theme.of(
+                                          context,
+                                        ).colorScheme.onPrimaryContainer
                                       : Theme.of(context).colorScheme.onSurface,
                                 ),
                           ),
                           trailing: isSelected
                               ? ElevatedButton.icon(
-                                  label: Text(AppLocalizations.of(context)!
-                                      .qrCodeDetail_download),
+                                  label: Text(
+                                    AppLocalizations.of(
+                                      context,
+                                    )!.qrCodeDetail_download,
+                                  ),
                                   icon: const Icon(
-                                      Icons.download_for_offline_rounded),
+                                    Icons.download_for_offline_rounded,
+                                  ),
                                   onPressed: () {
                                     Navigator.of(context).pop();
                                     onDownload(vm.selectedResolution);

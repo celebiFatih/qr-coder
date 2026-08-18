@@ -83,17 +83,21 @@ class ForgotPasswPage extends StatelessWidget {
   }
 
   Widget _buildEmailField(
-      ForgotPasswPageViewmodel viewModel, BuildContext context) {
+    ForgotPasswPageViewmodel viewModel,
+    BuildContext context,
+  ) {
     return TextFormField(
       controller: viewModel.emailController,
       focusNode: viewModel.emailFocusNode,
       autofocus: true,
       validator: (value) => viewModel.emailValidator(value, context),
       decoration: InputDecoration(
-        labelText:
-            AppLocalizations.of(context)!.forgotPasswordPage_textFieldLabelText,
-        hintText:
-            AppLocalizations.of(context)!.forgotPasswordPage_textFieldHintText,
+        labelText: AppLocalizations.of(
+          context,
+        )!.forgotPasswordPage_textFieldLabelText,
+        hintText: AppLocalizations.of(
+          context,
+        )!.forgotPasswordPage_textFieldHintText,
         prefixIcon: const Icon(Icons.email_outlined),
         suffixIcon: IconButton(
           icon: const Icon(Icons.close_rounded),
@@ -104,8 +108,11 @@ class ForgotPasswPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSubmitButton(BuildContext context, bool isSmallScreen,
-      ForgotPasswPageViewmodel viewModel) {
+  Widget _buildSubmitButton(
+    BuildContext context,
+    bool isSmallScreen,
+    ForgotPasswPageViewmodel viewModel,
+  ) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -132,39 +139,40 @@ class ForgotPasswPage extends StatelessWidget {
   }
 
   Future<void> _handleSendEmail(
-      BuildContext context, ForgotPasswPageViewmodel viewModel) async {
+    BuildContext context,
+    ForgotPasswPageViewmodel viewModel,
+  ) async {
+    final successMessage = AppLocalizations.of(
+      context,
+    )!.forgotPasswordPage_sendEmailSuccessMsg;
+
     if (_formKey.currentState?.validate() ?? false) {
       if (!viewModel.isLoading) {
         await viewModel.sendResetEmail(context);
+        if (!context.mounted) return;
       }
 
       if (viewModel.errorMessage.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              viewModel.errorMessage,
-              textAlign: TextAlign.center,
-            ),
+            content: Text(viewModel.errorMessage, textAlign: TextAlign.center),
           ),
         );
       } else {
         ScaffoldMessenger.of(context)
             .showSnackBar(
               SnackBar(
-                content: Text(
-                  AppLocalizations.of(context)!
-                      .forgotPasswordPage_sendEmailSuccessMsg,
-                  textAlign: TextAlign.center,
-                ),
+                content: Text(successMessage, textAlign: TextAlign.center),
               ),
             )
             .closed
             .then((value) {
-          Timer(const Duration(seconds: 2), () {
-            viewModel.clearAll();
-            Navigator.pop(context);
-          });
-        });
+              Timer(const Duration(seconds: 2), () {
+                if (!context.mounted) return;
+                viewModel.clearAll();
+                Navigator.pop(context);
+              });
+            });
       }
     }
   }

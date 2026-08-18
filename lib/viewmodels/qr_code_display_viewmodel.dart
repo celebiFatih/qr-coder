@@ -38,28 +38,29 @@ class QRCodeDisplayViewModel extends ChangeNotifier {
       ),
     );
 
-    if (confirmed != true) return;
+    if (confirmed != true || !context.mounted) return;
 
     // Reklam hazır değilse kullanıcıyı bilgilendir
     if (!_rewardedAdService.isAdReady && _rewardedAdService.isLoading) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.qrcodeDisplay_loading_ad)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.qrcodeDisplay_loading_ad)));
       return;
     }
 
     final ok = await _rewardedAdService.showRewardedAd();
+    if (!context.mounted) return;
 
     if (ok) {
       _isLogoRemoved = true;
       notifyListeners();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.qrcodeDisplay_removed_logo)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.qrcodeDisplay_removed_logo)));
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.qrcodeDisplay_error_ad)),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(l10n.qrcodeDisplay_error_ad)));
     }
   }
 }

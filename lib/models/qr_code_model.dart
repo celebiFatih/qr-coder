@@ -12,11 +12,7 @@ class QRCodeModel {
   });
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'data': data,
-      'created_at': createdAt,
-    };
+    return {'name': name, 'data': data, 'created_at': createdAt};
   }
 
   factory QRCodeModel.fromJson(String key, Map<dynamic, dynamic> json) {

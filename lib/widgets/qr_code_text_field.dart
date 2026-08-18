@@ -5,11 +5,12 @@ class QRCodeTextField extends StatelessWidget {
   final TextEditingController controller;
   final FocusNode focusNode;
   final void Function() onPressed;
-  const QRCodeTextField(
-      {required this.controller,
-      super.key,
-      required this.focusNode,
-      required this.onPressed});
+  const QRCodeTextField({
+    required this.controller,
+    super.key,
+    required this.focusNode,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,10 +19,11 @@ class QRCodeTextField extends StatelessWidget {
       focusNode: focusNode,
       autofocus: false,
       decoration: InputDecoration(
-        hintText:
-            AppLocalizations.of(context)!.qrCodeGenerator_textFieldHintText,
+        hintText: AppLocalizations.of(
+          context,
+        )!.qrCodeGenerator_textFieldHintText,
         hintStyle: TextStyle(
-          color: const Color(0xFF757575).withOpacity(0.5),
+          color: const Color(0xFF757575).withValues(alpha: 0.5),
         ),
         enabledBorder: const UnderlineInputBorder(
           borderSide: BorderSide(color: Color(0xFF673AB7)),
@@ -30,11 +32,9 @@ class QRCodeTextField extends StatelessWidget {
           borderSide: BorderSide(color: Color(0xFF673AB7)),
         ),
         suffixIcon: IconButton(
-            icon: const Icon(
-              Icons.clear,
-              size: 28,
-            ),
-            onPressed: onPressed),
+          icon: const Icon(Icons.clear, size: 28),
+          onPressed: onPressed,
+        ),
       ),
       style: const TextStyle(color: Color(0xFF212121)),
       minLines: 1, // Minimum number of lines

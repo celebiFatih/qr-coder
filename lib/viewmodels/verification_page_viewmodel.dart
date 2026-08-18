@@ -19,39 +19,33 @@ class VerificationPageViewModel extends ChangeNotifier {
   }
 
   void startEmailVerificationCheckTimer() {
-    _timer = Timer.periodic(
-      const Duration(seconds: 5),
-      (timer) async {
-        await Auth().reloadAndCheckEmailVerfication();
-        final user = Auth().currentUser;
-        if (user != null && user.emailVerified) {
-          emailVerified = true;
-          _timer?.cancel();
-          notifyListeners();
-        }
-      },
-    );
+    _timer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+      await Auth().reloadAndCheckEmailVerfication();
+      final user = Auth().currentUser;
+      if (user != null && user.emailVerified) {
+        emailVerified = true;
+        _timer?.cancel();
+        notifyListeners();
+      }
+    });
   }
 
   Future<void> sendVerificationEmail(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final resentMessage = l10n.verificationPage_verificationEmailResentMsg;
+    final sendMailErrorMsg = l10n.verificationPage_sendMailErrorMsg;
+
     try {
       isLoading = true;
       notifyListeners();
       await Auth().sendEmailVerification();
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!
-                .verificationPage_verificationEmailResentMsg,
-            textAlign:
-                TextAlign.center, // "Doğrulama bağlantısı tekrar gönderildi."
-          ),
-        ),
+        SnackBar(content: Text(resentMessage, textAlign: TextAlign.center)),
       );
     } catch (e) {
-      errorMessage =
-          AppLocalizations.of(context)!.verificationPage_sendMailErrorMsg;
-      print(e);
+      errorMessage = sendMailErrorMsg;
+      debugPrint('Verification email failed: $e');
     } finally {
       isLoading = false;
       notifyListeners();

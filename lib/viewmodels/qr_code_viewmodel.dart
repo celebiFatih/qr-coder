@@ -11,7 +11,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/models/qr_code_model.dart';
 import 'package:qr_coder/repository/main_qrcode_repository.dart';
-import 'package:qr_coder/utils/constants.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -30,10 +29,12 @@ class QRCodeViewModel extends ChangeNotifier {
   double _selectedResolution = 2.0;
 
   QRCodeViewModel({required bool isFirebaseUser, required String? uid})
-      : repository =
-            MainQrCodeRepository(isFirebaseUser: isFirebaseUser, uid: uid);
+    : repository = MainQrCodeRepository(
+        isFirebaseUser: isFirebaseUser,
+        uid: uid,
+      );
 
-  void clearAll() async {
+  void clearAll() {
     controller.clear();
     sharedText = '';
     qrData = '';
@@ -42,7 +43,6 @@ class QRCodeViewModel extends ChangeNotifier {
     isLoading = false;
     isDownloading = false;
     isSharing = false;
-    await Constants().prefs.then((prefs) => prefs.setBool('isGuest', false));
     notifyListeners();
   }
 
@@ -64,8 +64,13 @@ class QRCodeViewModel extends ChangeNotifier {
   /// Receive the shared text
   Future<void> receiveSharedText(BuildContext context) async {
     const MethodChannel platform = MethodChannel('com.qrcoder.app/app');
+    final l10n = AppLocalizations.of(context)!;
+    final sharedDataName = l10n.qrCodeGenerator_sharedData;
+    final receiveErrorMsg = l10n.qrCodeGenerator_receiveErrorMsg;
+
     try {
       final String? sharedData = await platform.invokeMethod('getSharedText');
+      if (!context.mounted) return;
       if (sharedData != null && sharedData.isNotEmpty) {
         final timestamp = DateFormat('dd.MM.yyyy HH:mm').format(DateTime.now());
         sharedText = sharedData;
@@ -74,15 +79,15 @@ class QRCodeViewModel extends ChangeNotifier {
         qrCodeModel = QRCodeModel(
           id: ' ',
           data: sharedData,
-          name: AppLocalizations.of(context)!.qrCodeGenerator_sharedData,
+          name: sharedDataName,
           createdAt: timestamp,
         );
         await saveQRCodeToDb(context);
         notifyListeners();
       }
     } catch (e) {
-      errorMsg = AppLocalizations.of(context)!.qrCodeGenerator_receiveErrorMsg;
-      print(e);
+      errorMsg = receiveErrorMsg;
+      debugPrint('Shared text receive failed: $e');
     }
   }
 
@@ -95,55 +100,60 @@ class QRCodeViewModel extends ChangeNotifier {
     errorMsg = '';
     isDownloading = true;
     String filePath = '';
+    final l10n = AppLocalizations.of(context)!;
+    final savePermissionErrorMsg = l10n.qrCodeGenerator_savePermissionErrorMsg;
+    final saveErrorMsg = l10n.qrCodeGenerator_saveErrorMsg;
     notifyListeners();
 
     try {
-      final plugin = DeviceInfoPlugin();
-      final androidInfo = await plugin.androidInfo;
-      final sdkInt = androidInfo.version.sdkInt;
+      PermissionStatus storageStatus = PermissionStatus.granted;
 
-      PermissionStatus storageStatus;
-
-      // Android 13 (SDK 33) and above do not require storage permission
-      if (sdkInt < 33) {
-        storageStatus = await Permission.storage.request();
-      } else {
-        storageStatus = PermissionStatus.granted;
+      // Legacy storage permission is only relevant on older Android versions.
+      // Android 13+ uses scoped media storage and does not grant
+      // READ/WRITE_EXTERNAL_STORAGE.
+      if (Platform.isAndroid) {
+        final androidInfo = await DeviceInfoPlugin().androidInfo;
+        if (androidInfo.version.sdkInt < 33) {
+          storageStatus = await Permission.storage.request();
+        }
       }
 
       if (storageStatus != PermissionStatus.granted) {
         if (storageStatus == PermissionStatus.permanentlyDenied) {
           openAppSettings();
         }
-        errorMsg = AppLocalizations.of(context)!
-            .qrCodeGenerator_savePermissionErrorMsg;
+        errorMsg = savePermissionErrorMsg;
         // print(errorMsg);
         return null;
       }
 
       // Catch the QR code and save it
       await WidgetsBinding
-          .instance.endOfFrame; // UI güncellensin, logo kaldırıldıysa yansısın
-      final boundary = repaintKey.currentContext!.findRenderObject()
-          as RenderRepaintBoundary;
+          .instance
+          .endOfFrame; // UI güncellensin, logo kaldırıldıysa yansısın
+      final boundary =
+          repaintKey.currentContext!.findRenderObject()
+              as RenderRepaintBoundary;
       final image = await boundary.toImage(pixelRatio: pixelRatio);
       final byteData = await image.toByteData(format: ImageByteFormat.png);
       final pngBytes = byteData!.buffer.asUint8List();
 
       // Save the PNG file to the device gallery
-      final result = await ImageGallerySaverPlus.saveImage(pngBytes,
-          quality: 100,
-          name: "qr_code_${DateTime.now().millisecondsSinceEpoch}");
+      final result = await ImageGallerySaverPlus.saveImage(
+        pngBytes,
+        quality: 100,
+        name: "qr_code_${DateTime.now().millisecondsSinceEpoch}",
+      );
 
       if (result['isSuccess']) {
         filePath = result['filePath'];
         // print('QR kodu galeriye kaydedildi: ${result['filePath']}');
       } else {
-        errorMsg = AppLocalizations.of(context)!.qrCodeGenerator_saveErrorMsg;
+        errorMsg = saveErrorMsg;
         return null;
       }
     } catch (e) {
-      errorMsg = AppLocalizations.of(context)!.qrCodeGenerator_saveErrorMsg;
+      errorMsg = saveErrorMsg;
       return null;
     } finally {
       isDownloading = false;
@@ -156,11 +166,14 @@ class QRCodeViewModel extends ChangeNotifier {
   /// Save the QR code to the database
   Future<void> saveQRCodeToDb(BuildContext context) async {
     errorMsg = '';
+    final saveToDbErrorMsg = AppLocalizations.of(
+      context,
+    )!.qrCodeGenerator_saveToDbErrorMsg;
     try {
       await repository.insertQrCode(qrCodeModel!);
     } catch (e) {
-      errorMsg = AppLocalizations.of(context)!.qrCodeGenerator_saveToDbErrorMsg;
-      print(e);
+      errorMsg = saveToDbErrorMsg;
+      debugPrint('QR code database save failed: $e');
     }
   }
 
@@ -168,13 +181,18 @@ class QRCodeViewModel extends ChangeNotifier {
   Future<void> shareQrCode(GlobalKey repaintKey, BuildContext context) async {
     errorMsg = '';
     isSharing = true;
+    final l10n = AppLocalizations.of(context)!;
+    final sharedTitle = l10n.qrCodeGenerator_sharedTitle;
+    final sharedErrorMsg = l10n.qrCodeGenerator_sharedErrorMsg;
     notifyListeners();
     try {
       // Get the QR code image
       await WidgetsBinding
-          .instance.endOfFrame; // UI güncellensin, logo kaldırıldıysa yansısın
-      final boundary = repaintKey.currentContext!.findRenderObject()
-          as RenderRepaintBoundary;
+          .instance
+          .endOfFrame; // UI güncellensin, logo kaldırıldıysa yansısın
+      final boundary =
+          repaintKey.currentContext!.findRenderObject()
+              as RenderRepaintBoundary;
       final image = await boundary.toImage(pixelRatio: selectedResolution);
       final byteData = await image.toByteData(format: ImageByteFormat.png);
       final Uint8List pngBytes = byteData!.buffer.asUint8List();
@@ -182,15 +200,16 @@ class QRCodeViewModel extends ChangeNotifier {
       // Create a temporary file and save the QR code image
       final tempDir = await getTemporaryDirectory();
       final file = await File(
-              '${tempDir.path}/qr_code_${DateTime.now().millisecondsSinceEpoch}.png')
-          .create();
+        '${tempDir.path}/qr_code_${DateTime.now().millisecondsSinceEpoch}.png',
+      ).create();
       await file.writeAsBytes(pngBytes);
 
-      // Share the file
-      await Share.shareXFiles([XFile(file.path)],
-          text: AppLocalizations.of(context)!.qrCodeGenerator_sharedTitle);
+      // Share the file using the current share_plus API.
+      await SharePlus.instance.share(
+        ShareParams(files: [XFile(file.path)], text: sharedTitle),
+      );
     } catch (e) {
-      errorMsg = AppLocalizations.of(context)!.qrCodeGenerator_sharedErrorMsg;
+      errorMsg = sharedErrorMsg;
     } finally {
       isSharing = false;
       notifyListeners();
@@ -200,15 +219,17 @@ class QRCodeViewModel extends ChangeNotifier {
   /// Generate the QR code
   Future<void> generateQRCode(BuildContext context) async {
     errorMsg = '';
+    final l10n = AppLocalizations.of(context)!;
+    final generatedQrName = l10n.qrCodeGenerator_qrCode;
+    final generatorErrorMsg = l10n.qrCodeGenerator_qrCodeGeneratorErrMsg;
     final data = controller.text;
     if (data.isEmpty) {
-      errorMsg = AppLocalizations.of(context)!.qrCodeGenerator_dataEmptyMsg;
+      errorMsg = l10n.qrCodeGenerator_dataEmptyMsg;
       focusNode.requestFocus();
       notifyListeners();
       return;
     } else if (data.length > 2500) {
-      errorMsg =
-          AppLocalizations.of(context)!.qrCodeGenerator_dataTooLongErrMsg;
+      errorMsg = l10n.qrCodeGenerator_dataTooLongErrMsg;
       focusNode.unfocus();
       notifyListeners();
       return;
@@ -217,18 +238,18 @@ class QRCodeViewModel extends ChangeNotifier {
       final timestamp = DateFormat('dd.MM.yyyy HH:mm').format(DateTime.now());
       qrData = data;
       qrCodeModel = QRCodeModel(
-          id: '',
-          data: data,
-          createdAt: timestamp,
-          name: AppLocalizations.of(context)!.qrCodeGenerator_qrCode);
+        id: '',
+        data: data,
+        createdAt: timestamp,
+        name: generatedQrName,
+      );
       await saveQRCodeToDb(context);
       focusNode.unfocus();
       notifyListeners();
     } catch (e) {
-      errorMsg =
-          AppLocalizations.of(context)!.qrCodeGenerator_qrCodeGeneratorErrMsg;
+      errorMsg = generatorErrorMsg;
       focusNode.unfocus();
-      print(e);
+      debugPrint('QR code generation failed: $e');
     }
   }
 
@@ -238,10 +259,10 @@ class QRCodeViewModel extends ChangeNotifier {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri);
       } else {
-        print('Dosya açılamadı: $filePath');
+        debugPrint('Dosya açılamadı: $filePath');
       }
     } else {
-      print('Dosya yolu geçersiz: $filePath');
+      debugPrint('Dosya yolu geçersiz: $filePath');
     }
   }
 }

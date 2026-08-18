@@ -33,7 +33,9 @@ class DatabaseService {
   }
 
   Future<void> updateQRCodeName(
-      String id, Map<String, dynamic> updatedData) async {
+    String id,
+    Map<String, dynamic> updatedData,
+  ) async {
     final user = Auth().currentUser;
     if (user != null) {
       String uid = user.uid;
@@ -47,22 +49,20 @@ class DatabaseService {
     if (user != null) {
       String uid = user.uid;
       DatabaseReference userRef = database.child('users/$uid/qrcodes');
-      return await userRef.once().then(
-        (event) {
-          if (event.snapshot.value != null) {
-            Map<dynamic, dynamic> fetchedData =
-                event.snapshot.value as Map<dynamic, dynamic>;
+      return await userRef.once().then((event) {
+        if (event.snapshot.value != null) {
+          Map<dynamic, dynamic> fetchedData =
+              event.snapshot.value as Map<dynamic, dynamic>;
 
-            List<QRCodeModel> qrCodesList = [];
-            fetchedData.forEach((key, value) {
-              qrCodesList.add(QRCodeModel.fromJson(key, value));
-            });
-            return qrCodesList;
-          } else {
-            return [];
-          }
-        },
-      );
+          List<QRCodeModel> qrCodesList = [];
+          fetchedData.forEach((key, value) {
+            qrCodesList.add(QRCodeModel.fromJson(key, value));
+          });
+          return qrCodesList;
+        } else {
+          return [];
+        }
+      });
     } else {
       return [];
     }

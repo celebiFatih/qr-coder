@@ -15,8 +15,9 @@ class BuildContent extends StatelessWidget {
       children: [
         Text(
           AppLocalizations.of(context)!.qrCodeDetail_Details,
-          style:
-              Theme.of(context).textTheme.headlineLarge!.copyWith(fontSize: 26),
+          style: Theme.of(
+            context,
+          ).textTheme.headlineLarge!.copyWith(fontSize: 26),
         ),
         const Divider(height: 2.0),
         Expanded(
@@ -55,12 +56,15 @@ class BuildContent extends StatelessWidget {
   Widget _buildWifi(BuildContext context, String wifiData) {
     final parts = wifiData.replaceFirst('WIFI:', '').split(';');
     final ssid = parts.firstWhere((part) => part.startsWith('S:')).substring(2);
-    final password =
-        parts.firstWhere((part) => part.startsWith('P:')).substring(2);
-    final encryption =
-        parts.firstWhere((part) => part.startsWith('T:')).substring(2);
-    final hidden =
-        parts.firstWhere((part) => part.startsWith('H:')).substring(2);
+    final password = parts
+        .firstWhere((part) => part.startsWith('P:'))
+        .substring(2);
+    final encryption = parts
+        .firstWhere((part) => part.startsWith('T:'))
+        .substring(2);
+    final hidden = parts
+        .firstWhere((part) => part.startsWith('H:'))
+        .substring(2);
 
     return GestureDetector(
       onTap: () async {
@@ -69,7 +73,7 @@ class BuildContent extends StatelessWidget {
           try {
             await intent.invokeMethod('openWifiSettings');
           } on PlatformException catch (e) {
-            print("Failed to open Wi-Fi settings: ${e.message}");
+            debugPrint('Failed to open Wi-Fi settings: ${e.message}');
           }
         } else {
           showDialog(
@@ -80,33 +84,46 @@ class BuildContent extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text('SSID: $ssid'),
-                  Text(AppLocalizations.of(context)!
-                      .qrCodeDetail_wifiPassw(password)),
-                  Text(AppLocalizations.of(context)!
-                      .qrCodeDetail_wifiEncryption(encryption)),
-                  Text(AppLocalizations.of(context)!
-                      .qrCodeDetail_wifiHidden(hidden)),
+                  Text(
+                    AppLocalizations.of(
+                      context,
+                    )!.qrCodeDetail_wifiPassw(password),
+                  ),
+                  Text(
+                    AppLocalizations.of(
+                      context,
+                    )!.qrCodeDetail_wifiEncryption(encryption),
+                  ),
+                  Text(
+                    AppLocalizations.of(
+                      context,
+                    )!.qrCodeDetail_wifiHidden(hidden),
+                  ),
                 ],
               ),
               actions: [
                 TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(AppLocalizations.of(context)!
-                        .qrCodeDetail_wifiConnectTextBtn))
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(
+                    AppLocalizations.of(
+                      context,
+                    )!.qrCodeDetail_wifiConnectTextBtn,
+                  ),
+                ),
               ],
             ),
           );
         }
       },
       child: Tooltip(
-        message:
-            AppLocalizations.of(context)!.qrCodeDetail_OpenWifiSettingsButton,
+        message: AppLocalizations.of(
+          context,
+        )!.qrCodeDetail_OpenWifiSettingsButton,
         child: Text(
           wifiData,
-          style: Theme.of(context)
-              .textTheme
-              .bodyLarge
-              ?.copyWith(color: Colors.blue),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyLarge?.copyWith(color: Colors.blue),
         ),
       ),
     );

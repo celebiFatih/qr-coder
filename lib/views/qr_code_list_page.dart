@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -17,8 +15,10 @@ class QRCodeListPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel =
-        Provider.of<QrCodeListPageViewmodel>(context, listen: false);
+    final viewModel = Provider.of<QrCodeListPageViewmodel>(
+      context,
+      listen: false,
+    );
     viewModel.repository = MainQrCodeRepository(
       isFirebaseUser: Auth().currentUser != null,
       uid: Auth().currentUser?.uid,
@@ -26,6 +26,7 @@ class QRCodeListPage extends StatelessWidget {
     return Scaffold(
       appBar: _buildAppBar(context, viewModel),
       body: _buildBody(context, viewModel),
+      bottomNavigationBar: const BannerAdWidget(),
       floatingActionButton: _buildFab(context, viewModel),
     );
   }
@@ -44,50 +45,56 @@ class QRCodeListPage extends StatelessWidget {
   }
 
   Widget _buildBody(BuildContext context, QrCodeListPageViewmodel viewModel) {
-    return Column(
-      children: [
-        Expanded(child: buildQRCodeList(context, viewModel)),
-        const BannerAdWidget()
-      ],
-    );
+    return buildQRCodeList(context, viewModel);
   }
 
   Widget buildQRCodeList(
-      BuildContext context, QrCodeListPageViewmodel viewModel) {
+    BuildContext context,
+    QrCodeListPageViewmodel viewModel,
+  ) {
     return FutureBuilder<void>(
-        future: viewModel.fetchQRCodes(context),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            print(e);
-            return Center(
-                child: Text(AppLocalizations.of(context)!
-                    .qrCodeList_fetchListErrorMsg));
-          } else if (viewModel.qrCodes.isEmpty) {
-            return Center(
-                child:
-                    Text(AppLocalizations.of(context)!.qrCodeList_emptyList));
-          }
+      future: viewModel.fetchQRCodes(AppLocalizations.of(context)!),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          debugPrint('QR code list FutureBuilder error: ${snapshot.error}');
+          return Center(
+            child: Text(
+              AppLocalizations.of(context)!.qrCodeList_fetchListErrorMsg,
+            ),
+          );
+        } else if (viewModel.qrCodes.isEmpty) {
+          return Center(
+            child: Text(AppLocalizations.of(context)!.qrCodeList_emptyList),
+          );
+        }
 
-          return _buildQRCodeListView(context, viewModel);
-        });
+        return _buildQRCodeListView(context, viewModel);
+      },
+    );
   }
 
   Widget _buildQRCodeListView(
-      BuildContext context, QrCodeListPageViewmodel viewModel) {
+    BuildContext context,
+    QrCodeListPageViewmodel viewModel,
+  ) {
     return Consumer<QrCodeListPageViewmodel>(
-        builder: (context, viewModel, child) {
-      return ListView.builder(
-        itemCount: viewModel.qrCodes.length,
-        itemBuilder: (context, index) =>
-            buildQRCodeListItem(context, viewModel, index),
-      );
-    });
+      builder: (context, viewModel, child) {
+        return ListView.builder(
+          itemCount: viewModel.qrCodes.length,
+          itemBuilder: (context, index) =>
+              buildQRCodeListItem(context, viewModel, index),
+        );
+      },
+    );
   }
 
   Widget buildQRCodeListItem(
-      BuildContext context, QrCodeListPageViewmodel viewModel, index) {
+    BuildContext context,
+    QrCodeListPageViewmodel viewModel,
+    index,
+  ) {
     var qrCode = viewModel.qrCodes[index];
     final isSelected = viewModel.selectedQRCodes.contains(qrCode.id);
     final isEditing = viewModel.editingQRCodes.contains(qrCode.id);
@@ -105,10 +112,18 @@ class QRCodeListPage extends StatelessWidget {
                 : _buildQRCodeName(qrCode),
             subtitle: _buildQRCodeSubtitle(context, qrCode),
             trailing: _buildQRCodeActions(
-                viewModel, qrCode, isSelected, isEditing, context),
+              viewModel,
+              qrCode,
+              isSelected,
+              isEditing,
+              context,
+            ),
             leading: _buildQRCodePreview(qrCode, context),
-            onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) => QRCodeDetailPage(qrCode: qrCode))),
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => QRCodeDetailPage(qrCode: qrCode),
+              ),
+            ),
           ),
         ),
       ),
@@ -116,14 +131,19 @@ class QRCodeListPage extends StatelessWidget {
   }
 
   Widget _buildEditingTextField(
-      BuildContext context,
-      TextEditingController controller,
-      QRCodeModel qrCode,
-      QrCodeListPageViewmodel viewModel) {
+    BuildContext context,
+    TextEditingController controller,
+    QRCodeModel qrCode,
+    QrCodeListPageViewmodel viewModel,
+  ) {
     return TextField(
       controller: controller,
       onSubmitted: (value) async {
-        await viewModel.updateQRCodeName(qrCode.id, value, context);
+        await viewModel.updateQRCodeName(
+          qrCode.id,
+          value,
+          AppLocalizations.of(context)!,
+        );
         viewModel.toggleEditingQRCode(qrCode.id);
       },
     );
@@ -138,20 +158,24 @@ class QRCodeListPage extends StatelessWidget {
 
   Widget _buildQRCodeSubtitle(BuildContext context, QRCodeModel qrCode) {
     return Text(
-        AppLocalizations.of(context)!.localeName == 'en'
-            ? DateFormat('MM.dd.yyyy HH:mm')
-                .format(DateFormat('dd.MM.yyyy HH:mm').parse(qrCode.createdAt))
-            : DateFormat('dd.MM.yyyy HH:mm')
-                .format(DateFormat('dd.MM.yyyy HH:mm').parse(qrCode.createdAt)),
-        maxLines: 1);
+      AppLocalizations.of(context)!.localeName == 'en'
+          ? DateFormat(
+              'MM.dd.yyyy HH:mm',
+            ).format(DateFormat('dd.MM.yyyy HH:mm').parse(qrCode.createdAt))
+          : DateFormat(
+              'dd.MM.yyyy HH:mm',
+            ).format(DateFormat('dd.MM.yyyy HH:mm').parse(qrCode.createdAt)),
+      maxLines: 1,
+    );
   }
 
   Widget _buildQRCodeActions(
-      QrCodeListPageViewmodel viewModel,
-      QRCodeModel qrCode,
-      bool isSelected,
-      bool isEditing,
-      BuildContext context) {
+    QrCodeListPageViewmodel viewModel,
+    QRCodeModel qrCode,
+    bool isSelected,
+    bool isEditing,
+    BuildContext context,
+  ) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -168,8 +192,10 @@ class QRCodeListPage extends StatelessWidget {
         ),
         IconButton(
           icon: const Icon(Icons.delete),
-          onPressed: () async =>
-              await viewModel.deleteQRCode(qrCode.id, context),
+          onPressed: () async => await viewModel.deleteQRCode(
+            qrCode.id,
+            AppLocalizations.of(context)!,
+          ),
           tooltip: AppLocalizations.of(context)!.qrCodeList_deleteBtn,
         ),
       ],
@@ -185,10 +211,11 @@ class QRCodeListPage extends StatelessWidget {
           borderRadius: BorderRadius.circular(8),
         ),
         child: QrImageView(
-            data: AppLocalizations.of(context)!.qrCodeList_defaultQrCode,
-            version: QrVersions.auto,
-            size: 50,
-            padding: const EdgeInsets.all(4)),
+          data: AppLocalizations.of(context)!.qrCodeList_defaultQrCode,
+          version: QrVersions.auto,
+          size: 50,
+          padding: const EdgeInsets.all(4),
+        ),
       ),
     );
   }
@@ -208,7 +235,9 @@ class QRCodeListPage extends StatelessWidget {
   }
 
   Widget _buildBottomSheetActions(
-      BuildContext context, QrCodeListPageViewmodel viewModel) {
+    BuildContext context,
+    QrCodeListPageViewmodel viewModel,
+  ) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Wrap(
@@ -217,24 +246,29 @@ class QRCodeListPage extends StatelessWidget {
             margin: const EdgeInsets.symmetric(vertical: 8),
             child: ListTile(
               leading: const Icon(Icons.delete_forever),
-              title:
-                  Text(AppLocalizations.of(context)!.qrCodeList_deleteAllBtn),
+              title: Text(
+                AppLocalizations.of(context)!.qrCodeList_deleteAllBtn,
+              ),
               onTap: () async {
+                final l10n = AppLocalizations.of(context)!;
                 Navigator.of(context).pop();
-                await viewModel.deleteAllQRCodes(context);
+                await viewModel.deleteAllQRCodes(l10n);
               },
             ),
           ),
           Card(
             margin: const EdgeInsets.symmetric(vertical: 8),
             child: ListTile(
-                leading: const Icon(Icons.delete_sweep),
-                title: Text(
-                    AppLocalizations.of(context)!.qrCodeList_deleteSelectedBtn),
-                onTap: () async {
-                  Navigator.of(context).pop();
-                  await viewModel.deleteSelectedQRCodes(context);
-                }),
+              leading: const Icon(Icons.delete_sweep),
+              title: Text(
+                AppLocalizations.of(context)!.qrCodeList_deleteSelectedBtn,
+              ),
+              onTap: () async {
+                final l10n = AppLocalizations.of(context)!;
+                Navigator.of(context).pop();
+                await viewModel.deleteSelectedQRCodes(l10n);
+              },
+            ),
           ),
         ],
       ),

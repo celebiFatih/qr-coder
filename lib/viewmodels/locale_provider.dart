@@ -13,14 +13,15 @@ class LocaleProvider with ChangeNotifier {
   void setLocale(Locale locale) async {
     _locale = locale;
     notifyListeners();
-    await Constants()
-        .prefs
-        .then((prefs) => prefs.setString('locale', locale.languageCode));
+    await Constants().prefs.then(
+      (prefs) => prefs.setString('locale', locale.languageCode),
+    );
   }
 
   void _loadLocale() async {
-    String? localeCode =
-        await Constants().prefs.then((prefs) => prefs.getString('locale'));
+    String? localeCode = await Constants().prefs.then(
+      (prefs) => prefs.getString('locale'),
+    );
     if (localeCode != null) {
       _locale = Locale(localeCode);
       notifyListeners();

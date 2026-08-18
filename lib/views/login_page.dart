@@ -5,7 +5,6 @@ import 'package:qr_coder/utils/constants.dart';
 import 'package:qr_coder/viewmodels/locale_provider.dart';
 import 'package:qr_coder/viewmodels/login_page_viewmodel.dart';
 import 'package:qr_coder/views/forgot_passw_page.dart';
-import 'package:qr_coder/views/qr_code_generator_page.dart';
 import 'package:qr_coder/widgets/wrapper.dart';
 
 class LoginPage extends StatelessWidget {
@@ -18,16 +17,16 @@ class LoginPage extends StatelessWidget {
 
     final mq = MediaQuery.of(context);
 
-// Mevcut ölçek katsayısını hesapla (1.0'ı ölçekleyip sonucu katsayı olarak kullanıyoruz)
+    // Mevcut ölçek katsayısını hesapla (1.0'ı ölçekleyip sonucu katsayı olarak kullanıyoruz)
     final currentFactor = mq.textScaler.scale(1.0);
 
-// 1.0–1.2 aralığına sabitle
+    // 1.0–1.2 aralığına sabitle
     final clampedFactor = currentFactor.clamp(1.0, 1.2).toDouble();
 
-// Yeni TextScaler oluştur
+    // Yeni TextScaler oluştur
     final clampedScaler = TextScaler.linear(clampedFactor);
 
-// MediaQuery'yi textScaler ile kopyala
+    // MediaQuery'yi textScaler ile kopyala
     final media = mq.copyWith(textScaler: clampedScaler);
 
     return MediaQuery(
@@ -72,7 +71,10 @@ class LoginPage extends StatelessWidget {
   }
 
   Widget _buildMainContent(
-      BuildContext context, bool isPhone, LoginPageViewmodel viewModel) {
+    BuildContext context,
+    bool isPhone,
+    LoginPageViewmodel viewModel,
+  ) {
     final pad = EdgeInsets.symmetric(
       horizontal: isPhone ? 20 : 32,
       vertical: isPhone ? 20 : 28,
@@ -131,11 +133,12 @@ class LoginPage extends StatelessWidget {
         },
         child: Container(
           padding: const EdgeInsets.all(8.0),
-          child: Text(localeProvider.locale?.languageCode == 'tr' ? 'EN' : 'TR',
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge!
-                  .copyWith(color: Colors.white)),
+          child: Text(
+            localeProvider.locale?.languageCode == 'tr' ? 'EN' : 'TR',
+            style: Theme.of(
+              context,
+            ).textTheme.bodyLarge!.copyWith(color: Colors.white),
+          ),
         ),
       ),
     );
@@ -177,7 +180,6 @@ class LoginPage extends StatelessWidget {
   Widget _buildEmailField(LoginPageViewmodel viewModel, BuildContext context) {
     return TextFormField(
       controller: viewModel.emailController,
-      focusNode: viewModel.emailFocusNode,
       validator: (value) => viewModel.emailValidator(value, context),
       decoration: InputDecoration(
         labelText: AppLocalizations.of(context)!.login_label_email,
@@ -189,7 +191,7 @@ class LoginPage extends StatelessWidget {
         ),
         border: const OutlineInputBorder(),
       ),
-      onFieldSubmitted: (value) => viewModel.passwordFocusNode.requestFocus(),
+      onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
     );
   }
 
@@ -198,7 +200,6 @@ class LoginPage extends StatelessWidget {
       builder: (context, viewModel, child) {
         return TextFormField(
           controller: viewModel.passwordController,
-          focusNode: viewModel.passwordFocusNode,
           validator: (value) => viewModel.passwordValidator(value, context),
           obscureText: !viewModel.isPasswordVisible,
           decoration: InputDecoration(
@@ -207,9 +208,11 @@ class LoginPage extends StatelessWidget {
             prefixIcon: const Icon(Icons.lock_outline_rounded),
             border: const OutlineInputBorder(),
             suffixIcon: IconButton(
-              icon: Icon(viewModel.isPasswordVisible
-                  ? Icons.visibility_off_rounded
-                  : Icons.visibility_rounded),
+              icon: Icon(
+                viewModel.isPasswordVisible
+                    ? Icons.visibility_off_rounded
+                    : Icons.visibility_rounded,
+              ),
               onPressed: () =>
                   viewModel.isPasswordVisible = !viewModel.isPasswordVisible,
             ),
@@ -245,7 +248,10 @@ class LoginPage extends StatelessWidget {
   }
 
   Widget _buildSubmitButton(
-      BuildContext context, bool isPhone, LoginPageViewmodel viewModel) {
+    BuildContext context,
+    bool isPhone,
+    LoginPageViewmodel viewModel,
+  ) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -284,37 +290,51 @@ class LoginPage extends StatelessWidget {
     BuildContext context,
   ) async {
     final scaffoldContext = ScaffoldMessenger.of(context);
-    final navigatorContext = Navigator.of(context);
-    final emailNotVerifiedMsg = AppLocalizations.of(context)!
-        .login_emailNotVerifiedMsg; // "E-posta doğrulaması yapılmadı. Lütfen e-postanızı kontrol edin."
+    final emailNotVerifiedMsg = AppLocalizations.of(
+      context,
+    )!.login_emailNotVerifiedMsg; // "E-posta doğrulaması yapılmadı. Lütfen e-postanızı kontrol edin."
     final signInErrorMsg = AppLocalizations.of(context)!.login_signInErrorMsg;
-    final sendVerificationEmailMsg = AppLocalizations.of(context)!
-        .verificationPage_sendAgainMsg; // "Kullanıcı doğrulaması tamamlanamadı!"
+    final sendVerificationEmailMsg = AppLocalizations.of(
+      context,
+    )!.verificationPage_sendAgainMsg; // "Kullanıcı doğrulaması tamamlanamadı!"
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     if (_formKey.currentState?.validate() ?? false) {
+      FocusScope.of(context).unfocus();
+
       if (!viewModel.isLogin) {
         await viewModel.signIn(
-            context, emailNotVerifiedMsg, signInErrorMsg, scaffoldMessenger);
+          context,
+          emailNotVerifiedMsg,
+          signInErrorMsg,
+          scaffoldMessenger,
+        );
       } else {
         await viewModel.createUser(
-            context, scaffoldMessenger, sendVerificationEmailMsg);
+          context,
+          scaffoldMessenger,
+          sendVerificationEmailMsg,
+        );
       }
       if (viewModel.errorMsg.isNotEmpty) {
+        if (!context.mounted) return;
         scaffoldContext.showSnackBar(
           SnackBar(
-            content: Text(
-              viewModel.errorMsg,
-              textAlign: TextAlign.center,
-            ),
+            content: Text(viewModel.errorMsg, textAlign: TextAlign.center),
           ),
         );
-      } else if (viewModel.isLogin) {
-        await viewModel.saveCredentials();
-        navigatorContext.pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => const Wrapper()),
-          (Route<dynamic> route) => false,
-        );
+        return;
       }
+
+      // Hem başarılı giriş hem de başarılı kayıt akışında oturum artık
+      // Firebase tarafında oluşturulmuştur. Guest bayrağını temizliyoruz;
+      // doğrulanmış/doğrulanmamış kullanıcı yönlendirmesini Wrapper yönetir.
+      await viewModel.saveCredentials();
+      final prefs = await Constants().prefs;
+      await prefs.setBool('isGuest', false);
+
+      // Başarılı giriş/kayıt sonrasında route değiştirmiyoruz.
+      // Wrapper, Firebase userChanges akışını dinlediği için kullanıcı
+      // durumuna göre QR veya doğrulama ekranını kendisi gösterecek.
     }
   }
 
@@ -331,10 +351,12 @@ class LoginPage extends StatelessWidget {
               children: [
                 TextSpan(
                   text: !viewModel.isLogin
-                      ? AppLocalizations.of(context)!
-                          .login_LoginOrRegisterToggle
-                      : AppLocalizations.of(context)!
-                          .login_LoginOrRegisterToggleAlreadyHaveAccount,
+                      ? AppLocalizations.of(
+                          context,
+                        )!.login_LoginOrRegisterToggle
+                      : AppLocalizations.of(
+                          context,
+                        )!.login_LoginOrRegisterToggleAlreadyHaveAccount,
                 ),
                 TextSpan(
                   text: !viewModel.isLogin
@@ -357,11 +379,10 @@ class LoginPage extends StatelessWidget {
     return InkWell(
       onTap: () async {
         await Constants().prefs.then((prefs) => prefs.setBool('isGuest', true));
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const QRCodeGenerator(),
-          ),
+        if (!context.mounted) return;
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => const Wrapper()),
+          (Route<dynamic> route) => false,
         );
       },
       child: Text(
@@ -377,7 +398,9 @@ class LoginPage extends StatelessWidget {
   Widget _buildForgotPasswordButton(BuildContext context) {
     return InkWell(
       onTap: () => Navigator.push(
-          context, MaterialPageRoute(builder: (context) => ForgotPasswPage())),
+        context,
+        MaterialPageRoute(builder: (context) => ForgotPasswPage()),
+      ),
       child: Text(
         AppLocalizations.of(context)!.login_ForgotPasswordButton,
         style: TextStyle(

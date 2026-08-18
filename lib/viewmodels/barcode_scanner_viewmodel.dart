@@ -19,8 +19,10 @@ class BarcodeScannerViewmodel extends ChangeNotifier {
   List<Barcode> get barcodes => List.unmodifiable(_barcodes);
 
   BarcodeScannerViewmodel({required bool isFirebaseUser, required String? uid})
-      : repository =
-            MainQrCodeRepository(isFirebaseUser: isFirebaseUser, uid: uid);
+    : repository = MainQrCodeRepository(
+        isFirebaseUser: isFirebaseUser,
+        uid: uid,
+      );
 
   void clearAll() {
     _barcodes.clear();
@@ -65,16 +67,22 @@ class BarcodeScannerViewmodel extends ChangeNotifier {
 
   Future<void> saveQrCodeToDb(Barcode barcode, BuildContext context) async {
     errorMsg = '';
+    final l10n = AppLocalizations.of(context)!;
+    final scannedDataName = l10n.scannerPage_scannedData;
+    final saveErrorMsg = l10n.scannerPage_saveErrorMsg;
+
     try {
-      await repository.insertQrCode(QRCodeModel(
-        id: '',
-        data: barcode.rawValue ?? '',
-        name: AppLocalizations.of(context)!.scannerPage_scannedData,
-        createdAt: DateFormat('dd.MM.yyyy HH:mm').format(DateTime.now()),
-      ));
+      await repository.insertQrCode(
+        QRCodeModel(
+          id: '',
+          data: barcode.rawValue ?? '',
+          name: scannedDataName,
+          createdAt: DateFormat('dd.MM.yyyy HH:mm').format(DateTime.now()),
+        ),
+      );
     } catch (e) {
-      errorMsg = AppLocalizations.of(context)!.scannerPage_saveErrorMsg;
-      print(e);
+      errorMsg = saveErrorMsg;
+      debugPrint('QR code save failed: $e');
     }
   }
 

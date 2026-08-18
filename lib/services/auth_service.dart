@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 
 class Auth {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -6,6 +7,7 @@ class Auth {
   User? get currentUser => _auth.currentUser;
 
   Stream<User?> get authStateChanges => _auth.authStateChanges();
+  Stream<User?> get userChanges => _auth.userChanges();
 
   // Send email verification
   Future<void> sendEmailVerification() async {
@@ -31,9 +33,9 @@ class Auth {
     if (_auth.currentUser != null) {
       await _auth.currentUser?.reload();
       if (_auth.currentUser!.emailVerified) {
-        print("Kullanıcı doğrulaması tamamlandı!");
+        debugPrint("Kullanıcı doğrulaması tamamlandı!");
       } else {
-        print("Kullanıcı doğrulaması tamamlanamadı!");
+        debugPrint("Kullanıcı doğrulaması tamamlanamadı!");
       }
     }
   }
@@ -44,7 +46,9 @@ class Auth {
     required String password,
   }) async {
     return await _auth.createUserWithEmailAndPassword(
-        email: email, password: password);
+      email: email,
+      password: password,
+    );
   }
 
   // Sign in with email and password

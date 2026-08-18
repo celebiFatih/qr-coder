@@ -9,9 +9,9 @@ class RewardedAdService {
   final String _addUnitId;
 
   RewardedAdService({String? addUnitId})
-      : _addUnitId = (addUnitId?.isNotEmpty == true)
-            ? addUnitId!
-            : 'ca-app-pub-3940256099942544/5224354917'; // google test
+    : _addUnitId = (addUnitId?.isNotEmpty == true)
+          ? addUnitId!
+          : 'ca-app-pub-3940256099942544/5224354917'; // google test
 
   bool get isAdReady => _rewardedAd != null;
   bool get isLoading => _isLoading;
@@ -67,9 +67,11 @@ class RewardedAdService {
       },
     );
 
-    _rewardedAd!.show(onUserEarnedReward: (ad, reward) {
-      earned = true;
-    });
+    _rewardedAd!.show(
+      onUserEarnedReward: (ad, reward) {
+        earned = true;
+      },
+    );
 
     // referansı boşalt
     _rewardedAd = null;

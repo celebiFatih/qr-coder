@@ -6,8 +6,11 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:math' as math;
 
 class QRcodeDisplay extends StatefulWidget {
-  const QRcodeDisplay(
-      {super.key, required this.data, required this.repaintKey});
+  const QRcodeDisplay({
+    super.key,
+    required this.data,
+    required this.repaintKey,
+  });
   final String data;
   final GlobalKey repaintKey;
 
@@ -36,15 +39,16 @@ class _QRcodeDisplayState extends State<QRcodeDisplay> {
         final logoSide = side * logoRatio;
 
         return Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              RepaintBoundary(
-                key: widget.repaintKey,
-                child: SizedBox.square(
-                  dimension: side,
-                  child: Consumer<QRCodeDisplayViewModel>(
-                    builder: (context, vm, child) => Stack(children: [
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            RepaintBoundary(
+              key: widget.repaintKey,
+              child: SizedBox.square(
+                dimension: side,
+                child: Consumer<QRCodeDisplayViewModel>(
+                  builder: (context, vm, child) => Stack(
+                    children: [
                       QrImageView(
                         data: widget.data,
                         backgroundColor: Colors.white,
@@ -54,10 +58,14 @@ class _QRcodeDisplayState extends State<QRcodeDisplay> {
                             ? null
                             : const AssetImage('assets/img/logo.png'),
                         embeddedImageStyle: QrEmbeddedImageStyle(
-                            size: Size(logoSide, logoSide)),
+                          size: Size(logoSide, logoSide),
+                        ),
                         errorStateBuilder: (cxt, err) => Center(
-                          child: Text(AppLocalizations.of(context)!
-                              .qrcodeDisplay_pageTitle),
+                          child: Text(
+                            AppLocalizations.of(
+                              context,
+                            )!.qrcodeDisplay_pageTitle,
+                          ),
                         ),
                       ),
                       if (!vm.isLogoRemoved)
@@ -71,12 +79,14 @@ class _QRcodeDisplayState extends State<QRcodeDisplay> {
                               behavior: HitTestBehavior.opaque,
                             ),
                           ),
-                        )
-                    ]),
+                        ),
+                    ],
                   ),
                 ),
               ),
-            ]);
+            ),
+          ],
+        );
       },
     );
   }

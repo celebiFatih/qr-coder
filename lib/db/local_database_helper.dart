@@ -19,7 +19,8 @@ class DatabaseHelper {
 
   void _createDatabase(Database db, int version) async {
     await db.execute(
-        '''CREATE TABLE qr_codes (id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT NOT NULL, name TEXT, created_at TEXT NOT NULL)''');
+      '''CREATE TABLE qr_codes (id INTEGER PRIMARY KEY AUTOINCREMENT, data TEXT NOT NULL, name TEXT, created_at TEXT NOT NULL)''',
+    );
   }
 
   Future<int> insertQrCode(Map<String, dynamic> row) async {
@@ -29,8 +30,12 @@ class DatabaseHelper {
 
   Future<int> updateQRCodeName(int id, String name) async {
     final db = await database;
-    return await db.update('qr_codes', {'name': name},
-        where: 'id = ?', whereArgs: [id]);
+    return await db.update(
+      'qr_codes',
+      {'name': name},
+      where: 'id = ?',
+      whereArgs: [id],
+    );
   }
 
   Future<List<Map<String, dynamic>>> getAllQRCodes() async {

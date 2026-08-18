@@ -26,8 +26,8 @@ class ForgotPasswPageViewmodel extends ChangeNotifier {
     }
 
     bool emailValid = RegExp(
-            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-        .hasMatch(value);
+      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+    ).hasMatch(value);
     if (!emailValid) {
       return 'Lütfen geçerli bir e-posta girin';
     }
@@ -36,6 +36,10 @@ class ForgotPasswPageViewmodel extends ChangeNotifier {
   }
 
   Future<void> sendResetEmail(BuildContext context) async {
+    final sendMailErrorMsg = AppLocalizations.of(
+      context,
+    )!.forgotPasswordPage_sendMailErrorMsg;
+
     try {
       isLoading = true;
       emailFocusNode.unfocus();
@@ -45,9 +49,8 @@ class ForgotPasswPageViewmodel extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       isLoading = false;
-      errorMessage =
-          AppLocalizations.of(context)!.forgotPasswordPage_sendMailErrorMsg;
-      print(e);
+      errorMessage = sendMailErrorMsg;
+      debugPrint('Password reset email failed: $e');
       notifyListeners();
     }
   }

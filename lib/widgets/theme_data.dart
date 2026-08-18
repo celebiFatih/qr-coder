@@ -32,26 +32,31 @@ class AppTheme {
       // Eskisi: buttonTheme (yalnızca eski RaisedButton/FlatButton için)
       // Yeni: ElevatedButtonTheme (Material 3)
       elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: scheme.secondary, // "buttonColor" yerine bu
-          foregroundColor: scheme.onSecondary, // yazı/icon rengi
-          elevation: 2,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-        ).copyWith(
-          // İsteğe bağlı: farklı durum renkleri
-          backgroundColor: WidgetStateProperty.resolveWith((states) {
-            if (states.contains(WidgetState.disabled)) {
-              return scheme.secondary.withValues(alpha: 0.4);
-            }
-            if (states.contains(WidgetState.pressed)) {
-              return scheme.secondary.withValues(alpha: 0.85);
-            }
-            return scheme.secondary;
-          }),
-        ),
+        style:
+            ElevatedButton.styleFrom(
+              backgroundColor: scheme.secondary, // "buttonColor" yerine bu
+              foregroundColor: scheme.onSecondary, // yazı/icon rengi
+              elevation: 2,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              textStyle: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ).copyWith(
+              // İsteğe bağlı: farklı durum renkleri
+              backgroundColor: WidgetStateProperty.resolveWith((states) {
+                if (states.contains(WidgetState.disabled)) {
+                  return scheme.secondary.withValues(alpha: 0.4);
+                }
+                if (states.contains(WidgetState.pressed)) {
+                  return scheme.secondary.withValues(alpha: 0.85);
+                }
+                return scheme.secondary;
+              }),
+            ),
       ),
 
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
@@ -69,10 +74,7 @@ class AppTheme {
 
       snackBarTheme: const SnackBarThemeData(
         backgroundColor: Color(0xFFCDDC39),
-        contentTextStyle: TextStyle(
-          color: Color(0xFF212121),
-          fontSize: 16.0,
-        ),
+        contentTextStyle: TextStyle(color: Color(0xFF212121), fontSize: 16.0),
       ),
     );
   }

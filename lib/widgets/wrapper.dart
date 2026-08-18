@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
@@ -17,26 +15,12 @@ class Wrapper extends StatefulWidget {
 }
 
 class _WrapperState extends State<Wrapper> {
-  StreamSubscription<User?>? _authStateSubscription;
-  bool isGuest = false;
-
-  // Aynı frame içinde tekrar tekrar yazmayı önlemek için:
-  bool _savedPendingTrue = false;
-  bool _savedPendingFalse = false;
+  bool? isGuest;
 
   @override
   void initState() {
     super.initState();
-    _authStateSubscription = Auth().authStateChanges.listen((_) {
-      if (mounted) setState(() {});
-    });
     _checkIfGuest();
-  }
-
-  @override
-  void dispose() {
-    _authStateSubscription?.cancel();
-    super.dispose();
   }
 
   Future<void> _checkIfGuest() async {
@@ -50,47 +34,33 @@ class _WrapperState extends State<Wrapper> {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<User?>(
-      stream: Auth().authStateChanges,
+      stream: Auth().userChanges,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         }
         if (snapshot.hasError) {
-          print(snapshot.error);
+          debugPrint('Authentication stream error: ${snapshot.error}');
           return Center(
             child: Text(AppLocalizations.of(context)!.wrapper_LoginPageToolTip),
           );
         }
         if (snapshot.hasData) {
           final user = snapshot.data!;
-          if (user.emailVerified) {
-            if (!_savedPendingFalse) {
-              _savedPendingFalse = true;
-              _savedPendingTrue = false;
-              WidgetsBinding.instance.addPostFrameCallback((_) async {
-                await _saveVerificationState(false);
-              });
-            }
-            return const QRCodeGenerator();
-          } else {
-            if (!_savedPendingTrue) {
-              _savedPendingTrue = true;
-              _savedPendingFalse = false;
-              WidgetsBinding.instance.addPostFrameCallback((_) async {
-                await _saveVerificationState(true);
-              });
-            }
-            return const VerificationPage();
-          }
+          return user.emailVerified
+              ? const QRCodeGenerator()
+              : const VerificationPage();
         }
-        if (isGuest) return const QRCodeGenerator();
+
+        if (isGuest == null) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (isGuest!) return const QRCodeGenerator();
         return LoginPage();
       },
     );
-  }
-
-  Future<void> _saveVerificationState(bool isVerificationPending) async {
-    final prefs = await Constants().prefs;
-    await prefs.setBool('isVerificationPending', isVerificationPending);
   }
 }

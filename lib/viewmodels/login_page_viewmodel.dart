@@ -12,8 +12,6 @@ class LoginPageViewmodel extends ChangeNotifier {
   String _errorMsg = '';
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final FocusNode _passwordFocusNode = FocusNode();
-  final FocusNode _emailFocusNode = FocusNode();
 
   LoginPageViewmodel() {
     loadSavedCredentials();
@@ -26,8 +24,6 @@ class LoginPageViewmodel extends ChangeNotifier {
   String get errorMsg => _errorMsg;
   TextEditingController get emailController => _emailController;
   TextEditingController get passwordController => _passwordController;
-  FocusNode get passwordFocusNode => _passwordFocusNode;
-  FocusNode get emailFocusNode => _emailFocusNode;
 
   void clearAll() {
     if (!rememberMe) {
@@ -55,12 +51,8 @@ class LoginPageViewmodel extends ChangeNotifier {
 
   @override
   void dispose() {
-    super.dispose();
     _emailController.dispose();
     _passwordController.dispose();
-    _passwordFocusNode.dispose();
-    _emailFocusNode.dispose();
-    // clearLoginForm();
     super.dispose();
   }
 
@@ -105,8 +97,8 @@ class LoginPageViewmodel extends ChangeNotifier {
     }
 
     bool emailValid = RegExp(
-            r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-        .hasMatch(value);
+      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+    ).hasMatch(value);
     if (!emailValid) {
       return AppLocalizations.of(context)!.login_emailValidatorError;
     }
@@ -126,53 +118,66 @@ class LoginPageViewmodel extends ChangeNotifier {
   }
 
   Future<void> createUser(
-      BuildContext context,
-      ScaffoldMessengerState scaffoldMessenger,
-      String sendVerificationEmailMsg) async {
+    BuildContext context,
+    ScaffoldMessengerState scaffoldMessenger,
+    String sendVerificationEmailMsg,
+  ) async {
     errorMsg = '';
     isLoading = true;
+    final l10n = AppLocalizations.of(context)!;
+    final emailNotVerifiedMsg = l10n.login_emailNotVerifiedMsg;
+    final createUserErrorMsg = l10n.login_createUserErrorMsg;
+
     try {
       final userCredential = await Auth().createUser(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim());
-      await userCredential.user!.sendEmailVerification();
-      scaffoldMessenger.showSnackBar(
-        SnackBar(
-          content: Text(
-            sendVerificationEmailMsg,
-            textAlign: TextAlign.center,
-          ),
-        ),
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
       );
+      await userCredential.user!.sendEmailVerification();
+      if (scaffoldMessenger.mounted) {
+        scaffoldMessenger.showSnackBar(
+          SnackBar(
+            content: Text(
+              sendVerificationEmailMsg,
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-already-in-use') {
         final existingUser = await Auth().signIn(
-            email: emailController.text.trim(),
-            password: passwordController.text.trim());
+          email: emailController.text.trim(),
+          password: passwordController.text.trim(),
+        );
         if (!existingUser.user!.emailVerified) {
           await existingUser.user!.sendEmailVerification();
           throw FirebaseAuthException(
             code: 'email-not-verified',
-            message: AppLocalizations.of(context)!
-                .login_emailNotVerifiedMsg, // "E-posta doğrulaması yapılmadı. Lütfen e-postanızı kontrol edin."
+            message: emailNotVerifiedMsg,
           );
         }
       }
-      errorMsg = AppLocalizations.of(context)!.login_createUserErrorMsg;
+      errorMsg = createUserErrorMsg;
     } finally {
       isLoading = false;
     }
   }
 
-  Future<void> signIn(BuildContext context, String emailNotVerifiedMsg,
-      String signInErrorMsg, ScaffoldMessengerState scaffoldMessenger) async {
+  Future<void> signIn(
+    BuildContext context,
+    String emailNotVerifiedMsg,
+    String signInErrorMsg,
+    ScaffoldMessengerState scaffoldMessenger,
+  ) async {
     errorMsg = '';
     isLoading = true;
 
     try {
       final userCredential = await Auth().signIn(
-          email: _emailController.text.trim(),
-          password: _passwordController.text.trim());
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
 
       if (!userCredential.user!.emailVerified) {
         await userCredential.user!.sendEmailVerification();
@@ -186,8 +191,11 @@ class LoginPageViewmodel extends ChangeNotifier {
     } on FirebaseAuthException catch (e) {
       if (e.code == 'email-not-verified') {
         errorMsg = e.message ?? 'E-posta doğrulaması yapılmadı.';
-        scaffoldMessenger
-            .showSnackBar(SnackBar(content: Text(emailNotVerifiedMsg)));
+        if (scaffoldMessenger.mounted) {
+          scaffoldMessenger.showSnackBar(
+            SnackBar(content: Text(emailNotVerifiedMsg)),
+          );
+        }
       } else {
         errorMsg = signInErrorMsg;
         // scaffoldMessenger.showSnackBar(
@@ -199,7 +207,7 @@ class LoginPageViewmodel extends ChangeNotifier {
       // errorMsg = e.code == 'invalid-credential'
       //     ? AppLocalizations.of(context)!.login_invalidCredentialsErrMsg
       //     : AppLocalizations.of(context)!.login_signInErrorMsg;
-      print(e.code);
+      debugPrint('Firebase sign-in error: ${e.code}');
     } finally {
       isLoading = false;
       notifyListeners();

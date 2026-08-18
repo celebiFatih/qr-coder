@@ -19,8 +19,10 @@ class QrCodeListPageViewmodel extends ChangeNotifier {
   List<String> get editingQRCodes => _editingQRCodes;
 
   QrCodeListPageViewmodel({required bool isFirebaseUser, required String? uid})
-      : repository =
-            MainQrCodeRepository(isFirebaseUser: isFirebaseUser, uid: uid);
+    : repository = MainQrCodeRepository(
+        isFirebaseUser: isFirebaseUser,
+        uid: uid,
+      );
 
   void clearAll() {
     _selectedQRCodes.clear();
@@ -52,57 +54,61 @@ class QrCodeListPageViewmodel extends ChangeNotifier {
   //   }
   // }
 
-  Future<void> fetchQRCodes(BuildContext context) async {
-    // _isLoading = true; // Yüklenmeye başla
+  Future<void> fetchQRCodes(AppLocalizations l10n) async {
+    final fetchErrorMsg = l10n.qrCodeList_fetchListErrorMsg;
     try {
       qrCodes = await repository.fetchAllQRCodes();
       qrCodes.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     } catch (e) {
-      _errorMsg = AppLocalizations.of(context)!.qrCodeList_fetchListErrorMsg;
-      print(e);
+      _errorMsg = fetchErrorMsg;
+      debugPrint('QR code list fetch failed: $e');
     }
     notifyListeners();
-    // _isLoading = false;
   }
 
   Future<void> updateQRCodeName(
-      String id, String name, BuildContext context) async {
+    String id,
+    String name,
+    AppLocalizations l10n,
+  ) async {
+    final updateErrorMsg = l10n.qrCodeList_updateDescriptionErrorMsg;
     try {
       await repository.updateQRCodeName(id, {'name': name});
-      await fetchQRCodes(context);
+      await fetchQRCodes(l10n);
     } catch (e) {
-      _errorMsg =
-          AppLocalizations.of(context)!.qrCodeList_updateDescriptionErrorMsg;
-      print(e);
+      _errorMsg = updateErrorMsg;
+      debugPrint('QR code name update failed: $e');
     }
   }
 
-  Future<void> deleteQRCode(String id, BuildContext context) async {
+  Future<void> deleteQRCode(String id, AppLocalizations l10n) async {
+    final deleteErrorMsg = l10n.qrCodeList_deleteErrorMsg;
     try {
       await repository.deleteQrCode(id);
-      await fetchQRCodes(context);
+      await fetchQRCodes(l10n);
     } catch (e) {
-      _errorMsg = AppLocalizations.of(context)!.qrCodeList_deleteErrorMsg;
-      print(e);
+      _errorMsg = deleteErrorMsg;
+      debugPrint('QR code delete failed: $e');
     }
   }
 
-  Future<void> deleteAllQRCodes(BuildContext context) async {
+  Future<void> deleteAllQRCodes(AppLocalizations l10n) async {
+    final deleteAllErrorMsg = l10n.qrCodeList_deleteAllErrorMsg;
     try {
       await repository.deleteAllQrCodes();
-      await fetchQRCodes(context);
+      await fetchQRCodes(l10n);
     } catch (e) {
-      _errorMsg = AppLocalizations.of(context)!.qrCodeList_deleteAllErrorMsg;
-      print(e);
+      _errorMsg = deleteAllErrorMsg;
+      debugPrint('Delete all QR codes failed: $e');
     }
   }
 
-  Future<void> deleteSelectedQRCodes(BuildContext context) async {
+  Future<void> deleteSelectedQRCodes(AppLocalizations l10n) async {
     for (String id in _selectedQRCodes) {
       await repository.deleteQrCode(id);
     }
     _selectedQRCodes.clear();
-    await fetchQRCodes(context);
+    await fetchQRCodes(l10n);
   }
 
   void selectQRCode(String id) {

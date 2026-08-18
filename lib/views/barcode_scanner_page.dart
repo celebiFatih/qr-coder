@@ -9,6 +9,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/models/qr_code_model.dart';
+import 'package:qr_coder/repository/main_qrcode_repository.dart';
+import 'package:qr_coder/services/auth_service.dart';
 import 'package:qr_coder/viewmodels/barcode_scanner_viewmodel.dart';
 import 'package:qr_coder/views/qr_code_detail_page.dart';
 import 'package:qr_coder/widgets/scanner_error_widget.dart';
@@ -37,6 +39,13 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
   void didChangeDependencies() {
     super.didChangeDependencies();
     provider = context.read<BarcodeScannerViewmodel>();
+
+    final user = Auth().currentUser;
+    provider.repository = MainQrCodeRepository(
+      isFirebaseUser: user != null,
+      uid: user?.uid,
+    );
+
     if (!_isCameraStarted) {
       _startCamera(provider);
     }
@@ -47,10 +56,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
     return Scaffold(
       appBar: _buildAppBar(context),
       body: Stack(
-        children: [
-          _buildCameraView(context),
-          _buildBottomToggle(context),
-        ],
+        children: [_buildCameraView(context), _buildBottomToggle(context)],
       ),
     );
   }
@@ -93,8 +99,9 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
         Consumer<BarcodeScannerViewmodel>(
           builder: (context, viewModel, child) {
             return IconButton(
-              tooltip:
-                  AppLocalizations.of(context)!.scannerPage_refreshBtnToolTip,
+              tooltip: AppLocalizations.of(
+                context,
+              )!.scannerPage_refreshBtnToolTip,
               onPressed: () => _refreshCamera(viewModel),
               icon: const Icon(Icons.refresh),
             );
@@ -148,11 +155,13 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
 
   // Alt sayfa gösterme
   void _showBottomSheet(
-      BuildContext context, BarcodeScannerViewmodel viewModel) {
+    BuildContext context,
+    BarcodeScannerViewmodel viewModel,
+  ) {
     viewModel.isBottomSheetOpen = true;
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFFCDDC39).withOpacity(0.8),
+      backgroundColor: const Color(0xFFCDDC39).withValues(alpha: 0.8),
       constraints: const BoxConstraints(maxHeight: double.infinity),
       builder: (context) => _buildBottomSheetContent(context, viewModel),
     ).whenComplete(() {
@@ -162,7 +171,9 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
 
   // Alt sayfa içeriğini oluşturma
   Widget _buildBottomSheetContent(
-      BuildContext context, BarcodeScannerViewmodel viewModel) {
+    BuildContext context,
+    BarcodeScannerViewmodel viewModel,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
       child: Column(
@@ -210,13 +221,20 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
 
   // Barkod liste öğesi oluşturma
   Widget _buildBarcodeListItem(
-      BuildContext context, BarcodeScannerViewmodel viewModel, int index) {
+    BuildContext context,
+    BarcodeScannerViewmodel viewModel,
+    int index,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+    final scannedDataName = l10n.scannerPage_scannedData;
+    final savedToListMsg = l10n.scannerPage_savedToListMsg;
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
         leading: const Icon(Icons.qr_code_scanner),
         title: Text(
-          '${AppLocalizations.of(context)!.scannerPage_scannedData}:',
+          '$scannedDataName:',
           style: Theme.of(context).textTheme.bodyMedium,
         ),
         subtitle: Text(
@@ -226,8 +244,10 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
         ),
         onTap: () async {
           await _stopCamera(provider);
+          if (!mounted) return;
           final scaffoldMsg = ScaffoldMessenger.of(context);
           await viewModel.saveQrCodeToDb(viewModel.barcodes[index], context);
+          if (!mounted) return;
           if (viewModel.errorMsg.isNotEmpty) {
             scaffoldMsg.showSnackBar(
               SnackBar(
@@ -242,19 +262,17 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
                   qrCode: QRCodeModel(
                     id: '',
                     data: viewModel.barcodes[index].rawValue ?? '',
-                    name: AppLocalizations.of(context)!.scannerPage_scannedData,
-                    createdAt:
-                        DateFormat('dd.MM.yyyy HH:mm').format(DateTime.now()),
+                    name: scannedDataName,
+                    createdAt: DateFormat(
+                      'dd.MM.yyyy HH:mm',
+                    ).format(DateTime.now()),
                   ),
                 ),
               ),
             ).then((value) => _startCamera(provider));
             scaffoldMsg.showSnackBar(
               SnackBar(
-                content: Text(
-                  AppLocalizations.of(context)!.scannerPage_savedToListMsg,
-                  textAlign: TextAlign.center,
-                ),
+                content: Text(savedToListMsg, textAlign: TextAlign.center),
               ),
             );
           }
@@ -266,17 +284,22 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
   // Kamerayı başlatma
   Future<void> _startCamera(BarcodeScannerViewmodel provider) async {
     provider.isCameraLoading = true;
+    final l10n = AppLocalizations.of(context)!;
+    final cameraStartError = l10n.scannerPage_cameraStartError;
+    final permissionDeniedError = l10n.scannerErrorWidget_permissionDenied;
 
     if (Platform.isAndroid && (await _isAndroid33OrAbove())) {
       _streamSubscription = controller.barcodes.listen(_handleBarcode);
-      await controller.start().then((_) {
-        _isCameraStarted = true;
-        provider.isCameraLoading = false;
-      }).catchError((error) {
-        provider.isCameraLoading = false;
-        provider.errorMsg =
-            AppLocalizations.of(context)!.scannerPage_cameraStartError;
-      });
+      await controller
+          .start()
+          .then((_) {
+            _isCameraStarted = true;
+            provider.isCameraLoading = false;
+          })
+          .catchError((error) {
+            provider.isCameraLoading = false;
+            provider.errorMsg = cameraStartError;
+          });
     } else {
       var status = await Permission.camera.status;
       if (!status.isGranted) {
@@ -284,18 +307,19 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
       }
       if (status.isGranted) {
         _streamSubscription = controller.barcodes.listen(_handleBarcode);
-        await controller.start().then((_) {
-          _isCameraStarted = true;
-          provider.isCameraLoading = false;
-        }).catchError((error) {
-          provider.isCameraLoading = false;
-          provider.errorMsg =
-              AppLocalizations.of(context)!.scannerPage_cameraStartError;
-        });
+        await controller
+            .start()
+            .then((_) {
+              _isCameraStarted = true;
+              provider.isCameraLoading = false;
+            })
+            .catchError((error) {
+              provider.isCameraLoading = false;
+              provider.errorMsg = cameraStartError;
+            });
       } else {
         provider.isCameraLoading = false;
-        provider.errorMsg =
-            AppLocalizations.of(context)!.scannerErrorWidget_permissionDenied;
+        provider.errorMsg = permissionDeniedError;
       }
     }
   }

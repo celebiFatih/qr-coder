@@ -11,7 +11,6 @@ import 'package:provider/provider.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/services/auth_service.dart';
 import 'package:qr_coder/services/firebase_options.dart';
-import 'package:qr_coder/utils/constants.dart';
 import 'package:qr_coder/viewmodels/barcode_scanner_viewmodel.dart';
 import 'package:qr_coder/viewmodels/forgot_passw_page_viewmodel.dart';
 import 'package:qr_coder/viewmodels/locale_provider.dart';
@@ -20,7 +19,6 @@ import 'package:qr_coder/viewmodels/qr_code_display_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_list_page_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_viewmodel.dart';
 import 'package:qr_coder/viewmodels/verification_page_viewmodel.dart';
-import 'package:qr_coder/views/verification_page.dart';
 import 'package:qr_coder/widgets/rewarded_add_service.dart';
 import 'package:qr_coder/widgets/theme_data.dart';
 import 'package:qr_coder/widgets/wrapper.dart';
@@ -37,7 +35,8 @@ Future<void> main() async {
     final testId = dotenv.env['TEST_DEVICE_ID'];
     if (testId != null && testId.isNotEmpty) {
       await MobileAds.instance.updateRequestConfiguration(
-          RequestConfiguration(testDeviceIds: [testId]));
+        RequestConfiguration(testDeviceIds: [testId]),
+      );
     }
   } else {
     // release'da testDeviceId yok
@@ -50,43 +49,44 @@ Future<void> main() async {
     addUnitId: dotenv.env['REWARDED_AD_UNIT_ID'],
   );
 
-  final prefs = await Constants().prefs;
-  final isVerificationPending = prefs.getBool('isVerificationPending') ?? false;
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => LocaleProvider()),
         ChangeNotifierProvider(
-            create: (context) => QRCodeViewModel(
-                isFirebaseUser: Auth().currentUser != null,
-                uid: Auth().currentUser?.uid)),
+          create: (context) => QRCodeViewModel(
+            isFirebaseUser: Auth().currentUser != null,
+            uid: Auth().currentUser?.uid,
+          ),
+        ),
         ChangeNotifierProvider(
-            create: (context) => BarcodeScannerViewmodel(
-                  isFirebaseUser: Auth().currentUser != null,
-                  uid: Auth().currentUser?.uid,
-                )),
+          create: (context) => BarcodeScannerViewmodel(
+            isFirebaseUser: Auth().currentUser != null,
+            uid: Auth().currentUser?.uid,
+          ),
+        ),
         ChangeNotifierProvider(create: (context) => LoginPageViewmodel()),
         ChangeNotifierProvider(
-            create: (context) => QrCodeListPageViewmodel(
-                isFirebaseUser: Auth().currentUser != null,
-                uid: Auth().currentUser?.uid)),
+          create: (context) => QrCodeListPageViewmodel(
+            isFirebaseUser: Auth().currentUser != null,
+            uid: Auth().currentUser?.uid,
+          ),
+        ),
         ChangeNotifierProvider(
-            create: (context) => VerificationPageViewModel()),
+          create: (context) => VerificationPageViewModel(),
+        ),
         ChangeNotifierProvider(create: (context) => ForgotPasswPageViewmodel()),
         ChangeNotifierProvider(
-            create: (context) => QRCodeDisplayViewModel(rewardedAdService)),
+          create: (context) => QRCodeDisplayViewModel(rewardedAdService),
+        ),
       ],
-      child: MainApp(
-        homeWidget:
-            isVerificationPending ? const VerificationPage() : const Wrapper(),
-      ),
+      child: const MainApp(),
     ),
   );
 }
 
 class MainApp extends StatelessWidget {
-  final Widget homeWidget;
-  const MainApp({super.key, required this.homeWidget});
+  const MainApp({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +94,8 @@ class MainApp extends StatelessWidget {
       builder: (context, localeProvider, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          locale: localeProvider.locale ??
+          locale:
+              localeProvider.locale ??
               Locale(Platform.localeName.split('_').first),
           supportedLocales: AppLocalizations.supportedLocales,
           localizationsDelegates: const [
@@ -105,7 +106,7 @@ class MainApp extends StatelessWidget {
           ],
           title: 'QR Code Generator',
           theme: AppTheme.lightTheme,
-          home: homeWidget,
+          home: const Wrapper(),
         );
       },
     );

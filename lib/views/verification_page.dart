@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/viewmodels/verification_page_viewmodel.dart';
-import 'package:qr_coder/views/qr_code_generator_page.dart';
 
 class VerificationPage extends StatefulWidget {
   const VerificationPage({super.key});
@@ -23,8 +22,6 @@ class _VerificationPageState extends State<VerificationPage> {
     final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
     final viewModel = Provider.of<VerificationPageViewModel>(context);
 
-    _checkEmailVerification(context, viewModel);
-
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
       body: _buildBody(context, viewModel, isSmallScreen),
@@ -32,35 +29,18 @@ class _VerificationPageState extends State<VerificationPage> {
   }
 
   void _startEmailVerificationCheck() {
-    final viewModel =
-        Provider.of<VerificationPageViewModel>(context, listen: false);
+    final viewModel = Provider.of<VerificationPageViewModel>(
+      context,
+      listen: false,
+    );
     viewModel.startEmailVerificationCheckTimer();
   }
 
-  void _checkEmailVerification(
-      BuildContext context, VerificationPageViewModel viewModel) {
-    WidgetsBinding.instance.addPostFrameCallback(
-      (_) {
-        if (viewModel.emailVerified) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                AppLocalizations.of(context)!.verificationPage_emailVerifiedMsg,
-                textAlign: TextAlign.center,
-              ),
-            ),
-          );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const QRCodeGenerator()),
-          );
-        }
-      },
-    );
-  }
-
-  Widget _buildBody(BuildContext context, VerificationPageViewModel viewModel,
-      bool isSmallScreen) {
+  Widget _buildBody(
+    BuildContext context,
+    VerificationPageViewModel viewModel,
+    bool isSmallScreen,
+  ) {
     return Center(
       child: Card(
         elevation: 8,
@@ -122,8 +102,11 @@ class _VerificationPageState extends State<VerificationPage> {
     );
   }
 
-  Widget _buildSubmitButton(BuildContext context, bool isSmallScreen,
-      VerificationPageViewModel viewModel) {
+  Widget _buildSubmitButton(
+    BuildContext context,
+    bool isSmallScreen,
+    VerificationPageViewModel viewModel,
+  ) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
@@ -148,27 +131,25 @@ class _VerificationPageState extends State<VerificationPage> {
   }
 
   Future<void> _handleSendVerification(
-      BuildContext context, VerificationPageViewModel viewModel) async {
+    BuildContext context,
+    VerificationPageViewModel viewModel,
+  ) async {
     final scaffoldContext = ScaffoldMessenger.of(context);
+    final sendAgainMessage = AppLocalizations.of(
+      context,
+    )!.verificationPage_sendAgainMsg;
     await viewModel.sendVerificationEmail(context);
+    if (!context.mounted) return;
     if (viewModel.errorMessage.isNotEmpty) {
       scaffoldContext.showSnackBar(
         SnackBar(
-          content: Text(
-            viewModel.errorMessage,
-            textAlign: TextAlign.center,
-          ),
+          content: Text(viewModel.errorMessage, textAlign: TextAlign.center),
         ),
       );
       viewModel.errorMessage = '';
     } else {
       scaffoldContext.showSnackBar(
-        SnackBar(
-          content: Text(
-            AppLocalizations.of(context)!.verificationPage_sendAgainMsg,
-            textAlign: TextAlign.center,
-          ),
-        ),
+        SnackBar(content: Text(sendAgainMessage, textAlign: TextAlign.center)),
       );
     }
   }

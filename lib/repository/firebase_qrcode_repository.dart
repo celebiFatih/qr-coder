@@ -28,7 +28,9 @@ class FirebaseQrCodeRepository implements QRCodeRepository {
 
   @override
   Future<void> updateQRCodeName(
-      String id, Map<String, dynamic> updatedData) async {
+    String id,
+    Map<String, dynamic> updatedData,
+  ) async {
     DatabaseReference userRef = database.child('users/$uid/qrcodes/$id');
     await userRef.update(updatedData);
   }
