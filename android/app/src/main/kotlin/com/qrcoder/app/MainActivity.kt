@@ -33,6 +33,11 @@ class MainActivity: FlutterActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Cold-start share intents must be buffered before FlutterActivity
+        // starts/configures the Flutter engine. Otherwise Flutter can call
+        // getSharedText before sharedText is populated.
+        handleIntent(intent)
+
         super.onCreate(savedInstanceState)
 
         // Edge-to-edge (Android 14 ve altına geriye dönük)
@@ -51,7 +56,6 @@ class MainActivity: FlutterActivity() {
         else
             ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
 
-        handleIntent(intent)
     }
 
     override fun onNewIntent(intent: Intent) {
