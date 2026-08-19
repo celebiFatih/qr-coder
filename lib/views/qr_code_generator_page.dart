@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
-import 'package:qr_coder/repository/main_qrcode_repository.dart';
 import 'package:qr_coder/services/auth_service.dart';
 import 'package:qr_coder/utils/constants.dart';
 import 'package:qr_coder/viewmodels/barcode_scanner_viewmodel.dart';
@@ -41,6 +40,12 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
   void didChangeDependencies() {
     super.didChangeDependencies();
 
+    // The provider is created before Firebase restores the persisted session.
+    // Always bind the repository to the current auth session before handling
+    // an incoming shared text, otherwise a signed-in user's QR can be written
+    // to the local guest database.
+    _syncRepositoryWithCurrentSession();
+
     if (_didCheckInitialSharedText) {
       return;
     }
@@ -60,18 +65,23 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
     if (state == AppLifecycleState.resumed &&
         mounted &&
         _didCheckInitialSharedText) {
+      // A share intent can arrive while the app is in the background. Make
+      // sure the repository still matches the active session before reading
+      // and persisting that shared text.
+      _syncRepositoryWithCurrentSession();
       viewModel.receiveSharedText(context);
     }
+  }
+
+  void _syncRepositoryWithCurrentSession() {
+    final user = Auth().currentUser;
+    viewModel.configureRepository(isFirebaseUser: user != null, uid: user?.uid);
   }
 
   @override
   Widget build(BuildContext context) {
     // final GlobalKey repaintKey = GlobalKey();
     final User? user = Auth().currentUser;
-    viewModel.repository = MainQrCodeRepository(
-      isFirebaseUser: user != null,
-      uid: user?.uid,
-    );
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: _buildAppBar(context, user),

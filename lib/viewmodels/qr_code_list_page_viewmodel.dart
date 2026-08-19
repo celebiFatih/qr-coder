@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/models/qr_code_model.dart';
 import 'package:qr_coder/repository/main_qrcode_repository.dart';
 
 class QrCodeListPageViewmodel extends ChangeNotifier {
+  static final DateFormat _createdAtFormat = DateFormat('dd.MM.yyyy HH:mm');
+
   MainQrCodeRepository repository;
   List<String> _selectedQRCodes = [];
   final List<String> _editingQRCodes = [];
@@ -58,12 +61,43 @@ class QrCodeListPageViewmodel extends ChangeNotifier {
     final fetchErrorMsg = l10n.qrCodeList_fetchListErrorMsg;
     try {
       qrCodes = await repository.fetchAllQRCodes();
-      qrCodes.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      sortByCreatedAtDescending(qrCodes);
     } catch (e) {
       _errorMsg = fetchErrorMsg;
       debugPrint('QR code list fetch failed: $e');
     }
     notifyListeners();
+  }
+
+  static void sortByCreatedAtDescending(List<QRCodeModel> qrCodes) {
+    qrCodes.sort((a, b) {
+      final aDate = _tryParseCreatedAt(a.createdAt);
+      final bDate = _tryParseCreatedAt(b.createdAt);
+
+      if (aDate != null && bDate != null) {
+        return bDate.compareTo(aDate);
+      }
+
+      // Eski/bozuk bir kayit tarihi tum listeyi bozmasin. Gecerli tarihli
+      // kayitlari once, parse edilemeyen kayitlari listenin sonunda tut.
+      if (aDate != null) {
+        return -1;
+      }
+      if (bDate != null) {
+        return 1;
+      }
+
+      // Iki tarih de parse edilemiyorsa siralamayi deterministik tut.
+      return b.createdAt.compareTo(a.createdAt);
+    });
+  }
+
+  static DateTime? _tryParseCreatedAt(String value) {
+    try {
+      return _createdAtFormat.parseStrict(value);
+    } on FormatException {
+      return null;
+    }
   }
 
   Future<void> updateQRCodeName(

@@ -11,11 +11,23 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/models/qr_code_model.dart';
 import 'package:qr_coder/repository/main_qrcode_repository.dart';
+import 'package:qr_coder/repository/qrcode_repository.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+typedef QrCodeRepositoryFactory =
+    QRCodeRepository Function(bool isFirebaseUser, String? uid);
+
+QRCodeRepository _createMainQrCodeRepository(bool isFirebaseUser, String? uid) {
+  return MainQrCodeRepository(isFirebaseUser: isFirebaseUser, uid: uid);
+}
+
 class QRCodeViewModel extends ChangeNotifier {
-  MainQrCodeRepository repository;
+  late QRCodeRepository _repository;
+  final QrCodeRepositoryFactory _repositoryFactory;
+  bool _repositoryInitialized = false;
+  bool _usesFirebaseRepository = false;
+  String? _repositoryUid;
   final TextEditingController controller = TextEditingController();
   FocusNode focusNode = FocusNode();
   String sharedText = '';
@@ -28,11 +40,32 @@ class QRCodeViewModel extends ChangeNotifier {
   String errorMsg = '';
   double _selectedResolution = 2.0;
 
-  QRCodeViewModel({required bool isFirebaseUser, required String? uid})
-    : repository = MainQrCodeRepository(
-        isFirebaseUser: isFirebaseUser,
-        uid: uid,
-      );
+  QRCodeViewModel({
+    required bool isFirebaseUser,
+    required String? uid,
+    QrCodeRepositoryFactory? repositoryFactory,
+  }) : _repositoryFactory = repositoryFactory ?? _createMainQrCodeRepository {
+    configureRepository(isFirebaseUser: isFirebaseUser, uid: uid);
+  }
+
+  void configureRepository({
+    required bool isFirebaseUser,
+    required String? uid,
+  }) {
+    final useFirebase = isFirebaseUser && uid != null;
+    final normalizedUid = useFirebase ? uid : null;
+
+    if (_repositoryInitialized &&
+        _usesFirebaseRepository == useFirebase &&
+        _repositoryUid == normalizedUid) {
+      return;
+    }
+
+    _repository = _repositoryFactory(useFirebase, normalizedUid);
+    _repositoryInitialized = true;
+    _usesFirebaseRepository = useFirebase;
+    _repositoryUid = normalizedUid;
+  }
 
   void clearAll() {
     controller.clear();
@@ -170,7 +203,7 @@ class QRCodeViewModel extends ChangeNotifier {
       context,
     )!.qrCodeGenerator_saveToDbErrorMsg;
     try {
-      await repository.insertQrCode(qrCodeModel!);
+      await _repository.insertQrCode(qrCodeModel!);
     } catch (e) {
       errorMsg = saveToDbErrorMsg;
       debugPrint('QR code database save failed: $e');
