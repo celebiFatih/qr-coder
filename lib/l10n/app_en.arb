@@ -126,6 +126,15 @@
     "verificationPage_sendMailErrorMsg": "Failed to send verification email!\nPlease try again.",
     "verificationPage_verificationEmailResentMsg": "Verification link sent again.",
     "verificationPage_sendAgainBtn": "Send Again",
+    "verificationPage_sendAgainCooldownBtn": "Send again ({seconds}s)",
+    "@verificationPage_sendAgainCooldownBtn": {
+        "placeholders": {
+            "seconds": {
+                "type": "int"
+            }
+        }
+    },
+    "verificationPage_tooManyRequestsMsg": "Too many requests were sent. Please try again later.",
     "verificationPage_useDifferentAccountBtn": "Sign in with a different account",
     "verificationPage_welcomeTitle": "Welcome to QR Coder!",
     "verificationPage_sendAgainMsg": "New verification email sent. Please verify your account within 24 hours.",

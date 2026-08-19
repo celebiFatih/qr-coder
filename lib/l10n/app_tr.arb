@@ -126,6 +126,15 @@
     "verificationPage_sendMailErrorMsg": "Doğrulama e-postası gönderilemedi!\nLütfen yeniden deneyin.",
     "verificationPage_verificationEmailResentMsg": "Doğrulama bağlantısı tekrar gönderildi.",
     "verificationPage_sendAgainBtn": "Yeniden gönderin",
+    "verificationPage_sendAgainCooldownBtn": "Yeniden gönder ({seconds} sn)",
+    "@verificationPage_sendAgainCooldownBtn": {
+        "placeholders": {
+            "seconds": {
+                "type": "int"
+            }
+        }
+    },
+    "verificationPage_tooManyRequestsMsg": "Çok fazla istek gönderildi. Lütfen bir süre sonra yeniden deneyin.",
     "verificationPage_useDifferentAccountBtn": "Farklı hesapla giriş yap",
     "verificationPage_welcomeTitle": "QR Coder'a Hoşgeldiniz!",
     "verificationPage_sendAgainMsg": "Yeni bir doğrulama e-postası gönderildi. Lütfen 24 saat içinde doğrulayın.",

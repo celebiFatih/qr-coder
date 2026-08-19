@@ -614,6 +614,18 @@ abstract class AppLocalizations {
   /// **'Send Again'**
   String get verificationPage_sendAgainBtn;
 
+  /// No description provided for @verificationPage_sendAgainCooldownBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Send again ({seconds}s)'**
+  String verificationPage_sendAgainCooldownBtn(int seconds);
+
+  /// No description provided for @verificationPage_tooManyRequestsMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many requests were sent. Please try again later.'**
+  String get verificationPage_tooManyRequestsMsg;
+
   /// No description provided for @verificationPage_useDifferentAccountBtn.
   ///
   /// In en, this message translates to:

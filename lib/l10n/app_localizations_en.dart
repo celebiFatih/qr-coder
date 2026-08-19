@@ -294,6 +294,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get verificationPage_sendAgainBtn => 'Send Again';
 
   @override
+  String verificationPage_sendAgainCooldownBtn(int seconds) {
+    return 'Send again (${seconds}s)';
+  }
+
+  @override
+  String get verificationPage_tooManyRequestsMsg =>
+      'Too many requests were sent. Please try again later.';
+
+  @override
   String get verificationPage_useDifferentAccountBtn =>
       'Sign in with a different account';
 

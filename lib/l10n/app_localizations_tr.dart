@@ -293,6 +293,15 @@ class AppLocalizationsTr extends AppLocalizations {
   String get verificationPage_sendAgainBtn => 'Yeniden gönderin';
 
   @override
+  String verificationPage_sendAgainCooldownBtn(int seconds) {
+    return 'Yeniden gönder ($seconds sn)';
+  }
+
+  @override
+  String get verificationPage_tooManyRequestsMsg =>
+      'Çok fazla istek gönderildi. Lütfen bir süre sonra yeniden deneyin.';
+
+  @override
   String get verificationPage_useDifferentAccountBtn =>
       'Farklı hesapla giriş yap';
 

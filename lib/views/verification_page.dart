@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
@@ -14,11 +16,74 @@ class VerificationPage extends StatefulWidget {
   State<VerificationPage> createState() => _VerificationPageState();
 }
 
-class _VerificationPageState extends State<VerificationPage> {
+class _VerificationPageState extends State<VerificationPage>
+    with WidgetsBindingObserver {
+  late VerificationPageViewModel _viewModel;
+  bool _verificationFlowInitialized = false;
+  bool _resumeScheduled = false;
+
   @override
   void initState() {
     super.initState();
-    _startEmailVerificationCheck();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_verificationFlowInitialized) {
+      return;
+    }
+
+    _verificationFlowInitialized = true;
+    _viewModel = context.read<VerificationPageViewModel>();
+    _scheduleResumeVerificationFlow();
+  }
+
+  void _scheduleResumeVerificationFlow() {
+    if (_resumeScheduled) {
+      return;
+    }
+
+    _resumeScheduled = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _resumeScheduled = false;
+
+      if (!mounted || !_verificationFlowInitialized) {
+        return;
+      }
+
+      unawaited(_viewModel.resumeVerificationFlow());
+    });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!_verificationFlowInitialized) {
+      return;
+    }
+
+    if (state == AppLifecycleState.resumed) {
+      _scheduleResumeVerificationFlow();
+      return;
+    }
+
+    if (state == AppLifecycleState.inactive ||
+        state == AppLifecycleState.paused ||
+        state == AppLifecycleState.detached ||
+        state == AppLifecycleState.hidden) {
+      _viewModel.pauseVerificationFlow();
+    }
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    if (_verificationFlowInitialized) {
+      _viewModel.pauseVerificationFlow();
+    }
+    super.dispose();
   }
 
   @override
@@ -30,14 +95,6 @@ class _VerificationPageState extends State<VerificationPage> {
       backgroundColor: Theme.of(context).colorScheme.primary,
       body: _buildBody(context, viewModel, isSmallScreen),
     );
-  }
-
-  void _startEmailVerificationCheck() {
-    final viewModel = Provider.of<VerificationPageViewModel>(
-      context,
-      listen: false,
-    );
-    viewModel.startEmailVerificationCheckTimer();
   }
 
   Widget _buildBody(
@@ -123,9 +180,9 @@ class _VerificationPageState extends State<VerificationPage> {
             borderRadius: BorderRadius.circular(10),
           ),
         ),
-        onPressed: viewModel.isLoading
-            ? null
-            : () => _handleSendVerification(context, viewModel),
+        onPressed: viewModel.canResend
+            ? () => _handleSendVerification(context, viewModel)
+            : null,
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: viewModel.isLoading
@@ -135,7 +192,15 @@ class _VerificationPageState extends State<VerificationPage> {
                   child: CircularProgressIndicator(strokeWidth: 2.5),
                 )
               : Text(
-                  AppLocalizations.of(context)!.verificationPage_sendAgainBtn,
+                  viewModel.isResendCoolingDown
+                      ? AppLocalizations.of(
+                          context,
+                        )!.verificationPage_sendAgainCooldownBtn(
+                          viewModel.resendCooldownSeconds,
+                        )
+                      : AppLocalizations.of(
+                          context,
+                        )!.verificationPage_sendAgainBtn,
                   style: isSmallScreen
                       ? Theme.of(context).textTheme.bodyLarge
                       : Theme.of(context).textTheme.headlineSmall,
@@ -199,9 +264,11 @@ class _VerificationPageState extends State<VerificationPage> {
     final l10n = AppLocalizations.of(context)!;
     final successMessage = l10n.verificationPage_verificationEmailResentMsg;
     final errorMessage = l10n.verificationPage_sendMailErrorMsg;
+    final tooManyRequestsMessage = l10n.verificationPage_tooManyRequestsMsg;
 
     final sent = await viewModel.sendVerificationEmail(
       sendMailErrorMsg: errorMessage,
+      tooManyRequestsMsg: tooManyRequestsMessage,
     );
     if (!context.mounted) return;
 

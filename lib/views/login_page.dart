@@ -4,6 +4,7 @@ import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/utils/constants.dart';
 import 'package:qr_coder/viewmodels/locale_provider.dart';
 import 'package:qr_coder/viewmodels/login_page_viewmodel.dart';
+import 'package:qr_coder/viewmodels/verification_page_viewmodel.dart';
 import 'package:qr_coder/views/forgot_passw_page.dart';
 import 'package:qr_coder/widgets/wrapper.dart';
 
@@ -344,10 +345,23 @@ class _LoginPageState extends State<LoginPage> {
       if (!viewModel.isLogin) {
         await viewModel.signIn(signInErrorMsg: signInErrorMsg);
       } else {
-        await viewModel.createUser(
+        // Firebase createUser() oturumu hemen açtığı için Wrapper, bu async
+        // işlem tamamlanmadan VerificationPage'i build edebilir. Global VM'i
+        // await öncesinde alıp ilk mail gerçekten gönderildiğinde cooldown'ı
+        // doğrudan ona bildiriyoruz.
+        final verificationPageViewModel = context
+            .read<VerificationPageViewModel>();
+
+        final verificationEmailSentUserId = await viewModel.createUser(
           createUserErrorMsg: createUserErrorMsg,
           emailAlreadyRegisteredMsg: emailAlreadyRegisteredMsg,
         );
+
+        if (verificationEmailSentUserId != null) {
+          await verificationPageViewModel.markInitialVerificationEmailSent(
+            verificationEmailSentUserId,
+          );
+        }
       }
       if (viewModel.errorMsg.isNotEmpty) {
         if (!context.mounted) return;

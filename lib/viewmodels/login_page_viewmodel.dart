@@ -124,12 +124,13 @@ class LoginPageViewmodel extends ChangeNotifier {
     return null;
   }
 
-  Future<void> createUser({
+  Future<String?> createUser({
     required String createUserErrorMsg,
     required String emailAlreadyRegisteredMsg,
   }) async {
     errorMsg = '';
     isLoading = true;
+    String? verificationEmailSentUserId;
 
     try {
       final userCredential = await Auth().createUser(
@@ -139,6 +140,7 @@ class LoginPageViewmodel extends ChangeNotifier {
 
       try {
         await userCredential.user?.sendEmailVerification();
+        verificationEmailSentUserId = userCredential.user?.uid;
       } catch (e) {
         // Hesap başarıyla oluşturulmuş durumda. Doğrulama e-postasının ilk
         // gönderimi başarısız olursa kullanıcı VerificationPage üzerinden
@@ -159,6 +161,8 @@ class LoginPageViewmodel extends ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+
+    return verificationEmailSentUserId;
   }
 
   Future<void> signIn({required String signInErrorMsg}) async {
