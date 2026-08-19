@@ -7,9 +7,51 @@ import 'package:qr_coder/viewmodels/login_page_viewmodel.dart';
 import 'package:qr_coder/views/forgot_passw_page.dart';
 import 'package:qr_coder/widgets/wrapper.dart';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormFieldState<String>> _emailFieldKey =
+      GlobalKey<FormFieldState<String>>();
+  final GlobalKey<FormFieldState<String>> _passwordFieldKey =
+      GlobalKey<FormFieldState<String>>();
+
+  Locale? _lastLocale;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final locale = Localizations.localeOf(context);
+    final localeChanged = _lastLocale != null && _lastLocale != locale;
+    _lastLocale = locale;
+
+    if (!localeChanged) {
+      return;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      final emailFieldState = _emailFieldKey.currentState;
+      final passwordFieldState = _passwordFieldKey.currentState;
+
+      // Recalculate only validation errors that are already visible.
+      // Changing language must not introduce errors on untouched fields.
+      if (emailFieldState?.hasError ?? false) {
+        emailFieldState!.validate();
+      }
+
+      if (passwordFieldState?.hasError ?? false) {
+        passwordFieldState!.validate();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -179,6 +221,7 @@ class LoginPage extends StatelessWidget {
 
   Widget _buildEmailField(LoginPageViewmodel viewModel, BuildContext context) {
     return TextFormField(
+      key: _emailFieldKey,
       controller: viewModel.emailController,
       validator: (value) => viewModel.emailValidator(value, context),
       decoration: InputDecoration(
@@ -199,6 +242,7 @@ class LoginPage extends StatelessWidget {
     return Consumer<LoginPageViewmodel>(
       builder: (context, viewModel, child) {
         return TextFormField(
+          key: _passwordFieldKey,
           controller: viewModel.passwordController,
           validator: (value) => viewModel.passwordValidator(value, context),
           obscureText: !viewModel.isPasswordVisible,

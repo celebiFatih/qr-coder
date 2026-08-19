@@ -29,7 +29,9 @@ class ForgotPasswPageViewmodel extends ChangeNotifier {
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
     ).hasMatch(value);
     if (!emailValid) {
-      return 'Lütfen geçerli bir e-posta girin';
+      return AppLocalizations.of(
+        context,
+      )!.forgotPasswordPage_emailValidatorError;
     }
 
     return null;
@@ -41,6 +43,9 @@ class ForgotPasswPageViewmodel extends ChangeNotifier {
     )!.forgotPasswordPage_sendMailErrorMsg;
 
     try {
+      // Clear a previous failure before starting a new request so a
+      // successful retry is not mistaken for the old error.
+      errorMessage = '';
       isLoading = true;
       emailFocusNode.unfocus();
       notifyListeners();

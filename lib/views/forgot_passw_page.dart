@@ -5,9 +5,44 @@ import 'package:provider/provider.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/viewmodels/forgot_passw_page_viewmodel.dart';
 
-class ForgotPasswPage extends StatelessWidget {
-  ForgotPasswPage({super.key});
+class ForgotPasswPage extends StatefulWidget {
+  const ForgotPasswPage({super.key});
+
+  @override
+  State<ForgotPasswPage> createState() => _ForgotPasswPageState();
+}
+
+class _ForgotPasswPageState extends State<ForgotPasswPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormFieldState<String>> _emailFieldKey =
+      GlobalKey<FormFieldState<String>>();
+
+  Locale? _lastLocale;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final locale = Localizations.localeOf(context);
+    final localeChanged = _lastLocale != null && _lastLocale != locale;
+    _lastLocale = locale;
+
+    if (!localeChanged) {
+      return;
+    }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      final fieldState = _emailFieldKey.currentState;
+
+      // Locale changes should refresh an already-visible validation error,
+      // but must not introduce a new error on an untouched field.
+      if (fieldState?.hasError ?? false) {
+        fieldState!.validate();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -87,6 +122,7 @@ class ForgotPasswPage extends StatelessWidget {
     BuildContext context,
   ) {
     return TextFormField(
+      key: _emailFieldKey,
       controller: viewModel.emailController,
       focusNode: viewModel.emailFocusNode,
       autofocus: true,
@@ -122,6 +158,9 @@ class ForgotPasswPage extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
         ),
+        onPressed: viewModel.isLoading
+            ? null
+            : () => _handleSendEmail(context, viewModel),
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: viewModel.isLoading
@@ -133,7 +172,6 @@ class ForgotPasswPage extends StatelessWidget {
                       : Theme.of(context).textTheme.headlineSmall,
                 ),
         ),
-        onPressed: () => _handleSendEmail(context, viewModel),
       ),
     );
   }
@@ -142,15 +180,17 @@ class ForgotPasswPage extends StatelessWidget {
     BuildContext context,
     ForgotPasswPageViewmodel viewModel,
   ) async {
+    // Ignore any duplicate submit that slips through before the disabled
+    // button state is rendered.
+    if (viewModel.isLoading) return;
+
     final successMessage = AppLocalizations.of(
       context,
     )!.forgotPasswordPage_sendEmailSuccessMsg;
 
     if (_formKey.currentState?.validate() ?? false) {
-      if (!viewModel.isLoading) {
-        await viewModel.sendResetEmail(context);
-        if (!context.mounted) return;
-      }
+      await viewModel.sendResetEmail(context);
+      if (!context.mounted) return;
 
       if (viewModel.errorMessage.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
