@@ -2,11 +2,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
+import 'package:qr_coder/services/ad_consent_service.dart';
 import 'package:qr_coder/services/auth_service.dart';
 import 'package:qr_coder/utils/constants.dart';
 import 'package:qr_coder/viewmodels/barcode_scanner_viewmodel.dart';
 import 'package:qr_coder/viewmodels/forgot_passw_page_viewmodel.dart';
 import 'package:qr_coder/viewmodels/login_page_viewmodel.dart';
+import 'package:qr_coder/viewmodels/qr_code_display_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_list_page_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_viewmodel.dart';
 import 'package:qr_coder/viewmodels/verification_page_viewmodel.dart';
@@ -27,6 +29,7 @@ class QRCodeGenerator extends StatefulWidget {
 class _QRCodeGeneratorState extends State<QRCodeGenerator>
     with WidgetsBindingObserver {
   late QRCodeViewModel viewModel;
+  final GlobalKey _repaintKey = GlobalKey();
   bool _didCheckInitialSharedText = false;
 
   @override
@@ -80,7 +83,6 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
 
   @override
   Widget build(BuildContext context) {
-    // final GlobalKey repaintKey = GlobalKey();
     final User? user = Auth().currentUser;
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -111,6 +113,22 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
 
   List<Widget> _buildAppBarActions(BuildContext context, User? user) {
     return [
+      ListenableBuilder(
+        listenable: AdConsentService.instance,
+        builder: (context, child) {
+          if (!AdConsentService.instance.privacyOptionsRequired) {
+            return const SizedBox.shrink();
+          }
+
+          return IconButton(
+            tooltip: AppLocalizations.of(
+              context,
+            )!.qrCodeGenerator_privacyOptionsToolTip,
+            onPressed: () => _showPrivacyOptions(context),
+            icon: const Icon(Icons.privacy_tip_outlined),
+          );
+        },
+      ),
       IconButton(
         onPressed: () {},
         icon: user == null
@@ -144,6 +162,22 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
         icon: const Icon(Icons.format_list_bulleted_rounded),
       ),
     ];
+  }
+
+  Future<void> _showPrivacyOptions(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final formError = await AdConsentService.instance.showPrivacyOptionsForm();
+
+    if (formError != null && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            l10n.qrCodeGenerator_privacyOptionsErrorMsg,
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
   }
 
   Future<void> _handleLogout(BuildContext context) async {
@@ -229,6 +263,15 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
     }
   }
 
+  Future<void> _handleRemoveLogo() async {
+    if (!mounted) return;
+
+    // Use the page State's context rather than the short-lived QR subtree
+    // context. The generator can rebuild while the confirmation dialog is
+    // open; State.context remains valid for the whole page lifetime.
+    await context.read<QRCodeDisplayViewModel>().promptRemoveLogo(context);
+  }
+
   Widget _buildBody(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -266,8 +309,6 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
   }
 
   Widget _buildQRCodeDisplay(BuildContext context, BoxConstraints constraints) {
-    final GlobalKey repaintKey = GlobalKey();
-
     return ConstrainedBox(
       constraints: BoxConstraints(
         minHeight: constraints.maxHeight * 0.4,
@@ -292,8 +333,10 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
                                 child: AspectRatio(
                                   aspectRatio: 1,
                                   child: QRcodeDisplay(
+                                    key: ObjectKey(viewModel.qrCodeModel),
                                     data: viewModel.qrData,
-                                    repaintKey: repaintKey,
+                                    repaintKey: _repaintKey,
+                                    onLogoTap: _handleRemoveLogo,
                                   ),
                                 ),
                               ),

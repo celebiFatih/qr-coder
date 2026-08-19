@@ -149,6 +149,13 @@ class AppLocalizationsTr extends AppLocalizations {
   String get qrCodeGenerator_startScanningToolTip => 'Tarayıcıyı Başlat';
 
   @override
+  String get qrCodeGenerator_privacyOptionsToolTip => 'Gizlilik seçenekleri';
+
+  @override
+  String get qrCodeGenerator_privacyOptionsErrorMsg =>
+      'Gizlilik seçenekleri açılamadı. Lütfen tekrar deneyin.';
+
+  @override
   String get qrcodeGenerator_qrCodeListToolTip => 'Son Kaydedilenler';
 
   @override

@@ -362,6 +362,18 @@ abstract class AppLocalizations {
   /// **'Start Barcode Scanner'**
   String get qrCodeGenerator_startScanningToolTip;
 
+  /// No description provided for @qrCodeGenerator_privacyOptionsToolTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy options'**
+  String get qrCodeGenerator_privacyOptionsToolTip;
+
+  /// No description provided for @qrCodeGenerator_privacyOptionsErrorMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy options could not be opened. Please try again.'**
+  String get qrCodeGenerator_privacyOptionsErrorMsg;
+
   /// No description provided for @qrcodeGenerator_qrCodeListToolTip.
   ///
   /// In en, this message translates to:

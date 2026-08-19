@@ -8,13 +8,17 @@ class QRCodeDisplayViewModel extends ChangeNotifier {
 
   bool get isLogoRemoved => _isLogoRemoved;
 
-  QRCodeDisplayViewModel(this._rewardedAdService) {
-    _rewardedAdService.loadRewardedAd();
-  }
+  QRCodeDisplayViewModel(this._rewardedAdService);
 
   void resetLogo() {
     _isLogoRemoved = false;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _rewardedAdService.dispose();
+    super.dispose();
   }
 
   Future<void> promptRemoveLogo(BuildContext context) async {
@@ -38,22 +42,42 @@ class QRCodeDisplayViewModel extends ChangeNotifier {
       ),
     );
 
-    if (confirmed != true || !context.mounted) return;
-
-    // Reklam hazır değilse kullanıcıyı bilgilendir
-    if (!_rewardedAdService.isAdReady && _rewardedAdService.isLoading) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.qrcodeDisplay_loading_ad)));
+    if (confirmed != true || !context.mounted) {
       return;
     }
 
+    debugPrint(
+      'Remove-logo confirmed: '
+      'ready=${_rewardedAdService.isAdReady}, '
+      'loading=${_rewardedAdService.isLoading}, '
+      'showing=${_rewardedAdService.isShowing}.',
+    );
+
+    // A load may already be in progress. Do not make the user tap the logo a
+    // second time: show a short status message and let showRewardedAd() join
+    // the same in-flight load before opening the full-screen ad.
+    if (!_rewardedAdService.isAdReady) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(
+            content: Text(l10n.qrcodeDisplay_loading_ad),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+    }
+
     final ok = await _rewardedAdService.showRewardedAd();
-    if (!context.mounted) return;
+    if (!context.mounted) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
     if (ok) {
       _isLogoRemoved = true;
       notifyListeners();
+
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.qrcodeDisplay_removed_logo)));

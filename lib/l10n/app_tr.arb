@@ -44,6 +44,8 @@
     "qrCodeGenerator_qrCodeDefaultTitle": "QR Kod",
     "qrCodeGenerator_qrCodeGeneratorErrMsg": "QR kod oluşturma hataası!",
     "qrCodeGenerator_startScanningToolTip": "Tarayıcıyı Başlat",
+    "qrCodeGenerator_privacyOptionsToolTip": "Gizlilik seçenekleri",
+    "qrCodeGenerator_privacyOptionsErrorMsg": "Gizlilik seçenekleri açılamadı. Lütfen tekrar deneyin.",
     "qrcodeGenerator_qrCodeListToolTip": "Son Kaydedilenler",
     "qrCodeGenerator_textFieldHintText": "QR kod oluşturulacak metni girin",
     "qrCodeGenerator_dataTooLongErrMsg": "Metin çok uzun!",

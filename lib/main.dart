@@ -9,6 +9,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
+import 'package:qr_coder/services/ad_consent_service.dart';
 import 'package:qr_coder/services/auth_service.dart';
 import 'package:qr_coder/services/firebase_options.dart';
 import 'package:qr_coder/viewmodels/barcode_scanner_viewmodel.dart';
@@ -27,8 +28,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   await dotenv.load(fileName: '.env');
-  await MobileAds.instance.initialize();
-
   if (!kReleaseMode) {
     // sadece debug
     // TEST CİHAZI BİLDİR
@@ -47,6 +46,7 @@ Future<void> main() async {
 
   final rewardedAdService = RewardedAdService(
     addUnitId: dotenv.env['REWARDED_AD_UNIT_ID'],
+    consentService: AdConsentService.instance,
   );
 
   runApp(
@@ -83,6 +83,10 @@ Future<void> main() async {
       child: const MainApp(),
     ),
   );
+
+  // Start UMP after the Flutter app is attached. The consent service itself
+  // initializes Google Mobile Ads only when UMP says ad requests are allowed.
+  unawaited(AdConsentService.instance.initialize());
 }
 
 class MainApp extends StatelessWidget {

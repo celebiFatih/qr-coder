@@ -10,9 +10,12 @@ class QRcodeDisplay extends StatefulWidget {
     super.key,
     required this.data,
     required this.repaintKey,
+    this.onLogoTap,
   });
+
   final String data;
   final GlobalKey repaintKey;
+  final VoidCallback? onLogoTap;
 
   @override
   State<QRcodeDisplay> createState() => _QRcodeDisplayState();
@@ -74,7 +77,9 @@ class _QRcodeDisplayState extends State<QRcodeDisplay> {
                             width: logoSide,
                             height: logoSide,
                             child: GestureDetector(
-                              onTap: () => vm.promptRemoveLogo(context),
+                              onTap:
+                                  widget.onLogoTap ??
+                                  () => vm.promptRemoveLogo(context),
                               // Görünmez; sadece hit-test için
                               behavior: HitTestBehavior.opaque,
                             ),

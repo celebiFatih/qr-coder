@@ -44,6 +44,8 @@
     "qrCodeGenerator_qrCodeDefaultTitle": "QR Code",
     "qrCodeGenerator_qrCodeGeneratorErrMsg": "Failed to generate QR Code!",
     "qrCodeGenerator_startScanningToolTip": "Start Barcode Scanner",
+    "qrCodeGenerator_privacyOptionsToolTip": "Privacy options",
+    "qrCodeGenerator_privacyOptionsErrorMsg": "Privacy options could not be opened. Please try again.",
     "qrcodeGenerator_qrCodeListToolTip": "Saved QR Codes",
     "qrCodeGenerator_textFieldHintText": "Enter some text to generate a QR Code",
     "qrCodeGenerator_dataTooLongErrMsg": "Text is too long!",

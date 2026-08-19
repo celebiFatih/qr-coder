@@ -151,6 +151,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qrCodeGenerator_startScanningToolTip => 'Start Barcode Scanner';
 
   @override
+  String get qrCodeGenerator_privacyOptionsToolTip => 'Privacy options';
+
+  @override
+  String get qrCodeGenerator_privacyOptionsErrorMsg =>
+      'Privacy options could not be opened. Please try again.';
+
+  @override
   String get qrcodeGenerator_qrCodeListToolTip => 'Saved QR Codes';
 
   @override
