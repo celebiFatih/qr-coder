@@ -3,11 +3,12 @@ import 'package:intl/intl.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/models/qr_code_model.dart';
 import 'package:qr_coder/repository/main_qrcode_repository.dart';
+import 'package:qr_coder/repository/qrcode_repository.dart';
 
 class QrCodeListPageViewmodel extends ChangeNotifier {
   static final DateFormat _createdAtFormat = DateFormat('dd.MM.yyyy HH:mm');
 
-  MainQrCodeRepository repository;
+  QRCodeRepository repository;
   List<String> _selectedQRCodes = [];
   final List<String> _editingQRCodes = [];
   List<QRCodeModel> qrCodes = [];
@@ -21,19 +22,29 @@ class QrCodeListPageViewmodel extends ChangeNotifier {
   List<String> get selectedQRCodes => _selectedQRCodes;
   List<String> get editingQRCodes => _editingQRCodes;
 
-  QrCodeListPageViewmodel({required bool isFirebaseUser, required String? uid})
-    : repository = MainQrCodeRepository(
-        isFirebaseUser: isFirebaseUser,
-        uid: uid,
-      );
+  QrCodeListPageViewmodel({
+    required bool isFirebaseUser,
+    required String? uid,
+    QRCodeRepository? repository,
+  }) : repository =
+           repository ??
+           MainQrCodeRepository(isFirebaseUser: isFirebaseUser, uid: uid);
 
   void clearAll() {
-    _selectedQRCodes.clear();
-    _editingQRCodes.clear();
-    _allSelected = false;
+    resetTransientState(notify: false);
     _errorMsg = '';
     qrCodes.clear();
     notifyListeners();
+  }
+
+  void resetTransientState({bool notify = true}) {
+    _selectedQRCodes.clear();
+    _editingQRCodes.clear();
+    _allSelected = false;
+
+    if (notify) {
+      notifyListeners();
+    }
   }
 
   @override
@@ -59,13 +70,17 @@ class QrCodeListPageViewmodel extends ChangeNotifier {
 
   Future<void> fetchQRCodes(AppLocalizations l10n) async {
     final fetchErrorMsg = l10n.qrCodeList_fetchListErrorMsg;
+    _errorMsg = '';
+
     try {
       qrCodes = await repository.fetchAllQRCodes();
       sortByCreatedAtDescending(qrCodes);
     } catch (e) {
+      qrCodes = [];
       _errorMsg = fetchErrorMsg;
       debugPrint('QR code list fetch failed: $e');
     }
+
     notifyListeners();
   }
 

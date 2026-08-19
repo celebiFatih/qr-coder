@@ -10,95 +10,20 @@ import 'package:qr_coder/views/qr_code_detail_page.dart';
 import 'package:qr_coder/widgets/banner_ad_widget.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-class QRCodeListPage extends StatelessWidget {
+class QRCodeListPage extends StatefulWidget {
   const QRCodeListPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final viewModel = Provider.of<QrCodeListPageViewmodel>(
-      context,
-      listen: false,
-    );
-    viewModel.repository = MainQrCodeRepository(
-      isFirebaseUser: Auth().currentUser != null,
-      uid: Auth().currentUser?.uid,
-    );
-    return Scaffold(
-      appBar: _buildAppBar(context, viewModel),
-      body: _buildBody(context, viewModel),
-      bottomNavigationBar: const BannerAdWidget(),
-      floatingActionButton: _buildFab(context, viewModel),
-    );
-  }
-
-  AppBar _buildAppBar(BuildContext context, QrCodeListPageViewmodel viewModel) {
-    return AppBar(
-      title: Text(AppLocalizations.of(context)!.qrCodeList_title),
-      actions: [
-        IconButton(
-          tooltip: AppLocalizations.of(context)!.qrCodeList_selectAllBtn,
-          onPressed: () => viewModel.toggleSelectAllQRCodes(),
-          icon: const Icon(Icons.select_all),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBody(BuildContext context, QrCodeListPageViewmodel viewModel) {
-    return buildQRCodeList(context, viewModel);
-  }
-
-  Widget buildQRCodeList(
-    BuildContext context,
-    QrCodeListPageViewmodel viewModel,
-  ) {
-    return FutureBuilder<void>(
-      future: viewModel.fetchQRCodes(AppLocalizations.of(context)!),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
-          debugPrint('QR code list FutureBuilder error: ${snapshot.error}');
-          return Center(
-            child: Text(
-              AppLocalizations.of(context)!.qrCodeList_fetchListErrorMsg,
-            ),
-          );
-        } else if (viewModel.qrCodes.isEmpty) {
-          return Center(
-            child: Text(AppLocalizations.of(context)!.qrCodeList_emptyList),
-          );
-        }
-
-        return _buildQRCodeListView(context, viewModel);
-      },
-    );
-  }
-
-  Widget _buildQRCodeListView(
-    BuildContext context,
-    QrCodeListPageViewmodel viewModel,
-  ) {
-    return Consumer<QrCodeListPageViewmodel>(
-      builder: (context, viewModel, child) {
-        return ListView.builder(
-          itemCount: viewModel.qrCodes.length,
-          itemBuilder: (context, index) =>
-              buildQRCodeListItem(context, viewModel, index),
-        );
-      },
-    );
-  }
+  State<QRCodeListPage> createState() => _QRCodeListPageState();
 
   Widget buildQRCodeListItem(
     BuildContext context,
     QrCodeListPageViewmodel viewModel,
-    index,
+    int index,
   ) {
-    var qrCode = viewModel.qrCodes[index];
+    final qrCode = viewModel.qrCodes[index];
     final isSelected = viewModel.selectedQRCodes.contains(qrCode.id);
     final isEditing = viewModel.editingQRCodes.contains(qrCode.id);
-    TextEditingController controller = TextEditingController(text: qrCode.name);
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
@@ -108,7 +33,7 @@ class QRCodeListPage extends StatelessWidget {
           message: qrCode.data,
           child: ListTile(
             title: isEditing
-                ? _buildEditingTextField(context, controller, qrCode, viewModel)
+                ? _buildEditingTextField(context, qrCode, viewModel)
                 : _buildQRCodeName(qrCode),
             subtitle: _buildQRCodeSubtitle(context, qrCode),
             trailing: _buildQRCodeActions(
@@ -132,13 +57,13 @@ class QRCodeListPage extends StatelessWidget {
 
   Widget _buildEditingTextField(
     BuildContext context,
-    TextEditingController controller,
     QRCodeModel qrCode,
     QrCodeListPageViewmodel viewModel,
   ) {
-    return TextField(
-      controller: controller,
-      onSubmitted: (value) async {
+    return TextFormField(
+      key: ValueKey('qr-name-${qrCode.id}'),
+      initialValue: qrCode.name,
+      onFieldSubmitted: (value) async {
         await viewModel.updateQRCodeName(
           qrCode.id,
           value,
@@ -212,6 +137,110 @@ class QRCodeListPage extends StatelessWidget {
         ),
         child: QrCodePreviewImage(data: qrCode.data),
       ),
+    );
+  }
+}
+
+class _QRCodeListPageState extends State<QRCodeListPage> {
+  QrCodeListPageViewmodel? _viewModel;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final viewModel = context.read<QrCodeListPageViewmodel>();
+    if (!identical(_viewModel, viewModel)) {
+      _viewModel = viewModel;
+      viewModel.resetTransientState(notify: false);
+    }
+  }
+
+  @override
+  void dispose() {
+    _viewModel?.resetTransientState(notify: false);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final viewModel = context.read<QrCodeListPageViewmodel>();
+    viewModel.repository = MainQrCodeRepository(
+      isFirebaseUser: Auth().currentUser != null,
+      uid: Auth().currentUser?.uid,
+    );
+
+    return Scaffold(
+      appBar: _buildAppBar(context, viewModel),
+      body: _buildBody(context, viewModel),
+      bottomNavigationBar: const BannerAdWidget(),
+      floatingActionButton: _buildFab(context, viewModel),
+    );
+  }
+
+  AppBar _buildAppBar(BuildContext context, QrCodeListPageViewmodel viewModel) {
+    return AppBar(
+      title: Text(AppLocalizations.of(context)!.qrCodeList_title),
+      actions: [
+        IconButton(
+          tooltip: AppLocalizations.of(context)!.qrCodeList_selectAllBtn,
+          onPressed: () => viewModel.toggleSelectAllQRCodes(),
+          icon: const Icon(Icons.select_all),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBody(BuildContext context, QrCodeListPageViewmodel viewModel) {
+    return _buildQRCodeList(context, viewModel);
+  }
+
+  Widget _buildQRCodeList(
+    BuildContext context,
+    QrCodeListPageViewmodel viewModel,
+  ) {
+    return FutureBuilder<void>(
+      future: viewModel.fetchQRCodes(AppLocalizations.of(context)!),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (snapshot.hasError) {
+          debugPrint('QR code list FutureBuilder error: ${snapshot.error}');
+          return Center(
+            child: Text(
+              AppLocalizations.of(context)!.qrCodeList_fetchListErrorMsg,
+            ),
+          );
+        }
+
+        if (viewModel.errorMsg.isNotEmpty) {
+          return Center(child: Text(viewModel.errorMsg));
+        }
+
+        if (viewModel.qrCodes.isEmpty) {
+          return Center(
+            child: Text(AppLocalizations.of(context)!.qrCodeList_emptyList),
+          );
+        }
+
+        return _buildQRCodeListView(context, viewModel);
+      },
+    );
+  }
+
+  Widget _buildQRCodeListView(
+    BuildContext context,
+    QrCodeListPageViewmodel viewModel,
+  ) {
+    return Consumer<QrCodeListPageViewmodel>(
+      builder: (context, viewModel, child) {
+        return ListView.builder(
+          itemCount: viewModel.qrCodes.length,
+          itemBuilder: (context, index) =>
+              widget.buildQRCodeListItem(context, viewModel, index),
+        );
+      },
     );
   }
 

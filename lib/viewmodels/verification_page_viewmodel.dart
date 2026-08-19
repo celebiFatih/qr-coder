@@ -285,7 +285,15 @@ class VerificationPageViewModel extends ChangeNotifier {
     }
 
     await Auth().reloadUser();
-    return Auth().currentUser?.emailVerified ?? false;
+
+    final isVerified = Auth().currentUser?.emailVerified ?? false;
+    if (isVerified) {
+      // Security Rules read the verification state from the ID token.
+      // Ensure that token is refreshed before Wrapper allows cloud-backed UI.
+      await Auth().ensureVerifiedEmailIdToken();
+    }
+
+    return isVerified;
   }
 
   Future<void> _sendVerificationEmail() async {
