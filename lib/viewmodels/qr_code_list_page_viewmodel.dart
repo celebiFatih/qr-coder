@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/models/qr_code_model.dart';
 import 'package:qr_coder/repository/main_qrcode_repository.dart';
 import 'package:qr_coder/repository/qrcode_repository.dart';
+import 'package:qr_coder/utils/qr_code_date_utils.dart';
 
 class QrCodeListPageViewmodel extends ChangeNotifier {
-  static final DateFormat _createdAtFormat = DateFormat('dd.MM.yyyy HH:mm');
-
   QRCodeRepository repository;
   List<String> _selectedQRCodes = [];
   final List<String> _editingQRCodes = [];
@@ -89,8 +87,8 @@ class QrCodeListPageViewmodel extends ChangeNotifier {
 
   static void sortByCreatedAtDescending(List<QRCodeModel> qrCodes) {
     qrCodes.sort((a, b) {
-      final aDate = _tryParseCreatedAt(a.createdAt);
-      final bDate = _tryParseCreatedAt(b.createdAt);
+      final aDate = QRCodeDateUtils.tryParse(a.createdAt);
+      final bDate = QRCodeDateUtils.tryParse(b.createdAt);
 
       if (aDate != null && bDate != null) {
         return bDate.compareTo(aDate);
@@ -108,14 +106,6 @@ class QrCodeListPageViewmodel extends ChangeNotifier {
       // Iki tarih de parse edilemiyorsa siralamayi deterministik tut.
       return b.createdAt.compareTo(a.createdAt);
     });
-  }
-
-  static DateTime? _tryParseCreatedAt(String value) {
-    try {
-      return _createdAtFormat.parseStrict(value);
-    } on FormatException {
-      return null;
-    }
   }
 
   Future<bool> updateQRCodeName(

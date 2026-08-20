@@ -51,19 +51,34 @@ class FirebaseQrCodeRepository implements QRCodeRepository {
 
   @override
   Future<List<QRCodeModel>> fetchAllQRCodes() async {
-    DatabaseReference userRef = database.child('users/$uid/qrcodes');
-    return await userRef.once().then((event) {
-      if (event.snapshot.value != null) {
-        Map<dynamic, dynamic> fetchedData =
-            event.snapshot.value as Map<dynamic, dynamic>;
-        List<QRCodeModel> qrCodesList = [];
-        fetchedData.forEach((key, value) {
-          qrCodesList.add(QRCodeModel.fromJson(key, value));
-        });
-        return qrCodesList;
-      } else {
-        return [];
+    final userRef = database.child('users/$uid/qrcodes');
+    final event = await userRef.once();
+    final rawValue = event.snapshot.value;
+
+    if (rawValue == null) {
+      return [];
+    }
+
+    if (rawValue is! Map) {
+      throw const FormatException('Unexpected QR-code collection format');
+    }
+
+    final qrCodesList = <QRCodeModel>[];
+
+    for (final entry in rawValue.entries) {
+      final key = entry.key;
+      final value = entry.value;
+
+      if (key is! String || value is! Map) {
+        continue;
       }
-    });
+
+      final qrCode = QRCodeModel.tryFromJson(key, value);
+      if (qrCode != null) {
+        qrCodesList.add(qrCode);
+      }
+    }
+
+    return qrCodesList;
   }
 }

@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/models/qr_code_model.dart';
 import 'package:qr_coder/repository/main_qrcode_repository.dart';
 import 'package:qr_coder/services/auth_service.dart';
+import 'package:qr_coder/utils/qr_code_date_utils.dart';
+import 'package:qr_coder/utils/qr_code_render_utils.dart';
 import 'package:qr_coder/viewmodels/qr_code_list_page_viewmodel.dart';
 import 'package:qr_coder/views/qr_code_detail_page.dart';
 import 'package:qr_coder/widgets/banner_ad_widget.dart';
@@ -34,7 +35,7 @@ class QRCodeListPage extends StatefulWidget {
           child: ListTile(
             title: isEditing
                 ? _buildEditingTextField(context, qrCode, viewModel)
-                : _buildQRCodeName(qrCode),
+                : _buildQRCodeName(context, qrCode),
             subtitle: _buildQRCodeSubtitle(context, qrCode),
             trailing: _buildQRCodeActions(
               viewModel,
@@ -81,23 +82,24 @@ class QRCodeListPage extends StatefulWidget {
     );
   }
 
-  Widget _buildQRCodeName(QRCodeModel qrCode) {
+  Widget _buildQRCodeName(BuildContext context, QRCodeModel qrCode) {
+    final displayName = qrCode.name.isEmpty
+        ? AppLocalizations.of(context)!.qrCodeGenerator_qrCode
+        : qrCode.name;
+
     return Text(
-      qrCode.name,
+      displayName,
       style: const TextStyle(overflow: TextOverflow.ellipsis),
     );
   }
 
   Widget _buildQRCodeSubtitle(BuildContext context, QRCodeModel qrCode) {
+    final isEnglish = AppLocalizations.of(context)!.localeName == 'en';
+
     return Text(
-      AppLocalizations.of(context)!.localeName == 'en'
-          ? DateFormat(
-              'MM.dd.yyyy HH:mm',
-            ).format(DateFormat('dd.MM.yyyy HH:mm').parse(qrCode.createdAt))
-          : DateFormat(
-              'dd.MM.yyyy HH:mm',
-            ).format(DateFormat('dd.MM.yyyy HH:mm').parse(qrCode.createdAt)),
+      QRCodeDateUtils.formatForLocale(qrCode.createdAt, isEnglish: isEnglish),
       maxLines: 1,
+      overflow: TextOverflow.ellipsis,
     );
   }
 
@@ -303,13 +305,12 @@ class _QRCodeListPageState extends State<QRCodeListPage> {
               ),
               onTap: () async {
                 final l10n = AppLocalizations.of(context)!;
-                final pageContext = this.context;
                 Navigator.of(context).pop();
 
                 await viewModel.deleteAllQRCodes(l10n);
 
                 if (!mounted) return;
-                widget._showActionError(pageContext, viewModel);
+                widget._showActionError(this.context, viewModel);
               },
             ),
           ),
@@ -322,13 +323,12 @@ class _QRCodeListPageState extends State<QRCodeListPage> {
               ),
               onTap: () async {
                 final l10n = AppLocalizations.of(context)!;
-                final pageContext = this.context;
                 Navigator.of(context).pop();
 
                 await viewModel.deleteSelectedQRCodes(l10n);
 
                 if (!mounted) return;
-                widget._showActionError(pageContext, viewModel);
+                widget._showActionError(this.context, viewModel);
               },
             ),
           ),
@@ -345,11 +345,22 @@ class QrCodePreviewImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!QRCodeRenderUtils.canRender(data)) {
+      return const SizedBox.square(
+        dimension: 50,
+        child: Icon(Icons.broken_image_outlined),
+      );
+    }
+
     return QrImageView(
       data: data,
       version: QrVersions.auto,
       size: 50,
       padding: const EdgeInsets.all(4),
+      errorStateBuilder: (context, error) => const SizedBox.square(
+        dimension: 50,
+        child: Icon(Icons.broken_image_outlined),
+      ),
     );
   }
 }

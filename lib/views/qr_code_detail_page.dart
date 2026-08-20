@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/models/qr_code_model.dart';
+import 'package:qr_coder/utils/qr_code_date_utils.dart';
 import 'package:qr_coder/viewmodels/qr_code_display_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_viewmodel.dart';
 import 'package:qr_coder/views/qr_code_list_page.dart';
@@ -45,8 +45,12 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
   }
 
   AppBar _buildAppBar(BuildContext context) {
+    final title = widget.qrCode.name.isEmpty
+        ? AppLocalizations.of(context)!.qrCodeGenerator_qrCode
+        : widget.qrCode.name;
+
     return AppBar(
-      title: Text(widget.qrCode.name),
+      title: Text(title),
       actions: [
         IconButton(
           onPressed: () =>
@@ -166,20 +170,22 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
   // }
 
   Widget _buildCreateDateTime(BuildContext context) {
-    final created = DateFormat(
-      'dd.MM.yyyy HH:mm',
-    ).parse(widget.qrCode.createdAt);
-    final isEn = AppLocalizations.of(context)!.localeName == 'en';
-    final fmt = isEn
-        ? DateFormat('MM.dd.yyyy HH:mm')
-        : DateFormat('dd.MM.yyyy HH:mm');
+    final isEnglish = AppLocalizations.of(context)!.localeName == 'en';
+    final createdAt = QRCodeDateUtils.formatForLocale(
+      widget.qrCode.createdAt,
+      isEnglish: isEnglish,
+    );
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Text(
-          AppLocalizations.of(
-            context,
-          )!.qrCodeDetail_createdDateTime(fmt.format(created)),
+        Flexible(
+          child: Text(
+            AppLocalizations.of(
+              context,
+            )!.qrCodeDetail_createdDateTime(createdAt),
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
       ],
     );

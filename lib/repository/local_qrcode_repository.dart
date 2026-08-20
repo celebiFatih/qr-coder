@@ -80,17 +80,22 @@ class LocalQrCodeRepository implements QRCodeRepository {
   @override
   Future<List<QRCodeModel>> fetchAllQRCodes() async {
     final db = await database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      'qr_codes',
-      orderBy: 'created_at ASC',
-    );
+    final maps = await db.query('qr_codes', orderBy: 'created_at ASC');
 
-    if (maps.isEmpty) {
-      return [];
-    } else {
-      return List.generate(maps.length, (i) {
-        return QRCodeModel.fromJson(maps[i]['id'].toString(), maps[i]);
-      });
+    final qrCodes = <QRCodeModel>[];
+
+    for (final row in maps) {
+      final rawId = row['id'];
+      if (rawId == null) {
+        continue;
+      }
+
+      final qrCode = QRCodeModel.tryFromJson(rawId.toString(), row);
+      if (qrCode != null) {
+        qrCodes.add(qrCode);
+      }
     }
+
+    return qrCodes;
   }
 }

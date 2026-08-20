@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
+import 'package:qr_coder/utils/qr_code_render_utils.dart';
 import 'package:qr_coder/viewmodels/qr_code_display_viewmodel.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'dart:math' as math;
@@ -50,43 +51,58 @@ class _QRcodeDisplayState extends State<QRcodeDisplay> {
               child: SizedBox.square(
                 dimension: side,
                 child: Consumer<QRCodeDisplayViewModel>(
-                  builder: (context, vm, child) => Stack(
-                    children: [
-                      QrImageView(
-                        data: widget.data,
-                        backgroundColor: Colors.white,
-                        version: QrVersions.auto,
-                        errorCorrectionLevel: QrErrorCorrectLevel.H,
-                        embeddedImage: vm.isLogoRemoved
-                            ? null
-                            : const AssetImage('assets/img/logo.png'),
-                        embeddedImageStyle: QrEmbeddedImageStyle(
-                          size: Size(logoSide, logoSide),
+                  builder: (context, vm, child) {
+                    final canRender = QRCodeRenderUtils.canRender(
+                      widget.data,
+                      errorCorrectionLevel: QrErrorCorrectLevel.H,
+                    );
+
+                    if (!canRender) {
+                      return Center(
+                        child: Text(
+                          AppLocalizations.of(context)!.qrcodeDisplay_pageTitle,
                         ),
-                        errorStateBuilder: (cxt, err) => Center(
-                          child: Text(
-                            AppLocalizations.of(
-                              context,
-                            )!.qrcodeDisplay_pageTitle,
+                      );
+                    }
+
+                    return Stack(
+                      children: [
+                        QrImageView(
+                          data: widget.data,
+                          backgroundColor: Colors.white,
+                          version: QrVersions.auto,
+                          errorCorrectionLevel: QrErrorCorrectLevel.H,
+                          embeddedImage: vm.isLogoRemoved
+                              ? null
+                              : const AssetImage('assets/img/logo.png'),
+                          embeddedImageStyle: QrEmbeddedImageStyle(
+                            size: Size(logoSide, logoSide),
                           ),
-                        ),
-                      ),
-                      if (!vm.isLogoRemoved)
-                        Center(
-                          child: SizedBox(
-                            width: logoSide,
-                            height: logoSide,
-                            child: GestureDetector(
-                              onTap:
-                                  widget.onLogoTap ??
-                                  () => vm.promptRemoveLogo(context),
-                              // Görünmez; sadece hit-test için
-                              behavior: HitTestBehavior.opaque,
+                          errorStateBuilder: (cxt, err) => Center(
+                            child: Text(
+                              AppLocalizations.of(
+                                context,
+                              )!.qrcodeDisplay_pageTitle,
                             ),
                           ),
                         ),
-                    ],
-                  ),
+                        if (!vm.isLogoRemoved)
+                          Center(
+                            child: SizedBox(
+                              width: logoSide,
+                              height: logoSide,
+                              child: GestureDetector(
+                                onTap:
+                                    widget.onLogoTap ??
+                                    () => vm.promptRemoveLogo(context),
+                                // Görünmez; sadece hit-test için
+                                behavior: HitTestBehavior.opaque,
+                              ),
+                            ),
+                          ),
+                      ],
+                    );
+                  },
                 ),
               ),
             ),
