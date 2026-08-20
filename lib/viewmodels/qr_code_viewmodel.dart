@@ -23,10 +23,13 @@ QRCodeRepository _createMainQrCodeRepository(bool isFirebaseUser, String? uid) {
 }
 
 class QRCodeViewModel extends ChangeNotifier {
+  static const int maxQrDataLength = 2500;
+
   late QRCodeRepository _repository;
   final QrCodeRepositoryFactory _repositoryFactory;
   bool _repositoryInitialized = false;
   bool _usesFirebaseRepository = false;
+  bool _isReceivingSharedText = false;
   String? _repositoryUid;
   final TextEditingController controller = TextEditingController();
   FocusNode focusNode = FocusNode();
@@ -94,33 +97,84 @@ class QRCodeViewModel extends ChangeNotifier {
     }
   }
 
+  String? _validationErrorForData(String data, AppLocalizations l10n) {
+    if (data.isEmpty) {
+      return l10n.qrCodeGenerator_dataEmptyMsg;
+    }
+
+    if (data.length > maxQrDataLength) {
+      return l10n.qrCodeGenerator_dataTooLongErrMsg;
+    }
+
+    return null;
+  }
+
   /// Receive the shared text
   Future<void> receiveSharedText(BuildContext context) async {
+    if (_isReceivingSharedText) {
+      return;
+    }
+
+    _isReceivingSharedText = true;
+    errorMsg = '';
+
     const MethodChannel platform = MethodChannel('com.qrcoder.app/app');
     final l10n = AppLocalizations.of(context)!;
     final sharedDataName = l10n.qrCodeGenerator_sharedData;
     final receiveErrorMsg = l10n.qrCodeGenerator_receiveErrorMsg;
 
+    var startedPersistence = false;
+
     try {
       final String? sharedData = await platform.invokeMethod('getSharedText');
       if (!context.mounted) return;
-      if (sharedData != null && sharedData.isNotEmpty) {
-        final timestamp = DateFormat('dd.MM.yyyy HH:mm').format(DateTime.now());
-        sharedText = sharedData;
-        qrData = sharedData;
-        controller.text = sharedData;
-        qrCodeModel = QRCodeModel(
-          id: ' ',
-          data: sharedData,
-          name: sharedDataName,
-          createdAt: timestamp,
-        );
-        await saveQRCodeToDb(context);
-        notifyListeners();
+
+      // Null/empty means there is no pending Android share intent to process.
+      if (sharedData == null || sharedData.isEmpty) {
+        return;
       }
+
+      sharedText = sharedData;
+      controller.text = sharedData;
+
+      final validationError = _validationErrorForData(sharedData, l10n);
+      if (validationError != null) {
+        // Keep the incoming text editable, but never render or persist an
+        // invalid QR payload.
+        qrData = '';
+        qrCodeModel = null;
+        errorMsg = validationError;
+        focusNode.unfocus();
+        notifyListeners();
+        return;
+      }
+
+      isLoading = true;
+      startedPersistence = true;
+      notifyListeners();
+
+      final timestamp = DateFormat('dd.MM.yyyy HH:mm').format(DateTime.now());
+      qrData = sharedData;
+      qrCodeModel = QRCodeModel(
+        id: ' ',
+        data: sharedData,
+        name: sharedDataName,
+        createdAt: timestamp,
+      );
+
+      await saveQRCodeToDb(context);
+      focusNode.unfocus();
     } catch (e) {
       errorMsg = receiveErrorMsg;
       debugPrint('Shared text receive failed: $e');
+      notifyListeners();
+    } finally {
+      _isReceivingSharedText = false;
+
+      if (startedPersistence) {
+        isLoading = false;
+        notifyListeners();
+      }
     }
   }
 
@@ -251,24 +305,40 @@ class QRCodeViewModel extends ChangeNotifier {
 
   /// Generate the QR code
   Future<void> generateQRCode(BuildContext context) async {
+    // The UI also disables the FAB while loading, but the ViewModel remains
+    // the source of truth so rapid taps/programmatic calls cannot create
+    // duplicate database rows.
+    if (isLoading || _isReceivingSharedText) {
+      return;
+    }
+
     errorMsg = '';
+
     final l10n = AppLocalizations.of(context)!;
     final generatedQrName = l10n.qrCodeGenerator_qrCode;
     final generatorErrorMsg = l10n.qrCodeGenerator_qrCodeGeneratorErrMsg;
     final data = controller.text;
-    if (data.isEmpty) {
-      errorMsg = l10n.qrCodeGenerator_dataEmptyMsg;
-      focusNode.requestFocus();
-      notifyListeners();
-      return;
-    } else if (data.length > 2500) {
-      errorMsg = l10n.qrCodeGenerator_dataTooLongErrMsg;
-      focusNode.unfocus();
+
+    final validationError = _validationErrorForData(data, l10n);
+    if (validationError != null) {
+      errorMsg = validationError;
+
+      if (data.isEmpty) {
+        focusNode.requestFocus();
+      } else {
+        focusNode.unfocus();
+      }
+
       notifyListeners();
       return;
     }
+
+    isLoading = true;
+    notifyListeners();
+
     try {
       final timestamp = DateFormat('dd.MM.yyyy HH:mm').format(DateTime.now());
+
       qrData = data;
       qrCodeModel = QRCodeModel(
         id: '',
@@ -276,13 +346,16 @@ class QRCodeViewModel extends ChangeNotifier {
         createdAt: timestamp,
         name: generatedQrName,
       );
+
       await saveQRCodeToDb(context);
       focusNode.unfocus();
-      notifyListeners();
     } catch (e) {
       errorMsg = generatorErrorMsg;
       focusNode.unfocus();
       debugPrint('QR code generation failed: $e');
+    } finally {
+      isLoading = false;
+      notifyListeners();
     }
   }
 

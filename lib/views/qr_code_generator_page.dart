@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -54,7 +56,7 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
     }
 
     _didCheckInitialSharedText = true;
-    viewModel.receiveSharedText(context);
+    unawaited(_handleReceiveSharedText());
   }
 
   @override
@@ -72,13 +74,35 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
       // sure the repository still matches the active session before reading
       // and persisting that shared text.
       _syncRepositoryWithCurrentSession();
-      viewModel.receiveSharedText(context);
+      unawaited(_handleReceiveSharedText());
     }
   }
 
   void _syncRepositoryWithCurrentSession() {
     final user = Auth().currentUser;
     viewModel.configureRepository(isFirebaseUser: user != null, uid: user?.uid);
+  }
+
+  Future<void> _handleReceiveSharedText() async {
+    await viewModel.receiveSharedText(context);
+    if (!mounted || viewModel.errorMsg.isEmpty) {
+      return;
+    }
+
+    final message = viewModel.errorMsg;
+
+    // On cold start receiveSharedText can complete while the first frame is
+    // still settling. Show the validation/database error only after a frame
+    // where the ScaffoldMessenger is guaranteed to be attached.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          SnackBar(content: Text(message, textAlign: TextAlign.center)),
+        );
+    });
   }
 
   @override
@@ -232,7 +256,9 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
         label: AppLocalizations.of(context)!.qrCodeGenerator_FabSemantic,
         child: viewModel.qrData.isEmpty
             ? FloatingActionButton.large(
-                onPressed: () => _handleGenerateQRCode(context),
+                onPressed: viewModel.isLoading
+                    ? null
+                    : () => _handleGenerateQRCode(context),
                 backgroundColor: Theme.of(context).colorScheme.secondary,
                 tooltip: AppLocalizations.of(
                   context,
@@ -240,7 +266,9 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
                 child: const Icon(Icons.qr_code_scanner, size: 50),
               )
             : FloatingActionButton(
-                onPressed: () => _handleGenerateQRCode(context),
+                onPressed: viewModel.isLoading
+                    ? null
+                    : () => _handleGenerateQRCode(context),
                 backgroundColor: Theme.of(context).colorScheme.secondary,
                 tooltip: AppLocalizations.of(
                   context,
