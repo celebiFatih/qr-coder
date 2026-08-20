@@ -125,8 +125,12 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
               errorBuilder: (context, error) {
                 return ScannerErrorWidget(error: error);
               },
-              onDetect: (barcodes) {
-                if (!viewModel.isBottomSheetOpen) {
+              onDetect: (capture) {
+                final hasUsableBarcode = capture.barcodes.any(
+                  BarcodeScannerViewmodel.hasUsableRawValue,
+                );
+
+                if (hasUsableBarcode && !viewModel.isBottomSheetOpen) {
                   _showBottomSheet(context, viewModel);
                 }
               },
@@ -251,6 +255,16 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
           style: Theme.of(context).textTheme.bodyLarge,
         ),
         onTap: () async {
+          final barcode = viewModel.barcodes[index];
+          final rawValue = BarcodeScannerViewmodel.usableRawValue(barcode);
+
+          // Invalid scanner results are filtered before they reach the list,
+          // but keep this boundary guard so an empty payload can never be
+          // persisted or forwarded to the detail page.
+          if (rawValue == null) {
+            return;
+          }
+
           await _stopCamera(provider);
           if (!mounted) return;
           if (!context.mounted) {
@@ -258,7 +272,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
             return;
           }
 
-          await viewModel.saveQrCodeToDb(viewModel.barcodes[index], context);
+          final saved = await viewModel.saveQrCodeToDb(barcode, context);
           if (!mounted) return;
           if (!context.mounted) {
             await _startCamera(provider);
@@ -266,12 +280,17 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
           }
 
           final scaffoldMsg = ScaffoldMessenger.of(context);
-          if (viewModel.errorMsg.isNotEmpty) {
-            scaffoldMsg.showSnackBar(
-              SnackBar(
-                content: Text(viewModel.errorMsg, textAlign: TextAlign.center),
-              ),
-            );
+          if (!saved) {
+            if (viewModel.errorMsg.isNotEmpty) {
+              scaffoldMsg.showSnackBar(
+                SnackBar(
+                  content: Text(
+                    viewModel.errorMsg,
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              );
+            }
 
             // Kayıt başarısız olduğunda kullanıcı taramaya devam edebilsin.
             await _startCamera(provider);
@@ -290,7 +309,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
               builder: (context) => QRCodeDetailPage(
                 qrCode: QRCodeModel(
                   id: '',
-                  data: viewModel.barcodes[index].rawValue ?? '',
+                  data: rawValue,
                   name: scannedDataName,
                   createdAt: DateFormat(
                     'dd.MM.yyyy HH:mm',

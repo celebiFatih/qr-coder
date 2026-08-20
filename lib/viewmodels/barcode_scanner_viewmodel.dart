@@ -57,16 +57,48 @@ class BarcodeScannerViewmodel extends ChangeNotifier {
     }
   }
 
-  void addBarcode(Barcode barcode) {
-    final existingBarcodes = _barcodes.map((e) => e.rawValue).toSet();
-    if (!existingBarcodes.contains(barcode.rawValue)) {
-      _barcodes = List.from(_barcodes)..add(barcode);
-      _notifySafely();
+  static String? usableRawValue(Barcode barcode) {
+    final rawValue = barcode.rawValue;
+
+    if (rawValue == null || rawValue.trim().isEmpty) {
+      return null;
     }
+
+    return rawValue;
   }
 
-  Future<void> saveQrCodeToDb(Barcode barcode, BuildContext context) async {
+  static bool hasUsableRawValue(Barcode barcode) {
+    return usableRawValue(barcode) != null;
+  }
+
+  bool addBarcode(Barcode barcode) {
+    final rawValue = usableRawValue(barcode);
+    if (rawValue == null) {
+      return false;
+    }
+
+    final existingBarcodes = _barcodes
+        .map(usableRawValue)
+        .whereType<String>()
+        .toSet();
+
+    if (existingBarcodes.contains(rawValue)) {
+      return false;
+    }
+
+    _barcodes = List.from(_barcodes)..add(barcode);
+    _notifySafely();
+    return true;
+  }
+
+  Future<bool> saveQrCodeToDb(Barcode barcode, BuildContext context) async {
     errorMsg = '';
+
+    final rawValue = usableRawValue(barcode);
+    if (rawValue == null) {
+      return false;
+    }
+
     final l10n = AppLocalizations.of(context)!;
     final scannedDataName = l10n.scannerPage_scannedData;
     final saveErrorMsg = l10n.scannerPage_saveErrorMsg;
@@ -75,14 +107,16 @@ class BarcodeScannerViewmodel extends ChangeNotifier {
       await repository.insertQrCode(
         QRCodeModel(
           id: '',
-          data: barcode.rawValue ?? '',
+          data: rawValue,
           name: scannedDataName,
           createdAt: DateFormat('dd.MM.yyyy HH:mm').format(DateTime.now()),
         ),
       );
+      return true;
     } catch (e) {
       errorMsg = saveErrorMsg;
       debugPrint('QR code save failed: $e');
+      return false;
     }
   }
 
