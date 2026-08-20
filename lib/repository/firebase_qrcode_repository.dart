@@ -21,6 +21,20 @@ class FirebaseQrCodeRepository implements QRCodeRepository {
   }
 
   @override
+  Future<void> deleteQrCodes(List<String> ids) async {
+    if (ids.isEmpty) {
+      return;
+    }
+
+    final userRef = database.child('users/$uid/qrcodes');
+    final updates = <String, Object?>{for (final id in ids) id: null};
+
+    // Realtime Database update() applies this multi-location change as one
+    // atomic write: either every selected QR is removed or none are.
+    await userRef.update(updates);
+  }
+
+  @override
   Future<void> deleteAllQrCodes() async {
     DatabaseReference userRef = database.child('users/$uid/qrcodes');
     await userRef.remove();

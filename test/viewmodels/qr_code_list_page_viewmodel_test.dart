@@ -33,6 +33,12 @@ class _FakeQrCodeRepository implements QRCodeRepository {
     String id,
     Map<String, dynamic> updatedData,
   ) async {}
+
+  @override
+  Future<void> deleteQrCodes(List<String> ids) {
+    // TODO: implement deleteQrCodes
+    throw UnimplementedError();
+  }
 }
 
 void main() {

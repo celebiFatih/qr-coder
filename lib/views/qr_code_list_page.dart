@@ -64,12 +64,19 @@ class QRCodeListPage extends StatefulWidget {
       key: ValueKey('qr-name-${qrCode.id}'),
       initialValue: qrCode.name,
       onFieldSubmitted: (value) async {
-        await viewModel.updateQRCodeName(
+        final success = await viewModel.updateQRCodeName(
           qrCode.id,
           value,
           AppLocalizations.of(context)!,
         );
-        viewModel.toggleEditingQRCode(qrCode.id);
+
+        if (!context.mounted) return;
+
+        if (success) {
+          viewModel.toggleEditingQRCode(qrCode.id);
+        } else {
+          _showActionError(context, viewModel);
+        }
       },
     );
   }
@@ -117,14 +124,35 @@ class QRCodeListPage extends StatefulWidget {
         ),
         IconButton(
           icon: const Icon(Icons.delete),
-          onPressed: () async => await viewModel.deleteQRCode(
-            qrCode.id,
-            AppLocalizations.of(context)!,
-          ),
+          onPressed: () async {
+            await viewModel.deleteQRCode(
+              qrCode.id,
+              AppLocalizations.of(context)!,
+            );
+
+            if (!context.mounted) return;
+            _showActionError(context, viewModel);
+          },
           tooltip: AppLocalizations.of(context)!.qrCodeList_deleteBtn,
         ),
       ],
     );
+  }
+
+  void _showActionError(
+    BuildContext context,
+    QrCodeListPageViewmodel viewModel,
+  ) {
+    final message = viewModel.actionErrorMsg;
+    if (message.isEmpty) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(content: Text(message, textAlign: TextAlign.center)),
+      );
   }
 
   Widget _buildQRCodePreview(QRCodeModel qrCode) {
@@ -275,8 +303,13 @@ class _QRCodeListPageState extends State<QRCodeListPage> {
               ),
               onTap: () async {
                 final l10n = AppLocalizations.of(context)!;
+                final pageContext = this.context;
                 Navigator.of(context).pop();
+
                 await viewModel.deleteAllQRCodes(l10n);
+
+                if (!mounted) return;
+                widget._showActionError(pageContext, viewModel);
               },
             ),
           ),
@@ -289,8 +322,13 @@ class _QRCodeListPageState extends State<QRCodeListPage> {
               ),
               onTap: () async {
                 final l10n = AppLocalizations.of(context)!;
+                final pageContext = this.context;
                 Navigator.of(context).pop();
+
                 await viewModel.deleteSelectedQRCodes(l10n);
+
+                if (!mounted) return;
+                widget._showActionError(pageContext, viewModel);
               },
             ),
           ),

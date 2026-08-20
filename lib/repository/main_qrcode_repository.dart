@@ -26,6 +26,11 @@ class MainQrCodeRepository implements QRCodeRepository {
   }
 
   @override
+  Future<void> deleteQrCodes(List<String> ids) {
+    return _repository.deleteQrCodes(ids);
+  }
+
+  @override
   Future<void> deleteAllQrCodes() {
     return _repository.deleteAllQrCodes();
   }

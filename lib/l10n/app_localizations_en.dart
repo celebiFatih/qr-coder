@@ -208,6 +208,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qrCodeList_deleteErrorMsg => 'Failed to delete QR Code!';
 
   @override
+  String get qrCodeList_deleteSelectedErrorMsg =>
+      'Failed to delete selected QR Codes!';
+
+  @override
   String qrCodeList_qrCodeTitle(String qrCode) {
     return 'QR Code: $qrCode';
   }

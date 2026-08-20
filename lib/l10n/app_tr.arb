@@ -62,6 +62,7 @@
     "qrCodeList_updateDescriptionErrorMsg": "QR Kod tanımlaması güncellenemedi!",
     "qrCodeList_deleteAllErrorMsg": "Tüm QR Kodlar silinemedi!",
     "qrCodeList_deleteErrorMsg": "QR Kod silinemedi!",
+    "qrCodeList_deleteSelectedErrorMsg": "Seçilen QR Kodlar silinemedi!",
     "qrCodeList_qrCodeTitle": "QR Kod: {qrCode}",
     "@qrCodeList_qrCodeTitle": {
         "placeholders": {

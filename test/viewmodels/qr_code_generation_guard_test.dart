@@ -38,6 +38,12 @@ class _RecordingQrCodeRepository implements QRCodeRepository {
     String id,
     Map<String, dynamic> updatedData,
   ) async {}
+
+  @override
+  Future<void> deleteQrCodes(List<String> ids) {
+    // TODO: implement deleteQrCodes
+    throw UnimplementedError();
+  }
 }
 
 Future<BuildContext> _pumpLocalizedContext(WidgetTester tester) async {

@@ -39,6 +39,25 @@ class LocalQrCodeRepository implements QRCodeRepository {
   }
 
   @override
+  Future<void> deleteQrCodes(List<String> ids) async {
+    if (ids.isEmpty) {
+      return;
+    }
+
+    // Parse every id before touching the database so malformed input cannot
+    // leave a partially deleted local selection.
+    final parsedIds = ids.map(int.parse).toList(growable: false);
+    final placeholders = List.filled(parsedIds.length, '?').join(', ');
+
+    final db = await database;
+    await db.delete(
+      'qr_codes',
+      where: 'id IN ($placeholders)',
+      whereArgs: parsedIds,
+    );
+  }
+
+  @override
   Future<void> deleteAllQrCodes() async {
     final db = await database;
     await db.delete('qr_codes');

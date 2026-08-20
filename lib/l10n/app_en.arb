@@ -62,6 +62,7 @@
     "qrCodeList_updateDescriptionErrorMsg": "Failed to update QR Code description!",
     "qrCodeList_deleteAllErrorMsg": "Failed to delete all QR Codes!",
     "qrCodeList_deleteErrorMsg": "Failed to delete QR Code!",
+    "qrCodeList_deleteSelectedErrorMsg": "Failed to delete selected QR Codes!",
     "qrCodeList_qrCodeTitle": "QR Code: {qrCode}",
     "@qrCodeList_qrCodeTitle": {
         "placeholders": {

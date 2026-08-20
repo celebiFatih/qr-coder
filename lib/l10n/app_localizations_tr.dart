@@ -206,6 +206,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get qrCodeList_deleteErrorMsg => 'QR Kod silinemedi!';
 
   @override
+  String get qrCodeList_deleteSelectedErrorMsg =>
+      'Seçilen QR Kodlar silinemedi!';
+
+  @override
   String qrCodeList_qrCodeTitle(String qrCode) {
     return 'QR Kod: $qrCode';
   }

@@ -470,6 +470,12 @@ abstract class AppLocalizations {
   /// **'Failed to delete QR Code!'**
   String get qrCodeList_deleteErrorMsg;
 
+  /// No description provided for @qrCodeList_deleteSelectedErrorMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete selected QR Codes!'**
+  String get qrCodeList_deleteSelectedErrorMsg;
+
   /// No description provided for @qrCodeList_qrCodeTitle.
   ///
   /// In en, this message translates to:

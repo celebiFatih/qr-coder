@@ -13,10 +13,12 @@ class QrCodeListPageViewmodel extends ChangeNotifier {
   final List<String> _editingQRCodes = [];
   List<QRCodeModel> qrCodes = [];
   String _errorMsg = '';
+  String _actionErrorMsg = '';
   bool _allSelected = false;
   // bool _isLoading = false;
 
   String get errorMsg => _errorMsg;
+  String get actionErrorMsg => _actionErrorMsg;
   bool get allSelected => _allSelected;
   // bool get isLoading => _isLoading;
   List<String> get selectedQRCodes => _selectedQRCodes;
@@ -33,6 +35,7 @@ class QrCodeListPageViewmodel extends ChangeNotifier {
   void clearAll() {
     resetTransientState(notify: false);
     _errorMsg = '';
+    _actionErrorMsg = '';
     qrCodes.clear();
     notifyListeners();
   }
@@ -115,49 +118,82 @@ class QrCodeListPageViewmodel extends ChangeNotifier {
     }
   }
 
-  Future<void> updateQRCodeName(
+  Future<bool> updateQRCodeName(
     String id,
     String name,
     AppLocalizations l10n,
   ) async {
-    final updateErrorMsg = l10n.qrCodeList_updateDescriptionErrorMsg;
+    _actionErrorMsg = '';
+
     try {
       await repository.updateQRCodeName(id, {'name': name});
       await fetchQRCodes(l10n);
+      return true;
     } catch (e) {
-      _errorMsg = updateErrorMsg;
+      _actionErrorMsg = l10n.qrCodeList_updateDescriptionErrorMsg;
       debugPrint('QR code name update failed: $e');
+      notifyListeners();
+      return false;
     }
   }
 
-  Future<void> deleteQRCode(String id, AppLocalizations l10n) async {
-    final deleteErrorMsg = l10n.qrCodeList_deleteErrorMsg;
+  Future<bool> deleteQRCode(String id, AppLocalizations l10n) async {
+    _actionErrorMsg = '';
+
     try {
       await repository.deleteQrCode(id);
+      _selectedQRCodes.remove(id);
+      _editingQRCodes.remove(id);
       await fetchQRCodes(l10n);
+      return true;
     } catch (e) {
-      _errorMsg = deleteErrorMsg;
+      _actionErrorMsg = l10n.qrCodeList_deleteErrorMsg;
       debugPrint('QR code delete failed: $e');
+      notifyListeners();
+      return false;
     }
   }
 
-  Future<void> deleteAllQRCodes(AppLocalizations l10n) async {
-    final deleteAllErrorMsg = l10n.qrCodeList_deleteAllErrorMsg;
+  Future<bool> deleteAllQRCodes(AppLocalizations l10n) async {
+    _actionErrorMsg = '';
+
     try {
       await repository.deleteAllQrCodes();
+      resetTransientState(notify: false);
       await fetchQRCodes(l10n);
+      return true;
     } catch (e) {
-      _errorMsg = deleteAllErrorMsg;
+      _actionErrorMsg = l10n.qrCodeList_deleteAllErrorMsg;
       debugPrint('Delete all QR codes failed: $e');
+      notifyListeners();
+      return false;
     }
   }
 
-  Future<void> deleteSelectedQRCodes(AppLocalizations l10n) async {
-    for (String id in _selectedQRCodes) {
-      await repository.deleteQrCode(id);
+  Future<bool> deleteSelectedQRCodes(AppLocalizations l10n) async {
+    if (_selectedQRCodes.isEmpty) {
+      return true;
     }
-    _selectedQRCodes.clear();
-    await fetchQRCodes(l10n);
+
+    _actionErrorMsg = '';
+    final selectedIds = List<String>.unmodifiable(_selectedQRCodes);
+
+    try {
+      // Production repositories implement this as one atomic backend
+      // operation. A failure therefore does not leave a half-deleted
+      // selection.
+      await repository.deleteQrCodes(selectedIds);
+
+      _selectedQRCodes.clear();
+      _editingQRCodes.removeWhere(selectedIds.contains);
+      await fetchQRCodes(l10n);
+      return true;
+    } catch (e) {
+      _actionErrorMsg = l10n.qrCodeList_deleteSelectedErrorMsg;
+      debugPrint('Delete selected QR codes failed: $e');
+      notifyListeners();
+      return false;
+    }
   }
 
   void selectQRCode(String id) {
