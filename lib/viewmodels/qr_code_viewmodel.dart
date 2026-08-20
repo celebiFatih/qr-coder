@@ -195,22 +195,22 @@ class QRCodeViewModel extends ChangeNotifier {
     try {
       PermissionStatus storageStatus = PermissionStatus.granted;
 
-      // Legacy storage permission is only relevant on older Android versions.
-      // Android 13+ uses scoped media storage and does not grant
-      // READ/WRITE_EXTERNAL_STORAGE.
+      // QR Coder only adds an image that it created itself to the gallery.
+      // Android 10+ (API 29+) uses scoped storage/MediaStore for this and does
+      // not require READ/WRITE_EXTERNAL_STORAGE. Keep the legacy write
+      // permission only for Android 9 (API 28) and lower.
       if (Platform.isAndroid) {
         final androidInfo = await DeviceInfoPlugin().androidInfo;
-        if (androidInfo.version.sdkInt < 33) {
+        if (androidInfo.version.sdkInt <= 28) {
           storageStatus = await Permission.storage.request();
         }
       }
 
       if (storageStatus != PermissionStatus.granted) {
         if (storageStatus == PermissionStatus.permanentlyDenied) {
-          openAppSettings();
+          await openAppSettings();
         }
         errorMsg = savePermissionErrorMsg;
-        // print(errorMsg);
         return null;
       }
 
