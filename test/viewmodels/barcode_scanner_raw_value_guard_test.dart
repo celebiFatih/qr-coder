@@ -3,6 +3,8 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:qr_coder/viewmodels/barcode_scanner_viewmodel.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   test('null rawValue is rejected', () {
     const barcode = Barcode(rawValue: null);
 

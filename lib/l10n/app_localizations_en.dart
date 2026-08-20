@@ -419,4 +419,78 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get qrcodeDisplay_permission_remove_logo =>
       'You need to watch a rewarded ad to remove the logo. Do you want to continue?';
+
+  @override
+  String get accountPrivacy_title => 'Account & Privacy';
+
+  @override
+  String get accountPrivacy_guestAccount => 'Guest';
+
+  @override
+  String get accountPrivacy_guestDescription =>
+      'QR codes are stored locally while you use guest mode.';
+
+  @override
+  String get accountPrivacy_cloudAccountDescription =>
+      'Verified account. Saved QR codes are stored in your cloud account.';
+
+  @override
+  String get accountPrivacy_privacyPolicy => 'Privacy Policy';
+
+  @override
+  String get accountPrivacy_privacyPolicyDescription =>
+      'See how QR Coder handles data, advertising, and privacy.';
+
+  @override
+  String get accountPrivacy_accountDeletionInfo =>
+      'Account deletion information';
+
+  @override
+  String get accountPrivacy_accountDeletionInfoDescription =>
+      'Open the account deletion instructions on the web.';
+
+  @override
+  String get accountPrivacy_deleteAccountTitle => 'Delete account';
+
+  @override
+  String get accountPrivacy_deleteAccountDescription =>
+      'Permanently deletes your QR Coder account and QR codes stored in your cloud account. This cannot be undone.';
+
+  @override
+  String get accountPrivacy_deleteAccountButton => 'Delete my account';
+
+  @override
+  String get accountPrivacy_deletingAccount => 'Deleting account...';
+
+  @override
+  String get accountPrivacy_deleteConfirmTitle => 'Permanently delete account?';
+
+  @override
+  String get accountPrivacy_deleteConfirmDescription =>
+      'Enter your password to confirm. Your account and cloud-saved QR codes will be permanently deleted.';
+
+  @override
+  String get accountPrivacy_passwordLabel => 'Password';
+
+  @override
+  String get accountPrivacy_deleteConfirmButton => 'Delete account';
+
+  @override
+  String get accountPrivacy_wrongPassword =>
+      'The password is incorrect. Please try again.';
+
+  @override
+  String get accountPrivacy_networkError =>
+      'The account could not be deleted because of a network error. Please try again.';
+
+  @override
+  String get accountPrivacy_tooManyRequests =>
+      'Too many attempts. Please try again later.';
+
+  @override
+  String get accountPrivacy_deleteError =>
+      'The account could not be deleted. Please try again.';
+
+  @override
+  String get accountPrivacy_linkOpenError => 'The link could not be opened.';
 }

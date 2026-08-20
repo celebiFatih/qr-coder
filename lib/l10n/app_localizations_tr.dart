@@ -419,4 +419,78 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get qrcodeDisplay_permission_remove_logo =>
       'Logoyu kaldırmak için bir reklam izlemeniz gerekiyor. Devam etmek istiyor musunuz?';
+
+  @override
+  String get accountPrivacy_title => 'Hesap ve Gizlilik';
+
+  @override
+  String get accountPrivacy_guestAccount => 'Misafir';
+
+  @override
+  String get accountPrivacy_guestDescription =>
+      'Misafir modunda kullandığınız QR kodlar yalnızca cihazda saklanır.';
+
+  @override
+  String get accountPrivacy_cloudAccountDescription =>
+      'Doğrulanmış hesap. Kaydedilen QR kodlar bulut hesabınızda saklanır.';
+
+  @override
+  String get accountPrivacy_privacyPolicy => 'Gizlilik Politikası';
+
+  @override
+  String get accountPrivacy_privacyPolicyDescription =>
+      'QR Coder\'ın verileri, reklamları ve gizliliği nasıl ele aldığını inceleyin.';
+
+  @override
+  String get accountPrivacy_accountDeletionInfo => 'Hesap silme bilgileri';
+
+  @override
+  String get accountPrivacy_accountDeletionInfoDescription =>
+      'Web üzerindeki hesap silme açıklamalarını açın.';
+
+  @override
+  String get accountPrivacy_deleteAccountTitle => 'Hesabı sil';
+
+  @override
+  String get accountPrivacy_deleteAccountDescription =>
+      'QR Coder hesabınızı ve bulut hesabınızda kayıtlı QR kodları kalıcı olarak siler. Bu işlem geri alınamaz.';
+
+  @override
+  String get accountPrivacy_deleteAccountButton => 'Hesabımı sil';
+
+  @override
+  String get accountPrivacy_deletingAccount => 'Hesap siliniyor...';
+
+  @override
+  String get accountPrivacy_deleteConfirmTitle =>
+      'Hesap kalıcı olarak silinsin mi?';
+
+  @override
+  String get accountPrivacy_deleteConfirmDescription =>
+      'Onaylamak için parolanızı girin. Hesabınız ve bulutta kayıtlı QR kodlarınız kalıcı olarak silinecek.';
+
+  @override
+  String get accountPrivacy_passwordLabel => 'Parola';
+
+  @override
+  String get accountPrivacy_deleteConfirmButton => 'Hesabı sil';
+
+  @override
+  String get accountPrivacy_wrongPassword =>
+      'Parola yanlış. Lütfen tekrar deneyin.';
+
+  @override
+  String get accountPrivacy_networkError =>
+      'Ağ hatası nedeniyle hesap silinemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get accountPrivacy_tooManyRequests =>
+      'Çok fazla deneme yapıldı. Lütfen daha sonra tekrar deneyin.';
+
+  @override
+  String get accountPrivacy_deleteError =>
+      'Hesap silinemedi. Lütfen tekrar deneyin.';
+
+  @override
+  String get accountPrivacy_linkOpenError => 'Bağlantı açılamadı.';
 }

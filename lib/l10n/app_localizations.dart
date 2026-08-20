@@ -835,6 +835,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You need to watch a rewarded ad to remove the logo. Do you want to continue?'**
   String get qrcodeDisplay_permission_remove_logo;
+
+  /// No description provided for @accountPrivacy_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Account & Privacy'**
+  String get accountPrivacy_title;
+
+  /// No description provided for @accountPrivacy_guestAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Guest'**
+  String get accountPrivacy_guestAccount;
+
+  /// No description provided for @accountPrivacy_guestDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'QR codes are stored locally while you use guest mode.'**
+  String get accountPrivacy_guestDescription;
+
+  /// No description provided for @accountPrivacy_cloudAccountDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified account. Saved QR codes are stored in your cloud account.'**
+  String get accountPrivacy_cloudAccountDescription;
+
+  /// No description provided for @accountPrivacy_privacyPolicy.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get accountPrivacy_privacyPolicy;
+
+  /// No description provided for @accountPrivacy_privacyPolicyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'See how QR Coder handles data, advertising, and privacy.'**
+  String get accountPrivacy_privacyPolicyDescription;
+
+  /// No description provided for @accountPrivacy_accountDeletionInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Account deletion information'**
+  String get accountPrivacy_accountDeletionInfo;
+
+  /// No description provided for @accountPrivacy_accountDeletionInfoDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the account deletion instructions on the web.'**
+  String get accountPrivacy_accountDeletionInfoDescription;
+
+  /// No description provided for @accountPrivacy_deleteAccountTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get accountPrivacy_deleteAccountTitle;
+
+  /// No description provided for @accountPrivacy_deleteAccountDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently deletes your QR Coder account and QR codes stored in your cloud account. This cannot be undone.'**
+  String get accountPrivacy_deleteAccountDescription;
+
+  /// No description provided for @accountPrivacy_deleteAccountButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete my account'**
+  String get accountPrivacy_deleteAccountButton;
+
+  /// No description provided for @accountPrivacy_deletingAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting account...'**
+  String get accountPrivacy_deletingAccount;
+
+  /// No description provided for @accountPrivacy_deleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Permanently delete account?'**
+  String get accountPrivacy_deleteConfirmTitle;
+
+  /// No description provided for @accountPrivacy_deleteConfirmDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password to confirm. Your account and cloud-saved QR codes will be permanently deleted.'**
+  String get accountPrivacy_deleteConfirmDescription;
+
+  /// No description provided for @accountPrivacy_passwordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get accountPrivacy_passwordLabel;
+
+  /// No description provided for @accountPrivacy_deleteConfirmButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete account'**
+  String get accountPrivacy_deleteConfirmButton;
+
+  /// No description provided for @accountPrivacy_wrongPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'The password is incorrect. Please try again.'**
+  String get accountPrivacy_wrongPassword;
+
+  /// No description provided for @accountPrivacy_networkError.
+  ///
+  /// In en, this message translates to:
+  /// **'The account could not be deleted because of a network error. Please try again.'**
+  String get accountPrivacy_networkError;
+
+  /// No description provided for @accountPrivacy_tooManyRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Too many attempts. Please try again later.'**
+  String get accountPrivacy_tooManyRequests;
+
+  /// No description provided for @accountPrivacy_deleteError.
+  ///
+  /// In en, this message translates to:
+  /// **'The account could not be deleted. Please try again.'**
+  String get accountPrivacy_deleteError;
+
+  /// No description provided for @accountPrivacy_linkOpenError.
+  ///
+  /// In en, this message translates to:
+  /// **'The link could not be opened.'**
+  String get accountPrivacy_linkOpenError;
 }
 
 class _AppLocalizationsDelegate

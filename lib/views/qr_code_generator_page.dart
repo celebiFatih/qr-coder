@@ -14,6 +14,7 @@ import 'package:qr_coder/viewmodels/qr_code_display_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_list_page_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_viewmodel.dart';
 import 'package:qr_coder/viewmodels/verification_page_viewmodel.dart';
+import 'package:qr_coder/views/account_privacy_page.dart';
 import 'package:qr_coder/views/barcode_scanner_page.dart';
 import 'package:qr_coder/widgets/wrapper.dart';
 import 'package:qr_coder/views/qr_code_list_page.dart';
@@ -154,7 +155,10 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
         },
       ),
       IconButton(
-        onPressed: () {},
+        onPressed: () => Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => AccountPrivacyPage()),
+        ),
         icon: user == null
             ? const Icon(Icons.account_circle_rounded)
             : const Icon(Icons.cloud_rounded),
