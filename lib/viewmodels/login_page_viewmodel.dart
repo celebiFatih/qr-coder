@@ -135,7 +135,7 @@ class LoginPageViewmodel extends ChangeNotifier {
     try {
       final userCredential = await Auth().createUser(
         email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+        password: _passwordController.text,
       );
 
       try {
@@ -172,7 +172,7 @@ class LoginPageViewmodel extends ChangeNotifier {
     try {
       await Auth().signIn(
         email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
+        password: _passwordController.text,
       );
       // E-posta doğrulama durumuna burada müdahale etmiyoruz. Başarılı
       // oturumdan sonra Wrapper, userChanges üzerinden doğrulanmış kullanıcıyı
