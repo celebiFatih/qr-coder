@@ -6,9 +6,8 @@ import 'package:qr_coder/widgets/qr_code_display.dart';
 
 void main() {
   test('generator owns one stable repaint key for its page lifetime', () {
-    final source = File(
-      'lib/views/qr_code_generator_page.dart',
-    ).readAsStringSync();
+    final source = File('lib/views/qr_code_generator_page.dart')
+        .readAsStringSync();
 
     expect(source, contains('final GlobalKey _repaintKey = GlobalKey();'));
     expect(
@@ -19,9 +18,8 @@ void main() {
   });
 
   test('generator routes logo removal through its stable page context', () {
-    final source = File(
-      'lib/views/qr_code_generator_page.dart',
-    ).readAsStringSync();
+    final source = File('lib/views/qr_code_generator_page.dart')
+        .readAsStringSync();
 
     expect(source, contains('Future<void> _handleRemoveLogo() async'));
     expect(source, contains('onLogoTap: _handleRemoveLogo'));

@@ -13,17 +13,14 @@ class ScannerErrorWidget extends StatelessWidget {
 
     switch (error.errorCode) {
       case MobileScannerErrorCode.controllerUninitialized:
-        errorMessage = AppLocalizations.of(
-          context,
-        )!.scannerErrorWidget_controllerUninitialized;
+        errorMessage = AppLocalizations.of(context)!
+            .scannerErrorWidget_controllerUninitialized;
       case MobileScannerErrorCode.permissionDenied:
-        errorMessage = AppLocalizations.of(
-          context,
-        )!.scannerErrorWidget_permissionDenied;
+        errorMessage = AppLocalizations.of(context)!
+            .scannerErrorWidget_permissionDenied;
       case MobileScannerErrorCode.unsupported:
-        errorMessage = AppLocalizations.of(
-          context,
-        )!.scannerErrorWidget_unsupported;
+        errorMessage = AppLocalizations.of(context)!
+            .scannerErrorWidget_unsupported;
       default:
         errorMessage = AppLocalizations.of(context)!.scannerErrorWidget_unknown;
         break;

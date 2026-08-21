@@ -178,9 +178,8 @@ class _LoginPageState extends State<LoginPage> {
           padding: const EdgeInsets.all(8.0),
           child: Text(
             localeProvider.locale?.languageCode == 'tr' ? 'EN' : 'TR',
-            style: Theme.of(
-              context,
-            ).textTheme.bodyLarge!.copyWith(color: Colors.white),
+            style: Theme.of(context).textTheme.bodyLarge!
+                .copyWith(color: Colors.white),
           ),
         ),
       ),
@@ -404,12 +403,10 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 TextSpan(
                   text: !viewModel.isLogin
-                      ? AppLocalizations.of(
-                          context,
-                        )!.login_LoginOrRegisterToggle
-                      : AppLocalizations.of(
-                          context,
-                        )!.login_LoginOrRegisterToggleAlreadyHaveAccount,
+                      ? AppLocalizations.of(context)!
+                            .login_LoginOrRegisterToggle
+                      : AppLocalizations.of(context)!
+                            .login_LoginOrRegisterToggleAlreadyHaveAccount,
                 ),
                 TextSpan(
                   text: !viewModel.isLogin

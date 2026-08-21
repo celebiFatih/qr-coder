@@ -101,9 +101,8 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
         Consumer<BarcodeScannerViewmodel>(
           builder: (context, viewModel, child) {
             return IconButton(
-              tooltip: AppLocalizations.of(
-                context,
-              )!.scannerPage_refreshBtnToolTip,
+              tooltip: AppLocalizations.of(context)!
+                  .scannerPage_refreshBtnToolTip,
               onPressed: () => _refreshCamera(viewModel),
               icon: const Icon(Icons.refresh),
             );
@@ -311,9 +310,8 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
                   id: '',
                   data: rawValue,
                   name: scannedDataName,
-                  createdAt: DateFormat(
-                    'dd.MM.yyyy HH:mm',
-                  ).format(DateTime.now()),
+                  createdAt: DateFormat('dd.MM.yyyy HH:mm')
+                      .format(DateTime.now()),
                 ),
               ),
             ),

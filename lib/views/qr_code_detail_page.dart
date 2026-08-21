@@ -56,18 +56,16 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
           onPressed: () =>
               Navigator.of(context).popUntil((route) => route.isFirst),
           icon: const Icon(Icons.home_rounded),
-          tooltip: AppLocalizations.of(
-            context,
-          )!.qrCodeDetail_homePageNavToolTip,
+          tooltip: AppLocalizations.of(context)!
+              .qrCodeDetail_homePageNavToolTip,
         ),
         IconButton(
           onPressed: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (context) => const QRCodeListPage()),
           ),
           icon: const Icon(Icons.format_list_bulleted_rounded),
-          tooltip: AppLocalizations.of(
-            context,
-          )!.qrCodeDetail_listPageNavToolTip,
+          tooltip: AppLocalizations.of(context)!
+              .qrCodeDetail_listPageNavToolTip,
         ),
       ],
     );
@@ -181,9 +179,8 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
       children: [
         Flexible(
           child: Text(
-            AppLocalizations.of(
-              context,
-            )!.qrCodeDetail_createdDateTime(createdAt),
+            AppLocalizations.of(context)!
+                .qrCodeDetail_createdDateTime(createdAt),
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -209,9 +206,8 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
             ? const CircularProgressIndicator()
             : FloatingActionButton(
                 heroTag: 'saverFab',
-                tooltip: AppLocalizations.of(
-                  context,
-                )!.qrCodeDetail_saveQrCodeButtonToolTip,
+                tooltip: AppLocalizations.of(context)!
+                    .qrCodeDetail_saveQrCodeButtonToolTip,
                 onPressed: () async {
                   _showResolutionPicker(context, (
                     double selectedResolution,
@@ -275,9 +271,8 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
             ? const CircularProgressIndicator()
             : FloatingActionButton(
                 heroTag: 'sharerFab',
-                tooltip: AppLocalizations.of(
-                  context,
-                )!.qrCodeDetail_shareQrCodeBtnToolTip,
+                tooltip: AppLocalizations.of(context)!
+                    .qrCodeDetail_shareQrCodeBtnToolTip,
                 onPressed: () async {
                   await viewModel.shareQrCode(repaintKey, context);
                   if (!context.mounted) return;
@@ -324,9 +319,8 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
             children: [
               Text(
                 AppLocalizations.of(context)!.qrCodeDetail_resolution,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+                style: Theme.of(context).textTheme.titleLarge
+                    ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
               ),
               Divider(
                 color: Theme.of(context).colorScheme.onSurface,
@@ -358,18 +352,17 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
                             style: Theme.of(context).textTheme.bodyLarge
                                 ?.copyWith(
                                   color: isSelected
-                                      ? Theme.of(
-                                          context,
-                                        ).colorScheme.onPrimaryContainer
+                                      ? Theme.of(context)
+                                            .colorScheme
+                                            .onPrimaryContainer
                                       : Theme.of(context).colorScheme.onSurface,
                                 ),
                           ),
                           trailing: isSelected
                               ? ElevatedButton.icon(
                                   label: Text(
-                                    AppLocalizations.of(
-                                      context,
-                                    )!.qrCodeDetail_download,
+                                    AppLocalizations.of(context)!
+                                        .qrCodeDetail_download,
                                   ),
                                   icon: const Icon(
                                     Icons.download_for_offline_rounded,

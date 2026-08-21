@@ -95,9 +95,8 @@ class _WrapperState extends State<Wrapper> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          AppLocalizations.of(
-                            context,
-                          )!.wrapper_LoginPageToolTip,
+                          AppLocalizations.of(context)!
+                              .wrapper_LoginPageToolTip,
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 12),

@@ -4,9 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   test('Android manifest keeps only legacy write storage through API 28', () {
-    final manifest = File(
-      'android/app/src/main/AndroidManifest.xml',
-    ).readAsStringSync();
+    final manifest = File('android/app/src/main/AndroidManifest.xml')
+        .readAsStringSync();
 
     expect(
       manifest,
@@ -28,9 +27,8 @@ void main() {
   });
 
   test('gallery save requests storage permission only on API 28 and lower', () {
-    final source = File(
-      'lib/viewmodels/qr_code_viewmodel.dart',
-    ).readAsStringSync();
+    final source = File('lib/viewmodels/qr_code_viewmodel.dart')
+        .readAsStringSync();
 
     expect(source, contains('androidInfo.version.sdkInt <= 28'));
     expect(source, isNot(contains('androidInfo.version.sdkInt < 33')));

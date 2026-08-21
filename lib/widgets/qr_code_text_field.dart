@@ -19,9 +19,8 @@ class QRCodeTextField extends StatelessWidget {
       focusNode: focusNode,
       autofocus: false,
       decoration: InputDecoration(
-        hintText: AppLocalizations.of(
-          context,
-        )!.qrCodeGenerator_textFieldHintText,
+        hintText: AppLocalizations.of(context)!
+            .qrCodeGenerator_textFieldHintText,
         hintStyle: TextStyle(
           color: const Color(0xFF757575).withValues(alpha: 0.5),
         ),

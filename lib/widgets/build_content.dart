@@ -15,9 +15,8 @@ class BuildContent extends StatelessWidget {
       children: [
         Text(
           AppLocalizations.of(context)!.qrCodeDetail_Details,
-          style: Theme.of(
-            context,
-          ).textTheme.headlineLarge!.copyWith(fontSize: 26),
+          style: Theme.of(context).textTheme.headlineLarge!
+              .copyWith(fontSize: 26),
         ),
         const Divider(height: 2.0),
         Expanded(
@@ -96,19 +95,16 @@ class BuildContent extends StatelessWidget {
                 children: [
                   Text('SSID: $ssid'),
                   Text(
-                    AppLocalizations.of(
-                      context,
-                    )!.qrCodeDetail_wifiPassw(password),
+                    AppLocalizations.of(context)!
+                        .qrCodeDetail_wifiPassw(password),
                   ),
                   Text(
-                    AppLocalizations.of(
-                      context,
-                    )!.qrCodeDetail_wifiEncryption(encryption),
+                    AppLocalizations.of(context)!
+                        .qrCodeDetail_wifiEncryption(encryption),
                   ),
                   Text(
-                    AppLocalizations.of(
-                      context,
-                    )!.qrCodeDetail_wifiHidden(hidden),
+                    AppLocalizations.of(context)!
+                        .qrCodeDetail_wifiHidden(hidden),
                   ),
                 ],
               ),
@@ -116,9 +112,8 @@ class BuildContent extends StatelessWidget {
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: Text(
-                    AppLocalizations.of(
-                      context,
-                    )!.qrCodeDetail_wifiConnectTextBtn,
+                    AppLocalizations.of(context)!
+                        .qrCodeDetail_wifiConnectTextBtn,
                   ),
                 ),
               ],
@@ -127,14 +122,12 @@ class BuildContent extends StatelessWidget {
         }
       },
       child: Tooltip(
-        message: AppLocalizations.of(
-          context,
-        )!.qrCodeDetail_OpenWifiSettingsButton,
+        message: AppLocalizations.of(context)!
+            .qrCodeDetail_OpenWifiSettingsButton,
         child: Text(
           wifiData,
-          style: Theme.of(
-            context,
-          ).textTheme.bodyLarge?.copyWith(color: Colors.blue),
+          style: Theme.of(context).textTheme.bodyLarge
+              ?.copyWith(color: Colors.blue),
         ),
       ),
     );

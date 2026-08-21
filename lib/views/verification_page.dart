@@ -193,14 +193,12 @@ class _VerificationPageState extends State<VerificationPage>
                 )
               : Text(
                   viewModel.isResendCoolingDown
-                      ? AppLocalizations.of(
-                          context,
-                        )!.verificationPage_sendAgainCooldownBtn(
-                          viewModel.resendCooldownSeconds,
-                        )
-                      : AppLocalizations.of(
-                          context,
-                        )!.verificationPage_sendAgainBtn,
+                      ? AppLocalizations.of(context)!
+                            .verificationPage_sendAgainCooldownBtn(
+                              viewModel.resendCooldownSeconds,
+                            )
+                      : AppLocalizations.of(context)!
+                            .verificationPage_sendAgainBtn,
                   style: isSmallScreen
                       ? Theme.of(context).textTheme.bodyLarge
                       : Theme.of(context).textTheme.headlineSmall,
@@ -225,9 +223,8 @@ class _VerificationPageState extends State<VerificationPage>
         label: Padding(
           padding: const EdgeInsets.symmetric(vertical: 10.0),
           child: Text(
-            AppLocalizations.of(
-              context,
-            )!.verificationPage_useDifferentAccountBtn,
+            AppLocalizations.of(context)!
+                .verificationPage_useDifferentAccountBtn,
             style: isSmallScreen
                 ? Theme.of(context).textTheme.bodyMedium
                 : Theme.of(context).textTheme.bodyLarge,
@@ -287,9 +284,8 @@ class _VerificationPageState extends State<VerificationPage>
     VerificationPageViewModel viewModel,
   ) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    final logoutErrorMessage = AppLocalizations.of(
-      context,
-    )!.qrCodeGenerator_LogOutErrorMsg;
+    final logoutErrorMessage = AppLocalizations.of(context)!
+        .qrCodeGenerator_LogOutErrorMsg;
 
     try {
       final prefs = await Constants().prefs;
@@ -317,9 +313,8 @@ class _VerificationPageState extends State<VerificationPage>
     VerificationPageViewModel viewModel,
   ) async {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
-    final logoutErrorMessage = AppLocalizations.of(
-      context,
-    )!.qrCodeGenerator_LogOutErrorMsg;
+    final logoutErrorMessage = AppLocalizations.of(context)!
+        .qrCodeGenerator_LogOutErrorMsg;
 
     try {
       final prefs = await Constants().prefs;

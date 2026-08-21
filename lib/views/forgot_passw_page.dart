@@ -128,12 +128,10 @@ class _ForgotPasswPageState extends State<ForgotPasswPage> {
       autofocus: true,
       validator: (value) => viewModel.emailValidator(value, context),
       decoration: InputDecoration(
-        labelText: AppLocalizations.of(
-          context,
-        )!.forgotPasswordPage_textFieldLabelText,
-        hintText: AppLocalizations.of(
-          context,
-        )!.forgotPasswordPage_textFieldHintText,
+        labelText: AppLocalizations.of(context)!
+            .forgotPasswordPage_textFieldLabelText,
+        hintText: AppLocalizations.of(context)!
+            .forgotPasswordPage_textFieldHintText,
         prefixIcon: const Icon(Icons.email_outlined),
         suffixIcon: IconButton(
           icon: const Icon(Icons.close_rounded),
@@ -184,9 +182,8 @@ class _ForgotPasswPageState extends State<ForgotPasswPage> {
     // button state is rendered.
     if (viewModel.isLoading) return;
 
-    final successMessage = AppLocalizations.of(
-      context,
-    )!.forgotPasswordPage_sendEmailSuccessMsg;
+    final successMessage = AppLocalizations.of(context)!
+        .forgotPasswordPage_sendEmailSuccessMsg;
 
     if (_formKey.currentState?.validate() ?? false) {
       await viewModel.sendResetEmail(context);

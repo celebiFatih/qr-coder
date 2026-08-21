@@ -4,6 +4,7 @@ import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/utils/qr_code_render_utils.dart';
 import 'package:qr_coder/viewmodels/qr_code_display_viewmodel.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+
 import 'dart:math' as math;
 
 class QRcodeDisplay extends StatefulWidget {
@@ -80,9 +81,8 @@ class _QRcodeDisplayState extends State<QRcodeDisplay> {
                           ),
                           errorStateBuilder: (cxt, err) => Center(
                             child: Text(
-                              AppLocalizations.of(
-                                context,
-                              )!.qrcodeDisplay_pageTitle,
+                              AppLocalizations.of(context)!
+                                  .qrcodeDisplay_pageTitle,
                             ),
                           ),
                         ),

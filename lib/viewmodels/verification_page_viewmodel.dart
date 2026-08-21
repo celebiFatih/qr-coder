@@ -18,7 +18,11 @@ class VerificationPageViewModel extends ChangeNotifier {
        _sendVerificationEmailOverride = sendVerificationEmailAction,
        _currentUserIdOverride = currentUserId,
        _now = now ?? DateTime.now,
+       // Public constructor parameters intentionally omit the private
+       // field prefix, so initializing formals would change the API.
+       // ignore: prefer_initializing_formals
        _verificationCheckInterval = verificationCheckInterval,
+       // ignore: prefer_initializing_formals
        _resendCooldown = resendCooldown;
 
   final Future<bool> Function()? _checkEmailVerifiedOverride;

@@ -29,18 +29,16 @@ class ForgotPasswPageViewmodel extends ChangeNotifier {
       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
     ).hasMatch(value);
     if (!emailValid) {
-      return AppLocalizations.of(
-        context,
-      )!.forgotPasswordPage_emailValidatorError;
+      return AppLocalizations.of(context)!
+          .forgotPasswordPage_emailValidatorError;
     }
 
     return null;
   }
 
   Future<void> sendResetEmail(BuildContext context) async {
-    final sendMailErrorMsg = AppLocalizations.of(
-      context,
-    )!.forgotPasswordPage_sendMailErrorMsg;
+    final sendMailErrorMsg = AppLocalizations.of(context)!
+        .forgotPasswordPage_sendMailErrorMsg;
 
     try {
       // Clear a previous failure before starting a new request so a

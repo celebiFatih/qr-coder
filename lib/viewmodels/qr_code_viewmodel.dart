@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:ui';
+
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -15,8 +16,10 @@ import 'package:qr_coder/repository/qrcode_repository.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-typedef QrCodeRepositoryFactory =
-    QRCodeRepository Function(bool isFirebaseUser, String? uid);
+typedef QrCodeRepositoryFactory = QRCodeRepository Function(
+  bool isFirebaseUser,
+  String? uid,
+);
 
 QRCodeRepository _createMainQrCodeRepository(bool isFirebaseUser, String? uid) {
   return MainQrCodeRepository(isFirebaseUser: isFirebaseUser, uid: uid);
@@ -253,9 +256,8 @@ class QRCodeViewModel extends ChangeNotifier {
   /// Save the QR code to the database
   Future<void> saveQRCodeToDb(BuildContext context) async {
     errorMsg = '';
-    final saveToDbErrorMsg = AppLocalizations.of(
-      context,
-    )!.qrCodeGenerator_saveToDbErrorMsg;
+    final saveToDbErrorMsg = AppLocalizations.of(context)!
+        .qrCodeGenerator_saveToDbErrorMsg;
     try {
       await _repository.insertQrCode(qrCodeModel!);
     } catch (e) {

@@ -82,9 +82,8 @@ class QRCodeDisplayViewModel extends ChangeNotifier {
         context,
       ).showSnackBar(SnackBar(content: Text(l10n.qrcodeDisplay_removed_logo)));
     } else {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(l10n.qrcodeDisplay_error_ad)));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(l10n.qrcodeDisplay_error_ad)));
     }
   }
 }
