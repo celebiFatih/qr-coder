@@ -68,4 +68,10 @@ void main() {
 
     expect(pubspec, contains('mobile_scanner: ^7.4.0'));
   });
+
+  test('sqflite stays on the validated federated-plugin baseline', () {
+    final pubspec = File('pubspec.yaml').readAsStringSync();
+
+    expect(pubspec, contains('sqflite: ^2.4.3'));
+  });
 }
