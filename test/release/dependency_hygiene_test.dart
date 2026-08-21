@@ -30,8 +30,25 @@ void main() {
     final pubspec = File('pubspec.yaml').readAsStringSync();
 
     expect(
-      RegExp(r'^  intl: \^0\.20\.2$', multiLine: true).hasMatch(pubspec),
+      RegExp(r'^  intl: \^0\.20\.3$', multiLine: true).hasMatch(pubspec),
       isTrue,
     );
+  });
+
+  test('project SDK floor matches the modernized Flutter toolchain', () {
+    final pubspec = File('pubspec.yaml').readAsStringSync();
+
+    expect(pubspec, contains("sdk: '>=3.13.0 <4.0.0'"));
+    expect(pubspec, contains("flutter: '>=3.47.0'"));
+  });
+
+  test('low-risk dependency baselines stay modernized', () {
+    final pubspec = File('pubspec.yaml').readAsStringSync();
+
+    expect(pubspec, contains('provider: ^6.1.5+1'));
+    expect(pubspec, contains('path: ^1.9.1'));
+    expect(pubspec, contains('flutter_dotenv: ^6.0.1'));
+    expect(pubspec, contains('url_launcher: ^6.3.2'));
+    expect(pubspec, contains('flutter_native_splash: ^2.4.8'));
   });
 }
