@@ -74,4 +74,11 @@ void main() {
 
     expect(pubspec, contains('sqflite: ^2.4.3'));
   });
+
+  test('plus plugins stay on the validated platform baseline', () {
+    final pubspec = File('pubspec.yaml').readAsStringSync();
+
+    expect(pubspec, contains('share_plus: ^13.3.0'));
+    expect(pubspec, contains('device_info_plus: ^13.2.0'));
+  });
 }
