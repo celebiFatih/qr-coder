@@ -81,4 +81,10 @@ void main() {
     expect(pubspec, contains('share_plus: ^13.3.0'));
     expect(pubspec, contains('device_info_plus: ^13.2.0'));
   });
+
+  test('linkable stays on the validated Flutter 3.47 baseline', () {
+    final pubspec = File('pubspec.yaml').readAsStringSync();
+
+    expect(pubspec, contains('linkable: ^4.0.0'));
+  });
 }

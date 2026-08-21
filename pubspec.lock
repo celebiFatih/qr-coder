@@ -353,10 +353,10 @@ packages:
     dependency: "direct main"
     description:
       name: linkable
-      sha256: "3cb3ccc83da8b23d27dc66b1421d5b42ed9e6e56ace045121e02a1235ee7a7e0"
+      sha256: "9a9f9b6806e5af7cf46f121caf6faac365813c33c4be07ed972e4198e4417c49"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.2"
+    version: "4.0.0"
   lints:
     dependency: transitive
     description:
