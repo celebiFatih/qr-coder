@@ -45,6 +45,10 @@
 		<true/>
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>QR Coder needs permission to save generated QR code images to your photo library.</string>
+		<key>NSPhotoLibraryUsageDescription</key>
+		<string>QR Coder needs photo library access to save generated QR code images.</string>
 		<key>NSAppTransportSecurity</key>
 		<dict>
 			<key>NSAllowsArbitraryLoads</key>
