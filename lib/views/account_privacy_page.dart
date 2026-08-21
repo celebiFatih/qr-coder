@@ -11,6 +11,7 @@ import 'package:qr_coder/viewmodels/login_page_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_list_page_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_viewmodel.dart';
 import 'package:qr_coder/viewmodels/verification_page_viewmodel.dart';
+import 'package:qr_coder/widgets/account_deletion_password_dialog.dart';
 import 'package:qr_coder/widgets/wrapper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -172,88 +173,17 @@ class _AccountPrivacyPageState extends State<AccountPrivacyPage> {
     }
   }
 
-  Future<String?> _requestPassword(BuildContext context) async {
+  Future<String?> _requestPassword(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final passwordController = TextEditingController();
-    var canDelete = false;
-    var obscurePassword = true;
 
-    final password = await showDialog<String>(
+    return showAccountDeletionPasswordDialog(
       context: context,
-      builder: (dialogContext) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              title: Text(l10n.accountPrivacy_deleteConfirmTitle),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l10n.accountPrivacy_deleteConfirmDescription),
-                  const SizedBox(height: 16),
-                  TextField(
-                    controller: passwordController,
-                    obscureText: obscurePassword,
-                    autofocus: true,
-                    decoration: InputDecoration(
-                      labelText: l10n.accountPrivacy_passwordLabel,
-                      border: const OutlineInputBorder(),
-                      suffixIcon: IconButton(
-                        onPressed: () {
-                          setDialogState(() {
-                            obscurePassword = !obscurePassword;
-                          });
-                        },
-                        icon: Icon(
-                          obscurePassword
-                              ? Icons.visibility_rounded
-                              : Icons.visibility_off_rounded,
-                        ),
-                      ),
-                    ),
-                    onChanged: (value) {
-                      final nextCanDelete = value.isNotEmpty;
-                      if (nextCanDelete != canDelete) {
-                        setDialogState(() {
-                          canDelete = nextCanDelete;
-                        });
-                      }
-                    },
-                    onSubmitted: (_) {
-                      if (canDelete) {
-                        Navigator.of(
-                          dialogContext,
-                        ).pop(passwordController.text);
-                      }
-                    },
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: Text(l10n.no),
-                ),
-                FilledButton(
-                  onPressed: canDelete
-                      ? () => Navigator.of(
-                          dialogContext,
-                        ).pop(passwordController.text)
-                      : null,
-                  style: FilledButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.error,
-                  ),
-                  child: Text(l10n.accountPrivacy_deleteConfirmButton),
-                ),
-              ],
-            );
-          },
-        );
-      },
+      title: l10n.accountPrivacy_deleteConfirmTitle,
+      description: l10n.accountPrivacy_deleteConfirmDescription,
+      passwordLabel: l10n.accountPrivacy_passwordLabel,
+      cancelLabel: l10n.no,
+      deleteLabel: l10n.accountPrivacy_deleteConfirmButton,
     );
-
-    passwordController.dispose();
-    return password;
   }
 
   Future<void> _confirmAndDeleteAccount(BuildContext context) async {
