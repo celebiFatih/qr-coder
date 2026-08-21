@@ -62,4 +62,10 @@ void main() {
       expect(pubspec, contains('image_gallery_saver_plus: 5.1.1'));
     },
   );
+
+  test('mobile scanner stays on the validated 7.4 baseline', () {
+    final pubspec = File('pubspec.yaml').readAsStringSync();
+
+    expect(pubspec, contains('mobile_scanner: ^7.4.0'));
+  });
 }
