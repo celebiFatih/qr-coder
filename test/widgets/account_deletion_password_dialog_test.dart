@@ -34,14 +34,28 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.enterText(find.byType(TextField), 'wrong-password');
-      await tester.tap(find.text('Delete'));
 
-      final result = await dialogResult;
-
-      // The Future returned by showDialog can complete before the reverse
-      // transition has completely removed the route. Pump through that
-      // transition and verify no disposed-controller exception is emitted.
+      // onChanged() enables the delete button via setState(). Pump once so the
+      // rebuilt FilledButton has a non-null onPressed before tapping it.
       await tester.pump();
+
+      final deleteButton = tester.widget<FilledButton>(
+        find.widgetWithText(FilledButton, 'Delete'),
+      );
+      expect(deleteButton.onPressed, isNotNull);
+
+      final pendingResult = dialogResult;
+      expect(pendingResult, isNotNull);
+
+      await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
+
+      // Start the reverse transition, then await the actual result returned by
+      // Navigator.pop().
+      await tester.pump();
+      final result = await pendingResult!;
+
+      // Complete the route removal and verify the controller remained valid
+      // for the whole dialog lifecycle.
       await tester.pumpAndSettle();
 
       expect(tester.takeException(), isNull);

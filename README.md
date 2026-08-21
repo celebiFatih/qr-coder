@@ -74,3 +74,36 @@ Copyright 2024 QR Coder
 This project is licensed under the Creative Commons Attribution-NonCommercial 4.0 International License. 
 You can view the full license [here](./LICENSE).
 ```
+
+### Local configuration & source hygiene
+
+QR Coder keeps machine-local configuration and signing material out of source
+control. Before building locally:
+
+1. Copy `.env.example` to `.env` and fill the production AdMob banner/rewarded
+   unit IDs.
+2. Place the Android Firebase configuration at
+   `android/app/google-services.json`.
+3. For a signed Android release, keep `android/key.properties` and the upload
+   keystore only on the release machine.
+
+Do not distribute `.env`, `android/key.properties`, `android/local.properties`,
+keystores, or platform Firebase configuration as part of a source archive.
+
+On Windows, create a sanitized source archive with:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\tool\package_source.ps1
+```
+
+`pubspec.lock` and the Gradle wrapper are intentionally kept in source control
+for reproducible application builds.
+
+### Privacy & account deletion
+
+- Privacy Policy: https://celebifatih.github.io/qr-coder-privacy/
+- Account deletion: https://celebifatih.github.io/qr-coder-privacy/account-deletion.html
+
+Registered users can also delete their account from **Account & Privacy**
+inside the app.
+
