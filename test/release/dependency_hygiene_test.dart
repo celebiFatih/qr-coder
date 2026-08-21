@@ -51,4 +51,15 @@ void main() {
     expect(pubspec, contains('url_launcher: ^6.3.2'));
     expect(pubspec, contains('flutter_native_splash: ^2.4.8'));
   });
+
+  test(
+    'platform-aware storage dependencies stay on the validated baseline',
+    () {
+      final pubspec = File('pubspec.yaml').readAsStringSync();
+
+      expect(pubspec, contains('path_provider: ^2.1.6'));
+      expect(pubspec, contains('shared_preferences: ^2.5.5'));
+      expect(pubspec, contains('image_gallery_saver_plus: 5.1.1'));
+    },
+  );
 }
