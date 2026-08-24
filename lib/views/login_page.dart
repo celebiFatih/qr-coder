@@ -58,55 +58,35 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final viewModel = Provider.of<LoginPageViewmodel>(context, listen: false);
 
-    final mq = MediaQuery.of(context);
+    return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      body: SafeArea(
+        child: Form(
+          key: _formKey,
+          child: Stack(
+            children: [
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final w = constraints.maxWidth;
+                  final h = constraints.maxHeight;
+                  final isPhone = w < 600;
+                  final cardMaxWidth = isPhone
+                      ? w.clamp(320.0, 420.0)
+                      : w.clamp(520.0, 560.0);
 
-    // Mevcut ölçek katsayısını hesapla (1.0'ı ölçekleyip sonucu katsayı olarak kullanıyoruz)
-    final currentFactor = mq.textScaler.scale(1.0);
-
-    // 1.0–1.2 aralığına sabitle
-    final clampedFactor = currentFactor.clamp(1.0, 1.2).toDouble();
-
-    // Yeni TextScaler oluştur
-    final clampedScaler = TextScaler.linear(clampedFactor);
-
-    // MediaQuery'yi textScaler ile kopyala
-    final media = mq.copyWith(textScaler: clampedScaler);
-
-    return MediaQuery(
-      data: media,
-      child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        body: SafeArea(
-          child: Form(
-            key: _formKey,
-            child: Stack(
-              children: [
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final w = constraints.maxWidth;
-                    final h = constraints.maxHeight;
-
-                    // kırılımlar
-                    final isPhone = w < 600;
-                    final cardMaxWidth = isPhone
-                        ? w.clamp(320.0, 420.0) // telefonlar
-                        : w.clamp(520.0, 560.0); // tablet/desktop
-
-                    return Center(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: cardMaxWidth,
-                          // Dikey taşma olmasın
-                          maxHeight: h, // Center + scroll ile birlikte çalışır
-                        ),
-                        child: _buildMainContent(context, isPhone, viewModel),
+                  return Center(
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        maxWidth: cardMaxWidth,
+                        maxHeight: h,
                       ),
-                    );
-                  },
-                ),
-                _buildLanguageChoice(context),
-              ],
-            ),
+                      child: _buildMainContent(context, isPhone, viewModel),
+                    ),
+                  );
+                },
+              ),
+              _buildLanguageChoice(context),
+            ],
           ),
         ),
       ),
@@ -123,8 +103,6 @@ class _LoginPageState extends State<LoginPage> {
       vertical: isPhone ? 20 : 28,
     );
     return Card(
-      elevation: 8,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
       child: SingleChildScrollView(
         padding: pad,
         child: Column(
@@ -166,20 +144,18 @@ class _LoginPageState extends State<LoginPage> {
     final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
     return Align(
       alignment: Alignment.bottomRight,
-      child: InkWell(
-        onTap: () {
-          if (localeProvider.locale?.languageCode != 'tr') {
-            localeProvider.setLocale(const Locale('tr'));
-          } else {
-            localeProvider.setLocale(const Locale('en'));
-          }
-        },
-        child: Container(
-          padding: const EdgeInsets.all(8.0),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: FilledButton.tonal(
+          onPressed: () {
+            if (localeProvider.locale?.languageCode != 'tr') {
+              localeProvider.setLocale(const Locale('tr'));
+            } else {
+              localeProvider.setLocale(const Locale('en'));
+            }
+          },
           child: Text(
             localeProvider.locale?.languageCode == 'tr' ? 'EN' : 'TR',
-            style: Theme.of(context).textTheme.bodyLarge!
-                .copyWith(color: Colors.white),
           ),
         ),
       ),
@@ -299,12 +275,6 @@ class _LoginPageState extends State<LoginPage> {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
         child: Padding(
           padding: const EdgeInsets.all(10.0),
           child: Consumer<LoginPageViewmodel>(

@@ -110,6 +110,8 @@ class MainApp extends StatelessWidget {
           ],
           title: 'QR Code Generator',
           theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: ThemeMode.system,
           home: const Wrapper(),
         );
       },
