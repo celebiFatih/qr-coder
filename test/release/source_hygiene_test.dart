@@ -52,4 +52,20 @@ void main() {
     expect(script, contains('flutter_export_environment.sh'));
     expect(script, contains('"ephemeral"'));
   });
+
+  test('source packaging prunes generated directories before recursion', () {
+    final script = File('tool/package_source.ps1').readAsStringSync();
+
+    expect(script, contains('function Should-ExcludeDirectory'));
+    expect(script, contains('function Get-SourceFiles'));
+    expect(script, contains(r'Get-SourceFiles $ProjectRoot'));
+    expect(
+      script,
+      isNot(
+        contains(
+          r'Get-ChildItem -LiteralPath $ProjectRoot -Force -Recurse -File',
+        ),
+      ),
+    );
+  });
 }

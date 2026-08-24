@@ -64,7 +64,7 @@ function Normalize-RelativePath([string]$Path) {
     return $Path.Replace("\", "/")
 }
 
-function Should-Exclude([string]$RelativePath) {
+function Should-ExcludeDirectory([string]$RelativePath) {
     $Normalized = Normalize-RelativePath $RelativePath
     $Segments = $Normalized.Split("/")
 
@@ -72,6 +72,16 @@ function Should-Exclude([string]$RelativePath) {
         if ($ExcludedDirectoryNames -contains $Segment) {
             return $true
         }
+    }
+
+    return $false
+}
+
+function Should-Exclude([string]$RelativePath) {
+    $Normalized = Normalize-RelativePath $RelativePath
+
+    if (Should-ExcludeDirectory $Normalized) {
+        return $true
     }
 
     if ($ExcludedExactPaths -contains $Normalized) {
@@ -95,8 +105,28 @@ function Should-Exclude([string]$RelativePath) {
     return $false
 }
 
+function Get-SourceFiles([string]$Directory) {
+    foreach ($Item in Get-ChildItem -LiteralPath $Directory -Force -ErrorAction Stop) {
+        if ($Item.PSIsContainer) {
+            $RelativeDirectory = $Item.FullName.Substring($ProjectRoot.Length).TrimStart("\", "/")
+
+            # Prune generated/transient directories before descending into them.
+            # This avoids races with Gradle/Flutter deleting build outputs while
+            # the archive is being created.
+            if (Should-ExcludeDirectory $RelativeDirectory) {
+                continue
+            }
+
+            Get-SourceFiles $Item.FullName
+            continue
+        }
+
+        Write-Output $Item
+    }
+}
+
 try {
-    Get-ChildItem -LiteralPath $ProjectRoot -Force -Recurse -File |
+    Get-SourceFiles $ProjectRoot |
         ForEach-Object {
             $Relative = $_.FullName.Substring($ProjectRoot.Length).TrimStart("\", "/")
 
