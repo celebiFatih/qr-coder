@@ -7,6 +7,7 @@ import 'package:qr_coder/viewmodels/qr_code_display_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_viewmodel.dart';
 import 'package:qr_coder/views/qr_code_list_page.dart';
 import 'package:qr_coder/widgets/app_components.dart';
+import 'package:qr_coder/widgets/app_design_tokens.dart';
 import 'package:qr_coder/widgets/app_layout.dart';
 import 'package:qr_coder/widgets/build_content.dart';
 import 'package:qr_coder/widgets/qr_code_display.dart';
@@ -25,7 +26,7 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
   @override
   void initState() {
     super.initState();
-    // Sayfaya her gelişte logo açık başlasın
+    // Sayfaya her gelişte logo açık başlasın.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       context.read<QRCodeDisplayViewModel>().resetLogo();
@@ -39,9 +40,8 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
     return AppPageScaffold(
       resizeToAvoidBottomInset: false,
       appBar: _buildAppBar(context),
-      body: _buildBody(context),
+      body: _buildBody(context, viewModel),
       showBannerAd: true,
-      floatingActionButton: _buildFabs(context, viewModel),
     );
   }
 
@@ -72,101 +72,72 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
     );
   }
 
-  Widget _buildBody(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // QR alanı — Generator ile aynı mantık
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    // Generator'daki gibi, ekrana göre esneyen bir aralık
-                    minHeight: constraints.maxHeight * 0.35,
-                    maxHeight: constraints.maxHeight * 0.60,
-                  ),
-                  child: Card(
-                    elevation: 8,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: AspectRatio(
-                        aspectRatio: 1,
-                        child: QRcodeDisplay(
-                          data: widget.qrCode.data,
-                          repaintKey: repaintKey,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
+  Widget _buildBody(BuildContext context, QRCodeViewModel viewModel) {
+    return AppContentFrame(
+      maxWidth: AppLayoutMetrics.wideContentMaxWidth,
+      child: SingleChildScrollView(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final windowClass = AppBreakpoints.classify(constraints.maxWidth);
+            final detailPanel = _buildDetailPanel(context, viewModel);
+            final preview = _buildPreview(context);
 
-            const SizedBox(height: 16),
-            // Alt kısım (detaylar) Generator’daki gibi Expanded + scroll
-            Expanded(child: BuildContent(qrCode: widget.qrCode)),
-            const SizedBox(height: 8),
-            _buildCreateDateTime(context),
-            const SizedBox(height: 8),
-          ],
-        );
-      },
+            if (windowClass == AppWindowSizeClass.expanded) {
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(flex: 4, child: preview),
+                  const SizedBox(width: AppSpacing.xl),
+                  Expanded(flex: 5, child: detailPanel),
+                ],
+              );
+            }
+
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                preview,
+                const SizedBox(height: AppSpacing.lg),
+                detailPanel,
+              ],
+            );
+          },
+        ),
+      ),
     );
   }
 
-  // Widget _buildQRCodeSquare() {
-  //   return Card(
-  //     elevation: 8,
-  //     child: Padding(
-  //       padding: const EdgeInsets.all(8.0),
-  //       child: RepaintBoundary(
-  //         key: repaintKey,
-  //         child: LayoutBuilder(
-  //           builder: (context, constraints) {
-  //             final side = constraints.biggest.shortestSide;
-  //             final logoSide = side * 0.12;
-  //             return SizedBox.expand(
-  //               child: Consumer<QRCodeDisplayViewModel>(
-  //                 builder: (context, vm, child) =>
-  //                     Stack(fit: StackFit.expand, children: [
-  //                   QrImageView(
-  //                     data: widget.qrCode.data,
-  //                     backgroundColor: Colors.white,
-  //                     version: QrVersions.auto,
-  //                     errorCorrectionLevel: QrErrorCorrectLevel.H,
-  //                     embeddedImage: vm.isLogoRemoved
-  //                         ? null
-  //                         : const AssetImage('assets/img/logo.png'),
-  //                     embeddedImageStyle:
-  //                         QrEmbeddedImageStyle(size: Size(logoSide, logoSide)),
-  //                     errorStateBuilder: (cxt, err) => Center(
-  //                       child: Text(AppLocalizations.of(context)!
-  //                           .qrcodeDisplay_pageTitle),
-  //                     ),
-  //                   ),
-  //                   if (!vm.isLogoRemoved)
-  //                     Center(
-  //                       child: SizedBox(
-  //                         width: logoSide,
-  //                         height: logoSide,
-  //                         child: GestureDetector(
-  //                           onTap: () => vm.promptRemoveLogo(context),
-  //                           behavior: HitTestBehavior.opaque,
-  //                         ),
-  //                       ),
-  //                     )
-  //                 ]),
-  //               ),
-  //             );
-  //           },
-  //         ),
-  //       ),
-  //     ),
-  //   );
-  // }
+  Widget _buildPreview(BuildContext context) {
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 420),
+        child: AppSurface(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          child: AspectRatio(
+            aspectRatio: 1,
+            child: QRcodeDisplay(
+              data: widget.qrCode.data,
+              repaintKey: repaintKey,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDetailPanel(BuildContext context, QRCodeViewModel viewModel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        _buildActions(context, viewModel),
+        const SizedBox(height: AppSpacing.lg),
+        BuildContent(qrCode: widget.qrCode),
+        const SizedBox(height: AppSpacing.md),
+        _buildCreateDateTime(context),
+        const SizedBox(height: AppSpacing.md),
+      ],
+    );
+  }
 
   Widget _buildCreateDateTime(BuildContext context) {
     final isEnglish = AppLocalizations.of(context)!.localeName == 'en';
@@ -174,58 +145,100 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
       widget.qrCode.createdAt,
       isEnglish: isEnglish,
     );
+    final scheme = Theme.of(context).colorScheme;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: [
-        Flexible(
-          child: Text(
-            AppLocalizations.of(context)!
-                .qrCodeDetail_createdDateTime(createdAt),
-            overflow: TextOverflow.ellipsis,
+    return AppSurface(
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      child: Row(
+        children: [
+          Icon(Icons.schedule_rounded, color: scheme.onSurfaceVariant),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(
+              AppLocalizations.of(context)!
+                  .qrCodeDetail_createdDateTime(createdAt),
+              style: Theme.of(context).textTheme.bodyMedium
+                  ?.copyWith(color: scheme.onSurfaceVariant),
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
-  Widget _buildFabs(BuildContext context, QRCodeViewModel viewModel) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.end,
-      children: [
-        _buildSaveButton(context, viewModel),
-        const SizedBox(height: 16),
-        _buildShareButton(context, viewModel),
-      ],
-    );
-  }
+  Widget _buildActions(BuildContext context, QRCodeViewModel viewModel) {
+    final l10n = AppLocalizations.of(context)!;
 
-  Widget _buildSaveButton(BuildContext context, QRCodeViewModel viewModel) {
     return Consumer<QRCodeViewModel>(
-      builder: (context, value, child) {
-        return value.isDownloading
-            ? const CircularProgressIndicator()
-            : FloatingActionButton(
-                heroTag: 'saverFab',
-                tooltip: AppLocalizations.of(context)!
-                    .qrCodeDetail_saveQrCodeButtonToolTip,
-                onPressed: () async {
-                  _showResolutionPicker(context, (
-                    double selectedResolution,
-                  ) async {
-                    final filePath = await viewModel.saveQrCode(
-                      repaintKey,
-                      context,
-                      viewModel.selectedResolution, // gerçekten seçilen
-                    );
-                    if (!context.mounted) return;
-                    _handleSaveResult(context, viewModel, filePath);
-                  });
-                },
-                child: const Icon(Icons.save_alt_rounded),
+      builder: (context, vm, child) {
+        final busy = vm.isDownloading || vm.isSharing;
+        final saveIcon = vm.isDownloading
+            ? const SizedBox.square(
+                dimension: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : const Icon(Icons.save_alt_rounded);
+        final shareIcon = vm.isSharing
+            ? const SizedBox.square(
+                dimension: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            : const Icon(Icons.share_rounded);
+
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            final stackActions =
+                constraints.maxWidth < AppBreakpoints.mediumWidth;
+
+            final saveButton = FilledButton.icon(
+              onPressed: busy ? null : () => _saveQRCode(context, viewModel),
+              icon: saveIcon,
+              label: Text(l10n.qrCodeDetail_saveQrCodeButtonToolTip),
+            );
+            final shareButton = OutlinedButton.icon(
+              onPressed: busy ? null : () => _shareQRCode(context, viewModel),
+              icon: shareIcon,
+              label: Text(l10n.qrCodeDetail_shareQrCodeBtnToolTip),
+            );
+
+            if (stackActions) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  saveButton,
+                  const SizedBox(height: AppSpacing.sm),
+                  shareButton,
+                ],
               );
+            }
+
+            return Row(
+              children: [
+                Expanded(child: saveButton),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(child: shareButton),
+              ],
+            );
+          },
+        );
       },
     );
+  }
+
+  Future<void> _saveQRCode(
+    BuildContext context,
+    QRCodeViewModel viewModel,
+  ) async {
+    final selectedResolution = await _showResolutionPicker(context);
+    if (selectedResolution == null || !context.mounted) return;
+
+    final filePath = await viewModel.saveQrCode(
+      repaintKey,
+      context,
+      selectedResolution,
+    );
+    if (!context.mounted) return;
+    _handleSaveResult(context, viewModel, filePath);
   }
 
   void _handleSaveResult(
@@ -233,72 +246,44 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
     QRCodeViewModel viewModel,
     String? filePath,
   ) {
-    if (filePath == null && viewModel.errorMsg.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(viewModel.errorMsg, textAlign: TextAlign.center),
-        ),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            spacing: 5.0,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(AppLocalizations.of(context)!.qrCodeDetail_saveSuccessMsg),
-              GestureDetector(
-                onTap: () => viewModel.openFile(filePath),
-                child: Text(
-                  AppLocalizations.of(context)!.qrCodeDetail_openSavedQrCode,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-  }
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.hideCurrentSnackBar();
 
-  Widget _buildShareButton(BuildContext context, QRCodeViewModel viewModel) {
-    return Consumer<QRCodeViewModel>(
-      builder: (context, value, child) {
-        return value.isSharing
-            ? const CircularProgressIndicator()
-            : FloatingActionButton(
-                heroTag: 'sharerFab',
-                tooltip: AppLocalizations.of(context)!
-                    .qrCodeDetail_shareQrCodeBtnToolTip,
-                onPressed: () async {
-                  await viewModel.shareQrCode(repaintKey, context);
-                  if (!context.mounted) return;
-                  _handleShareResult(context, viewModel);
-                },
-                child: const Icon(Icons.share_rounded),
-              );
-      },
+    if (filePath == null) {
+      if (viewModel.errorMsg.isNotEmpty) {
+        messenger.showSnackBar(SnackBar(content: Text(viewModel.errorMsg)));
+      }
+      return;
+    }
+
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          AppLocalizations.of(context)!.qrCodeDetail_saveSuccessMsg,
+        ),
+        action: SnackBarAction(
+          label: AppLocalizations.of(context)!.qrCodeDetail_openSavedQrCode,
+          onPressed: () => viewModel.openFile(filePath),
+        ),
+      ),
     );
   }
 
-  void _handleShareResult(BuildContext context, QRCodeViewModel viewModel) {
+  Future<void> _shareQRCode(
+    BuildContext context,
+    QRCodeViewModel viewModel,
+  ) async {
+    await viewModel.shareQrCode(repaintKey, context);
+    if (!context.mounted) return;
+
     if (viewModel.errorMsg.isNotEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(viewModel.errorMsg, textAlign: TextAlign.center),
-        ),
-      );
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(content: Text(viewModel.errorMsg)));
     }
   }
 
-  void _showResolutionPicker(
-    BuildContext context,
-    Function(double) onDownload,
-  ) {
+  Future<double?> _showResolutionPicker(BuildContext context) {
     final resolutions = [1.0, 2.0, 3.0];
     final labels = [
       AppLocalizations.of(context)!.qrCodeDetail_resolutionStandard,
@@ -306,81 +291,72 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
       AppLocalizations.of(context)!.qrCodeDetail_resolutionUltra,
     ];
 
-    showModalBottomSheet(
+    return showModalBottomSheet<double>(
       context: context,
-      backgroundColor: Theme.of(context).colorScheme.secondary,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                AppLocalizations.of(context)!.qrCodeDetail_resolution,
-                style: Theme.of(context).textTheme.titleLarge
-                    ?.copyWith(color: Theme.of(context).colorScheme.onSurface),
-              ),
-              Divider(
-                color: Theme.of(context).colorScheme.onSurface,
-                thickness: 1.0,
-                indent: 16.0, // Başlangıç boşluğu
-                endIndent: 16.0, // Bitiş boşluğu
-              ),
-              Consumer<QRCodeViewModel>(
+      useSafeArea: true,
+      showDragHandle: true,
+      isScrollControlled: true,
+      builder: (sheetContext) {
+        return SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.md,
+              0,
+              AppSpacing.md,
+              AppSpacing.md,
+            ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 560),
+              child: Consumer<QRCodeViewModel>(
                 builder: (context, vm, child) {
-                  return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: resolutions.length,
-                    itemBuilder: (context, index) {
-                      final res = resolutions[index];
-                      final isSelected = res == vm.selectedResolution;
-
-                      return Card(
-                        margin: const EdgeInsets.symmetric(vertical: 5),
-                        child: ListTile(
-                          onTap: () => vm.selectedResolution = res,
-                          tileColor: isSelected
-                              ? Theme.of(context).colorScheme.primaryContainer
-                              : Theme.of(context).colorScheme.surface,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                  return Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      AppSectionHeader(
+                        title: AppLocalizations.of(context)!
+                            .qrCodeDetail_resolution,
+                      ),
+                      const SizedBox(height: AppSpacing.sm),
+                      for (var index = 0; index < resolutions.length; index++)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: AppSpacing.xs),
+                          child: ListTile(
+                            selected:
+                                resolutions[index] == vm.selectedResolution,
+                            selectedTileColor: Theme.of(context)
+                                .colorScheme
+                                .secondaryContainer,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(
+                                AppRadii.control,
+                              ),
+                            ),
+                            title: Text(labels[index]),
+                            trailing:
+                                resolutions[index] == vm.selectedResolution
+                                ? const Icon(Icons.check_rounded)
+                                : null,
+                            onTap: () =>
+                                vm.selectedResolution = resolutions[index],
                           ),
-                          title: Text(
-                            labels[index],
-                            style: Theme.of(context).textTheme.bodyLarge
-                                ?.copyWith(
-                                  color: isSelected
-                                      ? Theme.of(context)
-                                            .colorScheme
-                                            .onPrimaryContainer
-                                      : Theme.of(context).colorScheme.onSurface,
-                                ),
-                          ),
-                          trailing: isSelected
-                              ? ElevatedButton.icon(
-                                  label: Text(
-                                    AppLocalizations.of(context)!
-                                        .qrCodeDetail_download,
-                                  ),
-                                  icon: const Icon(
-                                    Icons.download_for_offline_rounded,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                    onDownload(vm.selectedResolution);
-                                  },
-                                )
-                              : null,
                         ),
-                      );
-                    },
+                      const SizedBox(height: AppSpacing.xs),
+                      FilledButton.icon(
+                        onPressed: () =>
+                            Navigator.of(sheetContext)
+                                .pop(vm.selectedResolution),
+                        icon: const Icon(Icons.download_rounded),
+                        label: Text(
+                          AppLocalizations.of(context)!.qrCodeDetail_download,
+                        ),
+                      ),
+                    ],
                   );
                 },
               ),
-            ],
+            ),
           ),
         );
       },

@@ -57,7 +57,7 @@
     "qrCodeList_selectAllBtn": "Tümünü Seç",
     "qrCodeList_deleteSelectedBtn": "Seçilenleri Sil",
     "qrCodeList_editBtn": "Düzenle",
-    "qrCodeList_deleteBtn": "Delete",
+    "qrCodeList_deleteBtn": "Sil",
     "qrCodeList_defaultQrCode": "QR Coder'a Hoşgeldiniz!",
     "qrCodeList_fetchListErrorMsg": "QR Kod listesi alınamadı!",
     "qrCodeList_emptyList": "QR Kod listesi boş...",
@@ -74,6 +74,34 @@
             }
         }
     },
+    "qrCodeList_selectedCount": "{count} seçildi",
+    "@qrCodeList_selectedCount": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "qrCodeList_selectBtn": "Seç",
+    "qrCodeList_exitSelectionBtn": "Seçimi kapat",
+    "qrCodeList_retryBtn": "Tekrar Dene",
+    "qrCodeList_editTitle": "QR Kodunu Yeniden Adlandır",
+    "qrCodeList_nameLabel": "Ad",
+    "qrCodeList_cancelBtn": "Vazgeç",
+    "qrCodeList_saveEditBtn": "Kaydet",
+    "qrCodeList_deleteConfirmTitle": "QR kod silinsin mi?",
+    "qrCodeList_deleteConfirmMessage": "Bu QR kod kalıcı olarak silinecek.",
+    "qrCodeList_deleteSelectedConfirmTitle": "Seçilen QR kodlar silinsin mi?",
+    "qrCodeList_deleteSelectedConfirmMessage": "Seçilen {count} QR kod kalıcı olarak silinecek.",
+    "@qrCodeList_deleteSelectedConfirmMessage": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "qrCodeList_deleteAllConfirmTitle": "Tüm QR kodlar silinsin mi?",
+    "qrCodeList_deleteAllConfirmMessage": "Kaydedilmiş tüm QR kodlar kalıcı olarak silinecek.",
     "qrCodeDetail_Details": "Detaylar",
     "qrCodeDetail_wifiInfo": "Wi-Fi Bilgileri",
     "qrCodeDetail_wifiPassw": "Şifre: {password}",

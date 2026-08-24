@@ -494,6 +494,90 @@ abstract class AppLocalizations {
   /// **'QR Code: {qrCode}'**
   String qrCodeList_qrCodeTitle(String qrCode);
 
+  /// No description provided for @qrCodeList_selectedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String qrCodeList_selectedCount(int count);
+
+  /// No description provided for @qrCodeList_selectBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Select'**
+  String get qrCodeList_selectBtn;
+
+  /// No description provided for @qrCodeList_exitSelectionBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit selection'**
+  String get qrCodeList_exitSelectionBtn;
+
+  /// No description provided for @qrCodeList_retryBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get qrCodeList_retryBtn;
+
+  /// No description provided for @qrCodeList_editTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename QR Code'**
+  String get qrCodeList_editTitle;
+
+  /// No description provided for @qrCodeList_nameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get qrCodeList_nameLabel;
+
+  /// No description provided for @qrCodeList_cancelBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get qrCodeList_cancelBtn;
+
+  /// No description provided for @qrCodeList_saveEditBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get qrCodeList_saveEditBtn;
+
+  /// No description provided for @qrCodeList_deleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete QR Code?'**
+  String get qrCodeList_deleteConfirmTitle;
+
+  /// No description provided for @qrCodeList_deleteConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This QR code will be permanently deleted.'**
+  String get qrCodeList_deleteConfirmMessage;
+
+  /// No description provided for @qrCodeList_deleteSelectedConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete selected QR codes?'**
+  String get qrCodeList_deleteSelectedConfirmTitle;
+
+  /// No description provided for @qrCodeList_deleteSelectedConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected QR codes will be permanently deleted.'**
+  String qrCodeList_deleteSelectedConfirmMessage(int count);
+
+  /// No description provided for @qrCodeList_deleteAllConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all QR codes?'**
+  String get qrCodeList_deleteAllConfirmTitle;
+
+  /// No description provided for @qrCodeList_deleteAllConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'All saved QR codes will be permanently deleted.'**
+  String get qrCodeList_deleteAllConfirmMessage;
+
   /// No description provided for @qrCodeDetail_Details.
   ///
   /// In en, this message translates to:

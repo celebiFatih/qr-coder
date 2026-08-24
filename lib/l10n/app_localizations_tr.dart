@@ -192,7 +192,7 @@ class AppLocalizationsTr extends AppLocalizations {
   String get qrCodeList_editBtn => 'Düzenle';
 
   @override
-  String get qrCodeList_deleteBtn => 'Delete';
+  String get qrCodeList_deleteBtn => 'Sil';
 
   @override
   String get qrCodeList_defaultQrCode => 'QR Coder\'a Hoşgeldiniz!';
@@ -221,6 +221,55 @@ class AppLocalizationsTr extends AppLocalizations {
   String qrCodeList_qrCodeTitle(String qrCode) {
     return 'QR Kod: $qrCode';
   }
+
+  @override
+  String qrCodeList_selectedCount(int count) {
+    return '$count seçildi';
+  }
+
+  @override
+  String get qrCodeList_selectBtn => 'Seç';
+
+  @override
+  String get qrCodeList_exitSelectionBtn => 'Seçimi kapat';
+
+  @override
+  String get qrCodeList_retryBtn => 'Tekrar Dene';
+
+  @override
+  String get qrCodeList_editTitle => 'QR Kodunu Yeniden Adlandır';
+
+  @override
+  String get qrCodeList_nameLabel => 'Ad';
+
+  @override
+  String get qrCodeList_cancelBtn => 'Vazgeç';
+
+  @override
+  String get qrCodeList_saveEditBtn => 'Kaydet';
+
+  @override
+  String get qrCodeList_deleteConfirmTitle => 'QR kod silinsin mi?';
+
+  @override
+  String get qrCodeList_deleteConfirmMessage =>
+      'Bu QR kod kalıcı olarak silinecek.';
+
+  @override
+  String get qrCodeList_deleteSelectedConfirmTitle =>
+      'Seçilen QR kodlar silinsin mi?';
+
+  @override
+  String qrCodeList_deleteSelectedConfirmMessage(int count) {
+    return 'Seçilen $count QR kod kalıcı olarak silinecek.';
+  }
+
+  @override
+  String get qrCodeList_deleteAllConfirmTitle => 'Tüm QR kodlar silinsin mi?';
+
+  @override
+  String get qrCodeList_deleteAllConfirmMessage =>
+      'Kaydedilmiş tüm QR kodlar kalıcı olarak silinecek.';
 
   @override
   String get qrCodeDetail_Details => 'Detaylar';

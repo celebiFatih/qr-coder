@@ -225,6 +225,55 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String qrCodeList_selectedCount(int count) {
+    return '$count selected';
+  }
+
+  @override
+  String get qrCodeList_selectBtn => 'Select';
+
+  @override
+  String get qrCodeList_exitSelectionBtn => 'Exit selection';
+
+  @override
+  String get qrCodeList_retryBtn => 'Try Again';
+
+  @override
+  String get qrCodeList_editTitle => 'Rename QR Code';
+
+  @override
+  String get qrCodeList_nameLabel => 'Name';
+
+  @override
+  String get qrCodeList_cancelBtn => 'Cancel';
+
+  @override
+  String get qrCodeList_saveEditBtn => 'Save';
+
+  @override
+  String get qrCodeList_deleteConfirmTitle => 'Delete QR Code?';
+
+  @override
+  String get qrCodeList_deleteConfirmMessage =>
+      'This QR code will be permanently deleted.';
+
+  @override
+  String get qrCodeList_deleteSelectedConfirmTitle =>
+      'Delete selected QR codes?';
+
+  @override
+  String qrCodeList_deleteSelectedConfirmMessage(int count) {
+    return '$count selected QR codes will be permanently deleted.';
+  }
+
+  @override
+  String get qrCodeList_deleteAllConfirmTitle => 'Delete all QR codes?';
+
+  @override
+  String get qrCodeList_deleteAllConfirmMessage =>
+      'All saved QR codes will be permanently deleted.';
+
+  @override
   String get qrCodeDetail_Details => 'Details';
 
   @override

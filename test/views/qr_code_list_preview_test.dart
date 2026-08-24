@@ -49,4 +49,63 @@ void main() {
     expect(preview.data, expectedData);
     expect(find.byType(QrImageView), findsOneWidget);
   });
+
+  testWidgets(
+    'QR list item swaps overflow actions for a checkbox in selection mode',
+    (tester) async {
+      const expectedData = 'https://example.com/selection-mode';
+      final viewModel = QrCodeListPageViewmodel(
+        isFirebaseUser: false,
+        uid: null,
+      );
+      viewModel.qrCodes = [
+        QRCodeModel(
+          id: 'selection-1',
+          data: expectedData,
+          name: 'Selection',
+          createdAt: '18.08.2026 10:30',
+        ),
+      ];
+
+      const page = QRCodeListPage();
+
+      Widget buildItem(bool selectionMode) {
+        return MaterialApp(
+          supportedLocales: AppLocalizations.supportedLocales,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => page.buildQRCodeListItem(
+                context,
+                viewModel,
+                0,
+                selectionMode: selectionMode,
+              ),
+            ),
+          ),
+        );
+      }
+
+      await tester.pumpWidget(buildItem(false));
+      await tester.pump();
+      expect(
+        find.byWidgetPredicate((widget) => widget is PopupMenuButton),
+        findsOneWidget,
+      );
+      expect(find.byType(Checkbox), findsNothing);
+
+      await tester.pumpWidget(buildItem(true));
+      await tester.pump();
+      expect(
+        find.byWidgetPredicate((widget) => widget is PopupMenuButton),
+        findsNothing,
+      );
+      expect(find.byType(Checkbox), findsOneWidget);
+    },
+  );
 }

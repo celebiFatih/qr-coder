@@ -74,6 +74,34 @@
             }
         }
     },
+    "qrCodeList_selectedCount": "{count} selected",
+    "@qrCodeList_selectedCount": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "qrCodeList_selectBtn": "Select",
+    "qrCodeList_exitSelectionBtn": "Exit selection",
+    "qrCodeList_retryBtn": "Try Again",
+    "qrCodeList_editTitle": "Rename QR Code",
+    "qrCodeList_nameLabel": "Name",
+    "qrCodeList_cancelBtn": "Cancel",
+    "qrCodeList_saveEditBtn": "Save",
+    "qrCodeList_deleteConfirmTitle": "Delete QR Code?",
+    "qrCodeList_deleteConfirmMessage": "This QR code will be permanently deleted.",
+    "qrCodeList_deleteSelectedConfirmTitle": "Delete selected QR codes?",
+    "qrCodeList_deleteSelectedConfirmMessage": "{count} selected QR codes will be permanently deleted.",
+    "@qrCodeList_deleteSelectedConfirmMessage": {
+        "placeholders": {
+            "count": {
+                "type": "int"
+            }
+        }
+    },
+    "qrCodeList_deleteAllConfirmTitle": "Delete all QR codes?",
+    "qrCodeList_deleteAllConfirmMessage": "All saved QR codes will be permanently deleted.",
     "qrCodeDetail_Details": "Details",
     "qrCodeDetail_wifiInfo": "Wi-Fi Information",
     "qrCodeDetail_wifiPassw": "Password: {password}",

@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:linkable/linkable.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/models/qr_code_model.dart';
+import 'package:qr_coder/widgets/app_components.dart';
+import 'package:qr_coder/widgets/app_design_tokens.dart';
 
 class BuildContent extends StatelessWidget {
   final QRCodeModel qrCode;
@@ -10,30 +12,17 @@ class BuildContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          AppLocalizations.of(context)!.qrCodeDetail_Details,
-          style: Theme.of(context).textTheme.headlineLarge!
-              .copyWith(fontSize: 26),
-        ),
-        const Divider(height: 2.0),
-        Expanded(
-          child: SingleChildScrollView(
-            child: Card(
-              margin: const EdgeInsets.symmetric(vertical: 16.0),
-              elevation: 4.0,
-              child: Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: _buildContent(context, qrCode.data),
-                ),
-              ),
-            ),
+    return AppSurface(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          AppSectionHeader(
+            title: AppLocalizations.of(context)!.qrCodeDetail_Details,
           ),
-        ),
-      ],
+          const SizedBox(height: AppSpacing.md),
+          _buildContent(context, qrCode.data),
+        ],
+      ),
     );
   }
 
@@ -75,59 +64,98 @@ class BuildContent extends StatelessWidget {
     final password = _valueForPrefix(parts, 'P:');
     final encryption = _valueForPrefix(parts, 'T:');
     final hidden = _valueForPrefix(parts, 'H:', defaultValue: 'false');
+    final scheme = Theme.of(context).colorScheme;
 
-    return GestureDetector(
-      onTap: () async {
-        if (Theme.of(context).platform == TargetPlatform.android) {
-          const intent = MethodChannel('com.qrcoder.app/app');
-          try {
-            await intent.invokeMethod('openWifiSettings');
-          } on PlatformException catch (e) {
-            debugPrint('Failed to open Wi-Fi settings: ${e.message}');
-          }
-        } else {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text(AppLocalizations.of(context)!.qrCodeDetail_wifiInfo),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text('SSID: $ssid'),
-                  Text(
-                    AppLocalizations.of(context)!
-                        .qrCodeDetail_wifiPassw(password),
-                  ),
-                  Text(
-                    AppLocalizations.of(context)!
-                        .qrCodeDetail_wifiEncryption(encryption),
-                  ),
-                  Text(
-                    AppLocalizations.of(context)!
-                        .qrCodeDetail_wifiHidden(hidden),
+    return Material(
+      color: scheme.surfaceContainerLow,
+      borderRadius: BorderRadius.circular(AppRadii.control),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppRadii.control),
+        onTap: () async {
+          if (Theme.of(context).platform == TargetPlatform.android) {
+            const intent = MethodChannel('com.qrcoder.app/app');
+            try {
+              await intent.invokeMethod('openWifiSettings');
+            } on PlatformException catch (e) {
+              debugPrint('Failed to open Wi-Fi settings: ${e.message}');
+            }
+          } else {
+            if (!context.mounted) return;
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: Text(
+                  AppLocalizations.of(context)!.qrCodeDetail_wifiInfo,
+                ),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('SSID: $ssid'),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      AppLocalizations.of(context)!
+                          .qrCodeDetail_wifiPassw(password),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      AppLocalizations.of(context)!
+                          .qrCodeDetail_wifiEncryption(encryption),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      AppLocalizations.of(context)!
+                          .qrCodeDetail_wifiHidden(hidden),
+                    ),
+                  ],
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      AppLocalizations.of(context)!
+                          .qrCodeDetail_wifiConnectTextBtn,
+                    ),
                   ),
                 ],
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(
-                    AppLocalizations.of(context)!
-                        .qrCodeDetail_wifiConnectTextBtn,
+            );
+          }
+        },
+        child: Tooltip(
+          message: AppLocalizations.of(context)!
+              .qrCodeDetail_OpenWifiSettingsButton,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: AppSpacing.xxl),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.sm),
+              child: Row(
+                children: [
+                  Icon(Icons.wifi_rounded, color: scheme.primary),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          ssid,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const SizedBox(height: AppSpacing.xxs),
+                        Text(
+                          wifiData,
+                          style: Theme.of(context).textTheme.bodySmall
+                              ?.copyWith(color: scheme.onSurfaceVariant),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(width: AppSpacing.xs),
+                  Icon(Icons.open_in_new_rounded, color: scheme.primary),
+                ],
+              ),
             ),
-          );
-        }
-      },
-      child: Tooltip(
-        message: AppLocalizations.of(context)!
-            .qrCodeDetail_OpenWifiSettingsButton,
-        child: Text(
-          wifiData,
-          style: Theme.of(context).textTheme.bodyLarge
-              ?.copyWith(color: Colors.blue),
+          ),
         ),
       ),
     );
