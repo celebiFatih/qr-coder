@@ -6,6 +6,7 @@ import 'package:qr_coder/viewmodels/locale_provider.dart';
 import 'package:qr_coder/viewmodels/login_page_viewmodel.dart';
 import 'package:qr_coder/viewmodels/verification_page_viewmodel.dart';
 import 'package:qr_coder/views/forgot_passw_page.dart';
+import 'package:qr_coder/widgets/app_design_tokens.dart';
 import 'package:qr_coder/widgets/wrapper.dart';
 
 class LoginPage extends StatefulWidget {
@@ -69,7 +70,7 @@ class _LoginPageState extends State<LoginPage> {
                 builder: (context, constraints) {
                   final w = constraints.maxWidth;
                   final h = constraints.maxHeight;
-                  final isPhone = w < 600;
+                  final isPhone = w < AppBreakpoints.mediumWidth;
                   final cardMaxWidth = isPhone
                       ? w.clamp(320.0, 420.0)
                       : w.clamp(520.0, 560.0);

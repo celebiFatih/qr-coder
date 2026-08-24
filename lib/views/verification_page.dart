@@ -7,6 +7,7 @@ import 'package:qr_coder/services/auth_service.dart';
 import 'package:qr_coder/utils/constants.dart';
 import 'package:qr_coder/viewmodels/login_page_viewmodel.dart';
 import 'package:qr_coder/viewmodels/verification_page_viewmodel.dart';
+import 'package:qr_coder/widgets/app_design_tokens.dart';
 import 'package:qr_coder/widgets/wrapper.dart';
 
 class VerificationPage extends StatefulWidget {
@@ -88,7 +89,8 @@ class _VerificationPageState extends State<VerificationPage>
 
   @override
   Widget build(BuildContext context) {
-    final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
+    final bool isSmallScreen =
+        MediaQuery.sizeOf(context).width < AppBreakpoints.mediumWidth;
     final viewModel = Provider.of<VerificationPageViewModel>(context);
 
     return Scaffold(

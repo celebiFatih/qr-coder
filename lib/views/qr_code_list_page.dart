@@ -8,7 +8,8 @@ import 'package:qr_coder/utils/qr_code_date_utils.dart';
 import 'package:qr_coder/utils/qr_code_render_utils.dart';
 import 'package:qr_coder/viewmodels/qr_code_list_page_viewmodel.dart';
 import 'package:qr_coder/views/qr_code_detail_page.dart';
-import 'package:qr_coder/widgets/banner_ad_widget.dart';
+import 'package:qr_coder/widgets/app_components.dart';
+import 'package:qr_coder/widgets/app_layout.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 class QRCodeListPage extends StatefulWidget {
@@ -199,10 +200,10 @@ class _QRCodeListPageState extends State<QRCodeListPage> {
       uid: Auth().currentUser?.uid,
     );
 
-    return Scaffold(
+    return AppPageScaffold(
       appBar: _buildAppBar(context, viewModel),
       body: _buildBody(context, viewModel),
-      bottomNavigationBar: const BannerAdWidget(),
+      showBannerAd: true,
       floatingActionButton: _buildFab(context, viewModel),
     );
   }
@@ -211,7 +212,7 @@ class _QRCodeListPageState extends State<QRCodeListPage> {
     return AppBar(
       title: Text(AppLocalizations.of(context)!.qrCodeList_title),
       actions: [
-        IconButton(
+        AppIconButton(
           tooltip: AppLocalizations.of(context)!.qrCodeList_selectAllBtn,
           onPressed: () => viewModel.toggleSelectAllQRCodes(),
           icon: const Icon(Icons.select_all),
@@ -232,25 +233,23 @@ class _QRCodeListPageState extends State<QRCodeListPage> {
       future: viewModel.fetchQRCodes(AppLocalizations.of(context)!),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const AppStateView.loading();
         }
 
         if (snapshot.hasError) {
           debugPrint('QR code list FutureBuilder error: ${snapshot.error}');
-          return Center(
-            child: Text(
-              AppLocalizations.of(context)!.qrCodeList_fetchListErrorMsg,
-            ),
+          return AppStateView.error(
+            message: AppLocalizations.of(context)!.qrCodeList_fetchListErrorMsg,
           );
         }
 
         if (viewModel.errorMsg.isNotEmpty) {
-          return Center(child: Text(viewModel.errorMsg));
+          return AppStateView.error(message: viewModel.errorMsg);
         }
 
         if (viewModel.qrCodes.isEmpty) {
-          return Center(
-            child: Text(AppLocalizations.of(context)!.qrCodeList_emptyList),
+          return AppStateView.empty(
+            message: AppLocalizations.of(context)!.qrCodeList_emptyList,
           );
         }
 

@@ -6,6 +6,7 @@ import 'package:qr_coder/utils/constants.dart';
 import 'package:qr_coder/views/login_page.dart';
 import 'package:qr_coder/views/qr_code_generator_page.dart';
 import 'package:qr_coder/views/verification_page.dart';
+import 'package:qr_coder/widgets/app_components.dart';
 
 class Wrapper extends StatefulWidget {
   const Wrapper({super.key});
@@ -59,12 +60,12 @@ class _WrapperState extends State<Wrapper> {
       stream: Auth().userChanges,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const AppStateView.loading();
         }
         if (snapshot.hasError) {
           debugPrint('Authentication stream error: ${snapshot.error}');
-          return Center(
-            child: Text(AppLocalizations.of(context)!.wrapper_LoginPageToolTip),
+          return AppStateView.error(
+            message: AppLocalizations.of(context)!.wrapper_LoginPageToolTip,
           );
         }
         if (snapshot.hasData) {
@@ -79,9 +80,7 @@ class _WrapperState extends State<Wrapper> {
             future: _ensureVerifiedSessionReady(user),
             builder: (context, tokenSnapshot) {
               if (tokenSnapshot.connectionState == ConnectionState.waiting) {
-                return const Scaffold(
-                  body: Center(child: CircularProgressIndicator()),
-                );
+                return const Scaffold(body: AppStateView.loading());
               }
 
               if (tokenSnapshot.hasError) {
@@ -118,9 +117,7 @@ class _WrapperState extends State<Wrapper> {
         _resetVerifiedSessionGate();
 
         if (isGuest == null) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
+          return const Scaffold(body: AppStateView.loading());
         }
 
         if (isGuest!) return const QRCodeGenerator();

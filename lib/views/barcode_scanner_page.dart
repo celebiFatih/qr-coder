@@ -13,6 +13,7 @@ import 'package:qr_coder/repository/main_qrcode_repository.dart';
 import 'package:qr_coder/services/auth_service.dart';
 import 'package:qr_coder/viewmodels/barcode_scanner_viewmodel.dart';
 import 'package:qr_coder/views/qr_code_detail_page.dart';
+import 'package:qr_coder/widgets/app_components.dart';
 import 'package:qr_coder/widgets/scanner_error_widget.dart';
 
 class BarcodeScannerPage extends StatefulWidget {
@@ -100,7 +101,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
       actions: [
         Consumer<BarcodeScannerViewmodel>(
           builder: (context, viewModel, child) {
-            return IconButton(
+            return AppIconButton(
               tooltip: AppLocalizations.of(context)!
                   .scannerPage_refreshBtnToolTip,
               onPressed: () => _refreshCamera(viewModel),

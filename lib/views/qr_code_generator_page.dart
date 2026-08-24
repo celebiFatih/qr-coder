@@ -18,7 +18,8 @@ import 'package:qr_coder/views/account_privacy_page.dart';
 import 'package:qr_coder/views/barcode_scanner_page.dart';
 import 'package:qr_coder/widgets/wrapper.dart';
 import 'package:qr_coder/views/qr_code_list_page.dart';
-import 'package:qr_coder/widgets/banner_ad_widget.dart';
+import 'package:qr_coder/widgets/app_components.dart';
+import 'package:qr_coder/widgets/app_layout.dart';
 import 'package:qr_coder/widgets/qr_code_display.dart';
 import 'package:qr_coder/widgets/qr_code_text_field.dart';
 
@@ -109,11 +110,11 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
   @override
   Widget build(BuildContext context) {
     final User? user = Auth().currentUser;
-    return Scaffold(
+    return AppPageScaffold(
       resizeToAvoidBottomInset: false,
       appBar: _buildAppBar(context, user),
       body: _buildBody(context),
-      bottomNavigationBar: const BannerAdWidget(),
+      showBannerAd: true,
       floatingActionButton: _buildFab(context),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
@@ -128,8 +129,8 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
     );
   }
 
-  IconButton _buildLogoutButton(BuildContext context) {
-    return IconButton(
+  Widget _buildLogoutButton(BuildContext context) {
+    return AppIconButton(
       tooltip: AppLocalizations.of(context)!.qrCodeGenerator_LogOutToolTip,
       onPressed: () => _handleLogout(context),
       icon: const Icon(Icons.logout_rounded),
@@ -145,7 +146,7 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
             return const SizedBox.shrink();
           }
 
-          return IconButton(
+          return AppIconButton(
             tooltip: AppLocalizations.of(context)!
                 .qrCodeGenerator_privacyOptionsToolTip,
             onPressed: () => _showPrivacyOptions(context),
@@ -153,7 +154,7 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
           );
         },
       ),
-      IconButton(
+      AppIconButton(
         onPressed: () => Navigator.push(
           context,
           MaterialPageRoute(builder: (_) => AccountPrivacyPage()),
@@ -168,7 +169,7 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
                 ? user.email!.substring(0, user.email!.indexOf('@'))
                 : user.email}',
       ),
-      IconButton(
+      AppIconButton(
         tooltip: AppLocalizations.of(context)!
             .qrCodeGenerator_startScanningToolTip,
         onPressed: () => Navigator.push(
@@ -177,7 +178,7 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
         ),
         icon: const Icon(Icons.document_scanner_rounded),
       ),
-      IconButton(
+      AppIconButton(
         tooltip: AppLocalizations.of(context)!
             .qrcodeGenerator_qrCodeListToolTip,
         onPressed: () => Navigator.push(

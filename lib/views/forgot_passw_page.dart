@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/viewmodels/forgot_passw_page_viewmodel.dart';
+import 'package:qr_coder/widgets/app_design_tokens.dart';
 
 class ForgotPasswPage extends StatefulWidget {
   const ForgotPasswPage({super.key});
@@ -46,7 +47,8 @@ class _ForgotPasswPageState extends State<ForgotPasswPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isSmallScreen = MediaQuery.of(context).size.width < 600;
+    final bool isSmallScreen =
+        MediaQuery.sizeOf(context).width < AppBreakpoints.mediumWidth;
     final viewModel = Provider.of<ForgotPasswPageViewmodel>(context);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,

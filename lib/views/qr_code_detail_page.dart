@@ -6,7 +6,8 @@ import 'package:qr_coder/utils/qr_code_date_utils.dart';
 import 'package:qr_coder/viewmodels/qr_code_display_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_viewmodel.dart';
 import 'package:qr_coder/views/qr_code_list_page.dart';
-import 'package:qr_coder/widgets/banner_ad_widget.dart';
+import 'package:qr_coder/widgets/app_components.dart';
+import 'package:qr_coder/widgets/app_layout.dart';
 import 'package:qr_coder/widgets/build_content.dart';
 import 'package:qr_coder/widgets/qr_code_display.dart';
 
@@ -35,11 +36,11 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
   Widget build(BuildContext context) {
     final viewModel = Provider.of<QRCodeViewModel>(context, listen: false);
 
-    return Scaffold(
+    return AppPageScaffold(
       resizeToAvoidBottomInset: false,
       appBar: _buildAppBar(context),
       body: _buildBody(context),
-      bottomNavigationBar: const BannerAdWidget(),
+      showBannerAd: true,
       floatingActionButton: _buildFabs(context, viewModel),
     );
   }
@@ -52,14 +53,14 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
     return AppBar(
       title: Text(title),
       actions: [
-        IconButton(
+        AppIconButton(
           onPressed: () =>
               Navigator.of(context).popUntil((route) => route.isFirst),
           icon: const Icon(Icons.home_rounded),
           tooltip: AppLocalizations.of(context)!
               .qrCodeDetail_homePageNavToolTip,
         ),
-        IconButton(
+        AppIconButton(
           onPressed: () => Navigator.of(context).push(
             MaterialPageRoute(builder: (context) => const QRCodeListPage()),
           ),
