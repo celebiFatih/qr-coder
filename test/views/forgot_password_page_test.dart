@@ -61,7 +61,7 @@ Widget _buildLocaleSwitchingTestApp(
 }
 
 Future<void> _tapSubmitButton(WidgetTester tester) async {
-  final buttonFinder = find.byType(ElevatedButton);
+  final buttonFinder = find.byType(FilledButton);
 
   // The default widget-test surface is 800x600. On this page the submit
   // button can be below the initial viewport, so scroll it into view before
@@ -86,7 +86,7 @@ void main() {
 
     expect(viewModel.sendCount, 1);
 
-    final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
+    final button = tester.widget<FilledButton>(find.byType(FilledButton));
     expect(button.onPressed, isNull);
     expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });

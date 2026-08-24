@@ -12,6 +12,9 @@ import 'package:qr_coder/viewmodels/qr_code_list_page_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_viewmodel.dart';
 import 'package:qr_coder/viewmodels/verification_page_viewmodel.dart';
 import 'package:qr_coder/widgets/account_deletion_password_dialog.dart';
+import 'package:qr_coder/widgets/app_components.dart';
+import 'package:qr_coder/widgets/app_design_tokens.dart';
+import 'package:qr_coder/widgets/app_layout.dart';
 import 'package:qr_coder/widgets/wrapper.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -43,19 +46,25 @@ class _AccountPrivacyPageState extends State<AccountPrivacyPage> {
     final l10n = AppLocalizations.of(context)!;
     final user = Auth().currentUser;
 
-    return Scaffold(
-      appBar: AppBar(title: Text(l10n.accountPrivacy_title), centerTitle: true),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          _buildAccountCard(context, user),
-          const SizedBox(height: 16),
-          _buildPrivacyCard(context),
-          if (user != null) ...[
-            const SizedBox(height: 24),
-            _buildDeleteAccountSection(context),
-          ],
-        ],
+    return AppPageScaffold(
+      appBar: AppBar(title: Text(l10n.accountPrivacy_title)),
+      body: AppContentFrame(
+        child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _buildAccountCard(context, user),
+              const SizedBox(height: AppSpacing.md),
+              _buildPrivacyCard(context),
+              if (user != null) ...[
+                const SizedBox(height: AppSpacing.lg),
+                _buildDeleteAccountSection(context),
+              ],
+              const SizedBox(height: AppSpacing.lg),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -64,20 +73,47 @@ class _AccountPrivacyPageState extends State<AccountPrivacyPage> {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
 
-    return Card(
-      child: ListTile(
-        leading: Icon(
-          user == null ? Icons.person_outline_rounded : Icons.cloud_outlined,
-        ),
-        title: Text(
-          user?.email ?? l10n.accountPrivacy_guestAccount,
-          style: theme.textTheme.titleMedium,
-        ),
-        subtitle: Text(
-          user == null
-              ? l10n.accountPrivacy_guestDescription
-              : l10n.accountPrivacy_cloudAccountDescription,
-        ),
+    return AppSurface(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          DecoratedBox(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.primaryContainer,
+              shape: BoxShape.circle,
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.sm),
+              child: Icon(
+                user == null
+                    ? Icons.person_outline_rounded
+                    : Icons.cloud_done_outlined,
+                color: theme.colorScheme.onPrimaryContainer,
+              ),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  user?.email ?? l10n.accountPrivacy_guestAccount,
+                  style: theme.textTheme.titleMedium,
+                ),
+                const SizedBox(height: AppSpacing.xs),
+                Text(
+                  user == null
+                      ? l10n.accountPrivacy_guestDescription
+                      : l10n.accountPrivacy_cloudAccountDescription,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -85,10 +121,12 @@ class _AccountPrivacyPageState extends State<AccountPrivacyPage> {
   Widget _buildPrivacyCard(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Card(
+    return AppSurface(
+      padding: EdgeInsets.zero,
       child: Column(
         children: [
           ListTile(
+            minTileHeight: 64,
             leading: const Icon(Icons.privacy_tip_outlined),
             title: Text(l10n.accountPrivacy_privacyPolicy),
             subtitle: Text(l10n.accountPrivacy_privacyPolicyDescription),
@@ -98,6 +136,7 @@ class _AccountPrivacyPageState extends State<AccountPrivacyPage> {
           ),
           const Divider(height: 1),
           ListTile(
+            minTileHeight: 64,
             leading: const Icon(Icons.manage_accounts_outlined),
             title: Text(l10n.accountPrivacy_accountDeletionInfo),
             subtitle: Text(l10n.accountPrivacy_accountDeletionInfoDescription),
@@ -114,22 +153,42 @@ class _AccountPrivacyPageState extends State<AccountPrivacyPage> {
 
   Widget _buildDeleteAccountSection(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final scheme = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
 
     return Card(
+      color: scheme.errorContainer,
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              l10n.accountPrivacy_deleteAccountTitle,
-              style: Theme.of(context).textTheme.titleMedium
-                  ?.copyWith(color: scheme.error, fontWeight: FontWeight.w600),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.warning_amber_rounded,
+                  color: scheme.onErrorContainer,
+                ),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Text(
+                    l10n.accountPrivacy_deleteAccountTitle,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: scheme.onErrorContainer,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
-            Text(l10n.accountPrivacy_deleteAccountDescription),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.xs),
+            Text(
+              l10n.accountPrivacy_deleteAccountDescription,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: scheme.onErrorContainer,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
             OutlinedButton.icon(
               onPressed: _isDeleting
                   ? null
@@ -146,8 +205,8 @@ class _AccountPrivacyPageState extends State<AccountPrivacyPage> {
                     : l10n.accountPrivacy_deleteAccountButton,
               ),
               style: OutlinedButton.styleFrom(
-                foregroundColor: scheme.error,
-                side: BorderSide(color: scheme.error),
+                foregroundColor: scheme.onErrorContainer,
+                side: BorderSide(color: scheme.onErrorContainer),
               ),
             ),
           ],

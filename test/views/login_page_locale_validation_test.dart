@@ -32,7 +32,7 @@ Widget _buildLocaleSwitchingLoginApp(
 }
 
 Future<void> _tapSubmitButton(WidgetTester tester) async {
-  final submitButton = find.byType(ElevatedButton);
+  final submitButton = find.widgetWithText(FilledButton, 'Sign in');
 
   await tester.ensureVisible(submitButton);
   await tester.pumpAndSettle();

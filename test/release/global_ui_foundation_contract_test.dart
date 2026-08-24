@@ -63,7 +63,7 @@ void main() {
     },
   );
 
-  test('auth layouts consume the shared responsive breakpoint token', () {
+  test('auth layouts consume the shared responsive auth frame', () {
     for (final path in <String>[
       'lib/views/login_page.dart',
       'lib/views/forgot_passw_page.dart',
@@ -71,9 +71,13 @@ void main() {
     ]) {
       final source = File(path).readAsStringSync();
 
-      expect(source, contains('AppBreakpoints.mediumWidth'), reason: path);
+      expect(source, contains('AppAuthPageFrame('), reason: path);
       expect(source, isNot(contains('size.width < 600')), reason: path);
     }
+
+    final frameSource = File('lib/widgets/app_auth_layout.dart')
+        .readAsStringSync();
+    expect(frameSource, contains('AppBreakpoints.classify(width)'));
   });
 
   test('Material theme consumes shared spacing and radius tokens', () {

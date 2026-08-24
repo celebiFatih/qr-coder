@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/viewmodels/forgot_passw_page_viewmodel.dart';
+import 'package:qr_coder/widgets/app_auth_layout.dart';
+import 'package:qr_coder/widgets/app_components.dart';
 import 'package:qr_coder/widgets/app_design_tokens.dart';
+import 'package:qr_coder/widgets/app_layout.dart';
 
 class ForgotPasswPage extends StatefulWidget {
   const ForgotPasswPage({super.key});
@@ -47,39 +50,26 @@ class _ForgotPasswPageState extends State<ForgotPasswPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isSmallScreen =
-        MediaQuery.sizeOf(context).width < AppBreakpoints.mediumWidth;
-    final viewModel = Provider.of<ForgotPasswPageViewmodel>(context);
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.primary,
+    final viewModel = context.watch<ForgotPasswPageViewmodel>();
+    final l10n = AppLocalizations.of(context)!;
+
+    return AppPageScaffold(
+      appBar: AppBar(title: Text(l10n.login_ForgotPasswordButton)),
       body: Form(
         key: _formKey,
-        child: Center(
-          child: Card(
-            elevation: 8,
-            child: Container(
-              padding: const EdgeInsets.all(32.0),
-              constraints: BoxConstraints(maxWidth: isSmallScreen ? 300 : 500),
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildLogo(isSmallScreen),
-                    _gap(),
-                    _buildWelcomeText(context, isSmallScreen),
-                    _gap(),
-                    _buildDescriptionText(context, isSmallScreen),
-                    _gap(),
-                    _buildEmailField(viewModel, context),
-                    _gap(),
-                    const Icon(Icons.mark_email_unread_outlined, size: 100),
-                    _gap(),
-                    _buildSubmitButton(context, isSmallScreen, viewModel),
-                    _gap(),
-                  ],
-                ),
-              ),
+        child: AppAuthPageFrame(
+          child: AppSurface(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildHeader(context),
+                const SizedBox(height: AppSpacing.lg),
+                _buildEmailField(viewModel, context),
+                const SizedBox(height: AppSpacing.lg),
+                _buildSubmitButton(context, viewModel),
+              ],
             ),
           ),
         ),
@@ -87,35 +77,41 @@ class _ForgotPasswPageState extends State<ForgotPasswPage> {
     );
   }
 
-  Widget _gap() => const SizedBox(height: 15);
+  Widget _buildHeader(BuildContext context) {
+    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
-  Widget _buildLogo(bool isSmallScreen) {
-    return Image.asset('assets/img/logo.png', width: isSmallScreen ? 100 : 200);
-  }
-
-  Widget _buildWelcomeText(BuildContext context, bool isSmallScreen) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Text(
-        AppLocalizations.of(context)!.login_WelcomeText,
-        style: isSmallScreen
-            ? Theme.of(context).textTheme.headlineLarge
-            : Theme.of(context).textTheme.displayMedium,
-        textAlign: TextAlign.center,
-      ),
-    );
-  }
-
-  Widget _buildDescriptionText(BuildContext context, bool isSmallScreen) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16.0),
-      child: Text(
-        AppLocalizations.of(context)!.forgotPasswordPage_description,
-        style: isSmallScreen
-            ? Theme.of(context).textTheme.bodyMedium
-            : Theme.of(context).textTheme.bodyLarge,
-        textAlign: TextAlign.center,
-      ),
+    return Column(
+      children: [
+        DecoratedBox(
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primaryContainer,
+            shape: BoxShape.circle,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Icon(
+              Icons.mark_email_unread_outlined,
+              size: 36,
+              color: theme.colorScheme.onPrimaryContainer,
+            ),
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        Text(
+          l10n.login_ForgotPasswordButton,
+          style: theme.textTheme.titleLarge,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: AppSpacing.xs),
+        Text(
+          l10n.forgotPasswordPage_description,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
+          textAlign: TextAlign.center,
+        ),
+      ],
     );
   }
 
@@ -128,6 +124,10 @@ class _ForgotPasswPageState extends State<ForgotPasswPage> {
       controller: viewModel.emailController,
       focusNode: viewModel.emailFocusNode,
       autofocus: true,
+      enabled: !viewModel.isLoading,
+      keyboardType: TextInputType.emailAddress,
+      textInputAction: TextInputAction.done,
+      autofillHints: const [AutofillHints.username, AutofillHints.email],
       validator: (value) => viewModel.emailValidator(value, context),
       decoration: InputDecoration(
         labelText: AppLocalizations.of(context)!
@@ -137,42 +137,32 @@ class _ForgotPasswPageState extends State<ForgotPasswPage> {
         prefixIcon: const Icon(Icons.email_outlined),
         suffixIcon: IconButton(
           icon: const Icon(Icons.close_rounded),
-          onPressed: viewModel.clearAll,
+          onPressed: viewModel.isLoading ? null : viewModel.clearAll,
         ),
-        border: const OutlineInputBorder(),
       ),
+      onFieldSubmitted: (_) {
+        if (!viewModel.isLoading) {
+          _handleSendEmail(context, viewModel);
+        }
+      },
     );
   }
 
   Widget _buildSubmitButton(
     BuildContext context,
-    bool isSmallScreen,
     ForgotPasswPageViewmodel viewModel,
   ) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: Theme.of(context).colorScheme.secondary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-        onPressed: viewModel.isLoading
-            ? null
-            : () => _handleSendEmail(context, viewModel),
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: viewModel.isLoading
-              ? const CircularProgressIndicator()
-              : Text(
-                  AppLocalizations.of(context)!.forgotPasswordPage_btnSend,
-                  style: isSmallScreen
-                      ? Theme.of(context).textTheme.bodyLarge
-                      : Theme.of(context).textTheme.headlineSmall,
-                ),
-        ),
-      ),
+    return FilledButton.icon(
+      onPressed: viewModel.isLoading
+          ? null
+          : () => _handleSendEmail(context, viewModel),
+      icon: viewModel.isLoading
+          ? const SizedBox.square(
+              dimension: 20,
+              child: CircularProgressIndicator(strokeWidth: 2.5),
+            )
+          : const Icon(Icons.send_rounded),
+      label: Text(AppLocalizations.of(context)!.forgotPasswordPage_btnSend),
     );
   }
 

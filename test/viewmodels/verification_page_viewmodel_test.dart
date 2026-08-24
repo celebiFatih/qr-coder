@@ -109,6 +109,24 @@ void main() {
     },
   );
 
+  test(
+    'injected identity exposes email without live Firebase access',
+    () async {
+      final viewModel = VerificationPageViewModel(
+        currentUserId: () => 'email-user',
+        currentUserEmail: () => 'email-user@example.com',
+        checkEmailVerifiedAction: () async => false,
+        sendVerificationEmailAction: () async {},
+      );
+      addTearDown(viewModel.dispose);
+
+      await viewModel.resumeVerificationFlow();
+
+      expect(viewModel.userEmail, 'email-user@example.com');
+      viewModel.pauseVerificationFlow();
+    },
+  );
+
   test('verification polling pauses and never overlaps async checks', () async {
     var activeChecks = 0;
     var maxActiveChecks = 0;

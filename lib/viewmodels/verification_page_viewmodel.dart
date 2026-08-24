@@ -11,12 +11,14 @@ class VerificationPageViewModel extends ChangeNotifier {
     Future<bool> Function()? checkEmailVerifiedAction,
     Future<void> Function()? sendVerificationEmailAction,
     String? Function()? currentUserId,
+    String? Function()? currentUserEmail,
     DateTime Function()? now,
     Duration verificationCheckInterval = const Duration(seconds: 5),
     Duration resendCooldown = Constants.verificationEmailResendCooldown,
   }) : _checkEmailVerifiedOverride = checkEmailVerifiedAction,
        _sendVerificationEmailOverride = sendVerificationEmailAction,
        _currentUserIdOverride = currentUserId,
+       _currentUserEmailOverride = currentUserEmail,
        _now = now ?? DateTime.now,
        // Public constructor parameters intentionally omit the private
        // field prefix, so initializing formals would change the API.
@@ -28,6 +30,7 @@ class VerificationPageViewModel extends ChangeNotifier {
   final Future<bool> Function()? _checkEmailVerifiedOverride;
   final Future<void> Function()? _sendVerificationEmailOverride;
   final String? Function()? _currentUserIdOverride;
+  final String? Function()? _currentUserEmailOverride;
   final DateTime Function() _now;
   final Duration _verificationCheckInterval;
   final Duration _resendCooldown;
@@ -41,6 +44,7 @@ class VerificationPageViewModel extends ChangeNotifier {
   bool isLoading = false;
   bool emailVerified = false;
   int resendCooldownSeconds = 0;
+  String? userEmail;
 
   bool get isResendCoolingDown => resendCooldownSeconds > 0;
   bool get canResend => !isLoading && !isResendCoolingDown;
@@ -51,6 +55,7 @@ class VerificationPageViewModel extends ChangeNotifier {
 
     if (userChanged) {
       _activeUserId = userId;
+      userEmail = _currentUserEmail;
       emailVerified = false;
       errorMessage = '';
       _cancelResendCooldownTimer();
@@ -76,6 +81,7 @@ class VerificationPageViewModel extends ChangeNotifier {
 
     if (_activeUserId != userId) {
       _activeUserId = userId;
+      userEmail = _currentUserEmail;
       emailVerified = false;
       errorMessage = '';
       _cancelResendCooldownTimer();
@@ -100,6 +106,7 @@ class VerificationPageViewModel extends ChangeNotifier {
     emailVerified = false;
     resendCooldownSeconds = 0;
     _activeUserId = null;
+    userEmail = null;
     stopEmailVerificationCheckTimer();
     _cancelResendCooldownTimer();
     notifyListeners();
@@ -281,6 +288,22 @@ class VerificationPageViewModel extends ChangeNotifier {
 
   String? get _currentUserId =>
       _currentUserIdOverride?.call() ?? Auth().currentUser?.uid;
+
+  String? get _currentUserEmail {
+    final override = _currentUserEmailOverride;
+    if (override != null) {
+      return override();
+    }
+
+    // Tests and other injected identity flows must stay isolated from the
+    // live Firebase singleton. If the user id is injected, an omitted email
+    // simply means that the presentation has no email value to show.
+    if (_currentUserIdOverride != null) {
+      return null;
+    }
+
+    return Auth().currentUser?.email;
+  }
 
   Future<bool> _checkEmailVerified() async {
     final override = _checkEmailVerifiedOverride;

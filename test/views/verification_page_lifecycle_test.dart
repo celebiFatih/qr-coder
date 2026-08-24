@@ -18,6 +18,7 @@ void main() {
     (tester) async {
       final viewModel = VerificationPageViewModel(
         currentUserId: () => 'widget-user',
+        currentUserEmail: () => 'widget-user@example.com',
         checkEmailVerifiedAction: () async => false,
         sendVerificationEmailAction: () async {},
         verificationCheckInterval: const Duration(seconds: 30),
@@ -40,6 +41,7 @@ void main() {
       await tester.pump();
 
       expect(tester.takeException(), isNull);
+      expect(find.text('widget-user@example.com'), findsOneWidget);
       viewModel.pauseVerificationFlow();
     },
   );

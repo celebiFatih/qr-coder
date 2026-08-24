@@ -123,7 +123,10 @@ class _AccountDeletionPasswordDialogState
         ),
         FilledButton(
           onPressed: _canDelete ? _submit : null,
-          style: FilledButton.styleFrom(backgroundColor: scheme.error),
+          style: FilledButton.styleFrom(
+            backgroundColor: scheme.error,
+            foregroundColor: scheme.onError,
+          ),
           child: Text(widget.deleteLabel),
         ),
       ],
