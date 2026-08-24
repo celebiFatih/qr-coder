@@ -34,6 +34,7 @@ $ExcludedDirectoryNames = @(
     "build",
     "dist",
     "coverage",
+    "screenshots",
     "Pods",
     "ephemeral",
     ".symlinks"

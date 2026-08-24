@@ -12,24 +12,15 @@
 - Multi scan
 - Guest & User authentication
 - English and Turkish user interface
+- Material 3 light/dark themes and adaptive layouts
 
-### Screenshots
+### Release screenshots
 
 ---
 
-<p align="center">
-  <img src="https://github.com/celebiFatih/qr-coder/blob/main/screenshots/1.png?raw=true" width="200" />
-  <img src="https://github.com/celebiFatih/qr-coder/blob/main/screenshots/8.png?raw=true" width="200" />
-  <img src="https://github.com/celebiFatih/qr-coder/blob/main/screenshots/2.png?raw=true" width="200" />
-  <img src="https://github.com/celebiFatih/qr-coder/blob/main/screenshots/3.png?raw=true" width="200" />
-</p>
-
-<p align="center">
-  <img src="https://github.com/celebiFatih/qr-coder/blob/main/screenshots/4.png?raw=true" width="200" />
-  <img src="https://github.com/celebiFatih/qr-coder/blob/main/screenshots/5.png?raw=true" width="200" />
-  <img src="https://github.com/celebiFatih/qr-coder/blob/main/screenshots/6.png?raw=true" width="200" />
-  <img src="https://github.com/celebiFatih/qr-coder/blob/main/screenshots/7.png?raw=true" width="200" />
-</p>
+Store screenshots are captured from the signed release build and managed as
+release assets rather than source-code assets. Use anonymous/demo content only;
+do not commit screenshots containing personal data or obsolete UI.
 
 
 ### Download

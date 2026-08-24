@@ -51,6 +51,7 @@ void main() {
     expect(script, contains('Generated.xcconfig'));
     expect(script, contains('flutter_export_environment.sh'));
     expect(script, contains('"ephemeral"'));
+    expect(script, contains('"screenshots"'));
   });
 
   test('source packaging prunes generated directories before recursion', () {
