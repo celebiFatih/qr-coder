@@ -11,19 +11,19 @@ void main() {
 
     expect(
       settings,
-      contains('id "com.android.application" version "8.12.1" apply false'),
+      contains('id "com.android.application" version "9.1.1" apply false'),
     );
     expect(
       settings,
       contains(
-        'id "org.jetbrains.kotlin.android" version "2.3.20" apply false',
+        'id "org.jetbrains.kotlin.android" version "2.4.10" apply false',
       ),
     );
-    expect(wrapper, contains('gradle-8.14.5-all.zip'));
+    expect(wrapper, contains('gradle-9.3.1-all.zip'));
     expect(appGradle, contains('sourceCompatibility JavaVersion.VERSION_17'));
     expect(appGradle, contains('targetCompatibility JavaVersion.VERSION_17'));
     expect(appGradle, contains('jvmToolchain(17)'));
-    expect(appGradle, contains('compileSdk  36'));
+    expect(appGradle, contains('compileSdk  37'));
     expect(appGradle, contains('targetSdk  36'));
   });
 }

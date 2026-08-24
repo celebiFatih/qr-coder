@@ -33,7 +33,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace  "com.qrcoder.app"
-    compileSdk  36
+    compileSdk  37
     ndkVersion "28.0.13004108"
 
     compileOptions {

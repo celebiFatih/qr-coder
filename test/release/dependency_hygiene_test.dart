@@ -87,4 +87,17 @@ void main() {
 
     expect(pubspec, contains('linkable: ^4.0.0'));
   });
+
+  test(
+    'Firebase, ads, and permission dependencies stay on the validated baseline',
+    () {
+      final pubspec = File('pubspec.yaml').readAsStringSync();
+
+      expect(pubspec, contains('firebase_core: ^4.13.0'));
+      expect(pubspec, contains('firebase_auth: ^6.5.7'));
+      expect(pubspec, contains('firebase_database: ^12.4.7'));
+      expect(pubspec, contains('google_mobile_ads: ^9.1.0'));
+      expect(pubspec, contains('permission_handler: ^13.0.1'));
+    },
+  );
 }
