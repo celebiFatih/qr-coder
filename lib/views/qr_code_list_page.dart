@@ -15,8 +15,6 @@ import 'package:qr_flutter/qr_flutter.dart';
 
 enum _QrCodeListItemAction { edit, delete }
 
-enum _QrCodeListPageAction { deleteAll }
-
 class QRCodeListPage extends StatefulWidget {
   const QRCodeListPage({super.key});
 
@@ -277,33 +275,29 @@ class _QRCodeListPageState extends State<QRCodeListPage> {
                 onPressed: _enterSelectionMode,
                 icon: const Icon(Icons.checklist_rounded),
               ),
-              PopupMenuButton<_QrCodeListPageAction>(
-                tooltip: MaterialLocalizations.of(context).moreButtonTooltip,
-                onSelected: (action) {
-                  switch (action) {
-                    case _QrCodeListPageAction.deleteAll:
-                      _deleteAll(context, viewModel);
-                      break;
-                  }
-                },
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    value: _QrCodeListPageAction.deleteAll,
-                    child: ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: Icon(
-                        Icons.delete_forever_outlined,
+              MenuAnchor(
+                menuChildren: [
+                  MenuItemButton(
+                    onPressed: () => _deleteAll(context, viewModel),
+                    leadingIcon: Icon(
+                      Icons.delete_forever_outlined,
+                      color: Theme.of(context).colorScheme.error,
+                    ),
+                    child: Text(
+                      l10n.qrCodeList_deleteAllBtn,
+                      style: TextStyle(
                         color: Theme.of(context).colorScheme.error,
-                      ),
-                      title: Text(
-                        l10n.qrCodeList_deleteAllBtn,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
-                        ),
                       ),
                     ),
                   ),
                 ],
+                builder: (context, controller, child) => AppIconButton(
+                  tooltip: MaterialLocalizations.of(context).moreButtonTooltip,
+                  onPressed: controller.isOpen
+                      ? controller.close
+                      : controller.open,
+                  icon: const Icon(Icons.more_vert_rounded),
+                ),
               ),
             ],
     );

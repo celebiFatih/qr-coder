@@ -20,6 +20,7 @@ import 'package:qr_coder/viewmodels/qr_code_display_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_list_page_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_viewmodel.dart';
 import 'package:qr_coder/viewmodels/verification_page_viewmodel.dart';
+import 'package:qr_coder/viewmodels/theme_mode_provider.dart';
 import 'package:qr_coder/widgets/rewarded_add_service.dart';
 import 'package:qr_coder/widgets/theme_data.dart';
 import 'package:qr_coder/widgets/wrapper.dart';
@@ -53,6 +54,7 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => LocaleProvider()),
+        ChangeNotifierProvider(create: (context) => ThemeModeProvider()),
         ChangeNotifierProvider(
           create: (context) => QRCodeViewModel(
             isFirebaseUser: Auth().currentUser != null,
@@ -94,8 +96,8 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<LocaleProvider>(
-      builder: (context, localeProvider, child) {
+    return Consumer2<LocaleProvider, ThemeModeProvider>(
+      builder: (context, localeProvider, themeModeProvider, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
           locale:
@@ -111,7 +113,7 @@ class MainApp extends StatelessWidget {
           title: 'QR Code Generator',
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
-          themeMode: ThemeMode.system,
+          themeMode: themeModeProvider.themeMode,
           home: const Wrapper(),
         );
       },

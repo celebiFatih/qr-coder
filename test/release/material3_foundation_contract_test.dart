@@ -11,7 +11,10 @@ void main() {
     expect(theme, contains('ColorScheme.fromSeed('));
     expect(theme, contains('static ThemeData get darkTheme'));
     expect(main, contains('darkTheme: AppTheme.darkTheme'));
-    expect(main, contains('themeMode: ThemeMode.system'));
+    expect(main, contains('themeMode: themeModeProvider.themeMode'));
+    final provider = File('lib/viewmodels/theme_mode_provider.dart')
+        .readAsStringSync();
+    expect(provider, contains('ThemeMode _themeMode = ThemeMode.system'));
   });
 
   test('login does not cap the operating system text scale', () {

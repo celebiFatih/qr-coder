@@ -220,5 +220,27 @@
     "accountPrivacy_networkError": "The account could not be deleted because of a network error. Please try again.",
     "accountPrivacy_tooManyRequests": "Too many attempts. Please try again later.",
     "accountPrivacy_deleteError": "The account could not be deleted. Please try again.",
-    "accountPrivacy_linkOpenError": "The link could not be opened."
+    "accountPrivacy_linkOpenError": "The link could not be opened.",
+    "settings_title": "Settings",
+    "settings_personalizationTitle": "Appearance & language",
+    "settings_personalizationDescription": "Choose how QR Coder looks and which language it uses.",
+    "settings_languageTitle": "Language",
+    "settings_languageTurkish": "Türkçe",
+    "settings_languageEnglish": "English",
+    "settings_themeTitle": "Appearance",
+    "settings_themeSystem": "System",
+    "settings_themeLight": "Light",
+    "settings_themeDark": "Dark",
+    "settings_accountPrivacy": "Account & Privacy",
+    "settings_accountPrivacyDescription": "Review your account, privacy policy, and account deletion options.",
+    "settings_privacyOptions": "Ad privacy options",
+    "settings_privacyOptionsDescription": "Review or change the advertising consent choices available for this device.",
+    "navigation_accountMenuSemantic": "Account and navigation menu. Current session: {sessionLabel}",
+    "@navigation_accountMenuSemantic": {
+        "placeholders": {
+            "sessionLabel": {
+                "type": "String"
+            }
+        }
+    }
 }

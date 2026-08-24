@@ -220,5 +220,27 @@
     "accountPrivacy_networkError": "Ağ hatası nedeniyle hesap silinemedi. Lütfen tekrar deneyin.",
     "accountPrivacy_tooManyRequests": "Çok fazla deneme yapıldı. Lütfen daha sonra tekrar deneyin.",
     "accountPrivacy_deleteError": "Hesap silinemedi. Lütfen tekrar deneyin.",
-    "accountPrivacy_linkOpenError": "Bağlantı açılamadı."
+    "accountPrivacy_linkOpenError": "Bağlantı açılamadı.",
+    "settings_title": "Ayarlar",
+    "settings_personalizationTitle": "Görünüm ve dil",
+    "settings_personalizationDescription": "QR Coder görünümünü ve kullanacağı dili seçin.",
+    "settings_languageTitle": "Dil",
+    "settings_languageTurkish": "Türkçe",
+    "settings_languageEnglish": "English",
+    "settings_themeTitle": "Görünüm",
+    "settings_themeSystem": "Sistem",
+    "settings_themeLight": "Açık",
+    "settings_themeDark": "Koyu",
+    "settings_accountPrivacy": "Hesap ve Gizlilik",
+    "settings_accountPrivacyDescription": "Hesabınızı, gizlilik politikasını ve hesap silme seçeneklerini yönetin.",
+    "settings_privacyOptions": "Reklam gizlilik seçenekleri",
+    "settings_privacyOptionsDescription": "Bu cihaz için sunulan reklam izinlerini görüntüleyin veya değiştirin.",
+    "navigation_accountMenuSemantic": "Hesap ve gezinme menüsü. Geçerli oturum: {sessionLabel}",
+    "@navigation_accountMenuSemantic": {
+        "placeholders": {
+            "sessionLabel": {
+                "type": "String"
+            }
+        }
+    }
 }

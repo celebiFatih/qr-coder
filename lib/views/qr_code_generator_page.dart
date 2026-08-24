@@ -4,7 +4,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
-import 'package:qr_coder/services/ad_consent_service.dart';
 import 'package:qr_coder/services/auth_service.dart';
 import 'package:qr_coder/utils/constants.dart';
 import 'package:qr_coder/viewmodels/barcode_scanner_viewmodel.dart';
@@ -14,13 +13,14 @@ import 'package:qr_coder/viewmodels/qr_code_display_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_list_page_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_viewmodel.dart';
 import 'package:qr_coder/viewmodels/verification_page_viewmodel.dart';
-import 'package:qr_coder/views/account_privacy_page.dart';
 import 'package:qr_coder/views/barcode_scanner_page.dart';
+import 'package:qr_coder/views/settings_page.dart';
 import 'package:qr_coder/widgets/wrapper.dart';
 import 'package:qr_coder/views/qr_code_list_page.dart';
 import 'package:qr_coder/widgets/app_components.dart';
 import 'package:qr_coder/widgets/app_design_tokens.dart';
 import 'package:qr_coder/widgets/app_layout.dart';
+import 'package:qr_coder/widgets/app_navigation_menu.dart';
 import 'package:qr_coder/widgets/qr_code_display.dart';
 import 'package:qr_coder/widgets/qr_code_text_field.dart';
 
@@ -119,89 +119,40 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
   }
 
   AppBar _buildAppBar(BuildContext context, User? user) {
+    final l10n = AppLocalizations.of(context)!;
+    final sessionLabel = user?.email?.isNotEmpty == true
+        ? user!.email!
+        : l10n.qrCodeGenerator_userType;
+
     return AppBar(
       centerTitle: true,
       title: const Text('QR Coder'),
-      leading: _buildLogoutButton(context),
-      actions: _buildAppBarActions(context, user),
-    );
-  }
-
-  Widget _buildLogoutButton(BuildContext context) {
-    return AppIconButton(
-      tooltip: AppLocalizations.of(context)!.qrCodeGenerator_LogOutToolTip,
-      onPressed: () => _handleLogout(context),
-      icon: const Icon(Icons.logout_rounded),
-    );
-  }
-
-  List<Widget> _buildAppBarActions(BuildContext context, User? user) {
-    return [
-      ListenableBuilder(
-        listenable: AdConsentService.instance,
-        builder: (context, child) {
-          if (!AdConsentService.instance.privacyOptionsRequired) {
-            return const SizedBox.shrink();
-          }
-
-          return AppIconButton(
-            tooltip: AppLocalizations.of(context)!
-                .qrCodeGenerator_privacyOptionsToolTip,
-            onPressed: () => _showPrivacyOptions(context),
-            icon: const Icon(Icons.privacy_tip_outlined),
-          );
-        },
-      ),
-      AppIconButton(
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => AccountPrivacyPage()),
-        ),
-        icon: user == null
-            ? const Icon(Icons.account_circle_rounded)
-            : const Icon(Icons.cloud_rounded),
-        tooltip:
-            '${user == null
-                ? AppLocalizations.of(context)!.qrCodeGenerator_userType
-                : user.email!.contains('@') == true
-                ? user.email!.substring(0, user.email!.indexOf('@'))
-                : user.email}',
-      ),
-      AppIconButton(
-        tooltip: AppLocalizations.of(context)!
-            .qrCodeGenerator_startScanningToolTip,
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const BarcodeScannerPage()),
-        ),
-        icon: const Icon(Icons.document_scanner_rounded),
-      ),
-      AppIconButton(
-        tooltip: AppLocalizations.of(context)!
-            .qrcodeGenerator_qrCodeListToolTip,
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const QRCodeListPage()),
-        ),
-        icon: const Icon(Icons.format_list_bulleted_rounded),
-      ),
-    ];
-  }
-
-  Future<void> _showPrivacyOptions(BuildContext context) async {
-    final l10n = AppLocalizations.of(context)!;
-    final formError = await AdConsentService.instance.showPrivacyOptionsForm();
-
-    if (formError != null && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            l10n.qrCodeGenerator_privacyOptionsErrorMsg,
-            textAlign: TextAlign.center,
+      actions: [
+        AppIconButton(
+          tooltip: l10n.qrCodeGenerator_startScanningToolTip,
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const BarcodeScannerPage()),
           ),
+          icon: const Icon(Icons.document_scanner_rounded),
         ),
-      );
-    }
+        AppNavigationMenu(
+          isSignedIn: user != null,
+          sessionLabel: sessionLabel,
+          onSavedQRCodes: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const QRCodeListPage()),
+          ),
+          onSettings: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SettingsPage(userEmail: user?.email),
+            ),
+          ),
+          onLogout: () => _handleLogout(context),
+        ),
+      ],
+    );
   }
 
   Future<void> _handleLogout(BuildContext context) async {

@@ -550,4 +550,54 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accountPrivacy_linkOpenError => 'The link could not be opened.';
+
+  @override
+  String get settings_title => 'Settings';
+
+  @override
+  String get settings_personalizationTitle => 'Appearance & language';
+
+  @override
+  String get settings_personalizationDescription =>
+      'Choose how QR Coder looks and which language it uses.';
+
+  @override
+  String get settings_languageTitle => 'Language';
+
+  @override
+  String get settings_languageTurkish => 'Türkçe';
+
+  @override
+  String get settings_languageEnglish => 'English';
+
+  @override
+  String get settings_themeTitle => 'Appearance';
+
+  @override
+  String get settings_themeSystem => 'System';
+
+  @override
+  String get settings_themeLight => 'Light';
+
+  @override
+  String get settings_themeDark => 'Dark';
+
+  @override
+  String get settings_accountPrivacy => 'Account & Privacy';
+
+  @override
+  String get settings_accountPrivacyDescription =>
+      'Review your account, privacy policy, and account deletion options.';
+
+  @override
+  String get settings_privacyOptions => 'Ad privacy options';
+
+  @override
+  String get settings_privacyOptionsDescription =>
+      'Review or change the advertising consent choices available for this device.';
+
+  @override
+  String navigation_accountMenuSemantic(String sessionLabel) {
+    return 'Account and navigation menu. Current session: $sessionLabel';
+  }
 }

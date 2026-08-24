@@ -550,4 +550,54 @@ class AppLocalizationsTr extends AppLocalizations {
 
   @override
   String get accountPrivacy_linkOpenError => 'Bağlantı açılamadı.';
+
+  @override
+  String get settings_title => 'Ayarlar';
+
+  @override
+  String get settings_personalizationTitle => 'Görünüm ve dil';
+
+  @override
+  String get settings_personalizationDescription =>
+      'QR Coder görünümünü ve kullanacağı dili seçin.';
+
+  @override
+  String get settings_languageTitle => 'Dil';
+
+  @override
+  String get settings_languageTurkish => 'Türkçe';
+
+  @override
+  String get settings_languageEnglish => 'English';
+
+  @override
+  String get settings_themeTitle => 'Görünüm';
+
+  @override
+  String get settings_themeSystem => 'Sistem';
+
+  @override
+  String get settings_themeLight => 'Açık';
+
+  @override
+  String get settings_themeDark => 'Koyu';
+
+  @override
+  String get settings_accountPrivacy => 'Hesap ve Gizlilik';
+
+  @override
+  String get settings_accountPrivacyDescription =>
+      'Hesabınızı, gizlilik politikasını ve hesap silme seçeneklerini yönetin.';
+
+  @override
+  String get settings_privacyOptions => 'Reklam gizlilik seçenekleri';
+
+  @override
+  String get settings_privacyOptionsDescription =>
+      'Bu cihaz için sunulan reklam izinlerini görüntüleyin veya değiştirin.';
+
+  @override
+  String navigation_accountMenuSemantic(String sessionLabel) {
+    return 'Hesap ve gezinme menüsü. Geçerli oturum: $sessionLabel';
+  }
 }

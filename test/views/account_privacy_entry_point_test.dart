@@ -16,10 +16,15 @@ void main() {
     );
   });
 
-  test('generator account icon opens AccountPrivacyPage', () {
-    final source = File('lib/views/qr_code_generator_page.dart')
-        .readAsStringSync();
+  test(
+    'generator menu opens Settings and Settings opens AccountPrivacyPage',
+    () {
+      final generator = File('lib/views/qr_code_generator_page.dart')
+          .readAsStringSync();
+      final settings = File('lib/views/settings_page.dart').readAsStringSync();
 
-    expect(source, contains('AccountPrivacyPage()'));
-  });
+      expect(generator, contains('SettingsPage(userEmail: user?.email)'));
+      expect(settings, contains('AccountPrivacyPage()'));
+    },
+  );
 }

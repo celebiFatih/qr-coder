@@ -53,20 +53,31 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
     return AppBar(
       title: Text(title),
       actions: [
-        AppIconButton(
-          onPressed: () =>
-              Navigator.of(context).popUntil((route) => route.isFirst),
-          icon: const Icon(Icons.home_rounded),
-          tooltip: AppLocalizations.of(context)!
-              .qrCodeDetail_homePageNavToolTip,
-        ),
-        AppIconButton(
-          onPressed: () => Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const QRCodeListPage()),
+        MenuAnchor(
+          menuChildren: [
+            MenuItemButton(
+              onPressed: () =>
+                  Navigator.of(context).popUntil((route) => route.isFirst),
+              leadingIcon: const Icon(Icons.home_rounded),
+              child: Text(
+                AppLocalizations.of(context)!.qrCodeDetail_homePageNavToolTip,
+              ),
+            ),
+            MenuItemButton(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => const QRCodeListPage()),
+              ),
+              leadingIcon: const Icon(Icons.format_list_bulleted_rounded),
+              child: Text(
+                AppLocalizations.of(context)!.qrCodeDetail_listPageNavToolTip,
+              ),
+            ),
+          ],
+          builder: (context, controller, child) => AppIconButton(
+            tooltip: MaterialLocalizations.of(context).moreButtonTooltip,
+            onPressed: controller.isOpen ? controller.close : controller.open,
+            icon: const Icon(Icons.more_vert_rounded),
           ),
-          icon: const Icon(Icons.format_list_bulleted_rounded),
-          tooltip: AppLocalizations.of(context)!
-              .qrCodeDetail_listPageNavToolTip,
         ),
       ],
     );

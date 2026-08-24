@@ -1057,6 +1057,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The link could not be opened.'**
   String get accountPrivacy_linkOpenError;
+
+  /// No description provided for @settings_title.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings_title;
+
+  /// No description provided for @settings_personalizationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance & language'**
+  String get settings_personalizationTitle;
+
+  /// No description provided for @settings_personalizationDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how QR Coder looks and which language it uses.'**
+  String get settings_personalizationDescription;
+
+  /// No description provided for @settings_languageTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get settings_languageTitle;
+
+  /// No description provided for @settings_languageTurkish.
+  ///
+  /// In en, this message translates to:
+  /// **'Türkçe'**
+  String get settings_languageTurkish;
+
+  /// No description provided for @settings_languageEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get settings_languageEnglish;
+
+  /// No description provided for @settings_themeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get settings_themeTitle;
+
+  /// No description provided for @settings_themeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get settings_themeSystem;
+
+  /// No description provided for @settings_themeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get settings_themeLight;
+
+  /// No description provided for @settings_themeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get settings_themeDark;
+
+  /// No description provided for @settings_accountPrivacy.
+  ///
+  /// In en, this message translates to:
+  /// **'Account & Privacy'**
+  String get settings_accountPrivacy;
+
+  /// No description provided for @settings_accountPrivacyDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Review your account, privacy policy, and account deletion options.'**
+  String get settings_accountPrivacyDescription;
+
+  /// No description provided for @settings_privacyOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Ad privacy options'**
+  String get settings_privacyOptions;
+
+  /// No description provided for @settings_privacyOptionsDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Review or change the advertising consent choices available for this device.'**
+  String get settings_privacyOptionsDescription;
+
+  /// No description provided for @navigation_accountMenuSemantic.
+  ///
+  /// In en, this message translates to:
+  /// **'Account and navigation menu. Current session: {sessionLabel}'**
+  String navigation_accountMenuSemantic(String sessionLabel);
 }
 
 class _AppLocalizationsDelegate
