@@ -296,6 +296,12 @@ abstract class AppLocalizations {
   /// **'QR Code Preview'**
   String get qrCodeGenerator_qrCodeSemantic;
 
+  /// No description provided for @qrCodeGenerator_previewEmptyMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Your QR Code preview will appear here.'**
+  String get qrCodeGenerator_previewEmptyMsg;
+
   /// No description provided for @qrCodeGenerator_receiveErrorMsg.
   ///
   /// In en, this message translates to:
@@ -385,6 +391,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter some text to generate a QR Code'**
   String get qrCodeGenerator_textFieldHintText;
+
+  /// No description provided for @qrCodeGenerator_clearTextToolTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear text'**
+  String get qrCodeGenerator_clearTextToolTip;
 
   /// No description provided for @qrCodeGenerator_dataTooLongErrMsg.
   ///

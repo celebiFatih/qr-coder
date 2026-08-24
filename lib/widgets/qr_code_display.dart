@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:qr_coder/l10n/app_localizations.dart';
 import 'package:qr_coder/utils/qr_code_render_utils.dart';
 import 'package:qr_coder/viewmodels/qr_code_display_viewmodel.dart';
+import 'package:qr_coder/widgets/app_design_tokens.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import 'dart:math' as math;
@@ -88,15 +89,24 @@ class _QRcodeDisplayState extends State<QRcodeDisplay> {
                         ),
                         if (!vm.isLogoRemoved)
                           Center(
-                            child: SizedBox(
-                              width: logoSide,
-                              height: logoSide,
-                              child: GestureDetector(
-                                onTap:
-                                    widget.onLogoTap ??
-                                    () => vm.promptRemoveLogo(context),
-                                // Görünmez; sadece hit-test için
-                                behavior: HitTestBehavior.opaque,
+                            child: Semantics(
+                              label: AppLocalizations.of(context)!
+                                  .qrcodeDisplay_remove_logo,
+                              button: true,
+                              child: Tooltip(
+                                message: AppLocalizations.of(context)!
+                                    .qrcodeDisplay_remove_logo,
+                                child: SizedBox.square(
+                                  dimension: math.max(logoSide, AppSpacing.xxl),
+                                  child: GestureDetector(
+                                    onTap:
+                                        widget.onLogoTap ??
+                                        () => vm.promptRemoveLogo(context),
+                                    // Görünmez; yalnız logo aksiyonunun
+                                    // erişilebilir dokunma alanını büyütür.
+                                    behavior: HitTestBehavior.opaque,
+                                  ),
+                                ),
                               ),
                             ),
                           ),

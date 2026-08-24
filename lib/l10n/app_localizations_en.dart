@@ -115,6 +115,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qrCodeGenerator_qrCodeSemantic => 'QR Code Preview';
 
   @override
+  String get qrCodeGenerator_previewEmptyMsg =>
+      'Your QR Code preview will appear here.';
+
+  @override
   String get qrCodeGenerator_receiveErrorMsg => 'Failed to receive data!';
 
   @override
@@ -164,6 +168,9 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get qrCodeGenerator_textFieldHintText =>
       'Enter some text to generate a QR Code';
+
+  @override
+  String get qrCodeGenerator_clearTextToolTip => 'Clear text';
 
   @override
   String get qrCodeGenerator_dataTooLongErrMsg => 'Text is too long!';

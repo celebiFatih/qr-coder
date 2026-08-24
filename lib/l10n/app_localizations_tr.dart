@@ -114,6 +114,10 @@ class AppLocalizationsTr extends AppLocalizations {
   String get qrCodeGenerator_qrCodeSemantic => 'QR kodu görüntüsü';
 
   @override
+  String get qrCodeGenerator_previewEmptyMsg =>
+      'QR kodu önizlemeniz burada görünecek.';
+
+  @override
   String get qrCodeGenerator_receiveErrorMsg => 'Veri alınamadı!';
 
   @override
@@ -162,6 +166,9 @@ class AppLocalizationsTr extends AppLocalizations {
   @override
   String get qrCodeGenerator_textFieldHintText =>
       'QR kod oluşturulacak metni girin';
+
+  @override
+  String get qrCodeGenerator_clearTextToolTip => 'Metni temizle';
 
   @override
   String get qrCodeGenerator_dataTooLongErrMsg => 'Metin çok uzun!';

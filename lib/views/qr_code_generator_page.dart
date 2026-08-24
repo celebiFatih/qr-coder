@@ -19,6 +19,7 @@ import 'package:qr_coder/views/barcode_scanner_page.dart';
 import 'package:qr_coder/widgets/wrapper.dart';
 import 'package:qr_coder/views/qr_code_list_page.dart';
 import 'package:qr_coder/widgets/app_components.dart';
+import 'package:qr_coder/widgets/app_design_tokens.dart';
 import 'package:qr_coder/widgets/app_layout.dart';
 import 'package:qr_coder/widgets/qr_code_display.dart';
 import 'package:qr_coder/widgets/qr_code_text_field.dart';
@@ -111,12 +112,9 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
   Widget build(BuildContext context) {
     final User? user = Auth().currentUser;
     return AppPageScaffold(
-      resizeToAvoidBottomInset: false,
       appBar: _buildAppBar(context, user),
       body: _buildBody(context),
       showBannerAd: true,
-      floatingActionButton: _buildFab(context),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 
@@ -252,33 +250,6 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
     }
   }
 
-  Widget _buildFab(BuildContext context) {
-    return Consumer<QRCodeViewModel>(
-      builder: (context, viewModel, child) => Semantics(
-        label: AppLocalizations.of(context)!.qrCodeGenerator_FabSemantic,
-        child: viewModel.qrData.isEmpty
-            ? FloatingActionButton.large(
-                onPressed: viewModel.isLoading
-                    ? null
-                    : () => _handleGenerateQRCode(context),
-                backgroundColor: Theme.of(context).colorScheme.secondary,
-                tooltip: AppLocalizations.of(context)!
-                    .qrCodeGenerator_FabToolTip,
-                child: const Icon(Icons.qr_code_scanner, size: 50),
-              )
-            : FloatingActionButton(
-                onPressed: viewModel.isLoading
-                    ? null
-                    : () => _handleGenerateQRCode(context),
-                backgroundColor: Theme.of(context).colorScheme.secondary,
-                tooltip: AppLocalizations.of(context)!
-                    .qrCodeGenerator_FabToolTip,
-                child: const Icon(Icons.qr_code_scanner),
-              ),
-      ),
-    );
-  }
-
   Future<void> _handleGenerateQRCode(BuildContext context) async {
     await viewModel.generateQRCode(context);
     if (!context.mounted) return;
@@ -301,78 +272,156 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
   }
 
   Widget _buildBody(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                _buildTextField(context),
-                _buildQRCodeDisplay(context, constraints),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
+    return SafeArea(
+      top: false,
+      child: AppContentFrame(
+        maxWidth: AppLayoutMetrics.wideContentMaxWidth,
+        child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final isExpanded =
+                  AppBreakpoints.classify(constraints.maxWidth) ==
+                  AppWindowSizeClass.expanded;
 
-  Widget _buildTextField(BuildContext context) {
-    return Consumer<QRCodeViewModel>(
-      builder: (context, viewModel, child) {
-        return Semantics(
-          label: AppLocalizations.of(context)!.qrCodeGenerator_textSemantic,
-          child: QRCodeTextField(
-            controller: viewModel.controller,
-            focusNode: viewModel.focusNode,
-            onPressed: () {
-              viewModel.clearAll();
-              viewModel.focusNode.requestFocus();
+              final composer = _buildComposer(context);
+              final preview = _buildPreview(context);
+
+              if (isExpanded) {
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(child: composer),
+                    const SizedBox(width: AppSpacing.lg),
+                    Expanded(child: preview),
+                  ],
+                );
+              }
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  composer,
+                  const SizedBox(height: AppSpacing.lg),
+                  preview,
+                ],
+              );
             },
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
-  Widget _buildQRCodeDisplay(BuildContext context, BoxConstraints constraints) {
-    return ConstrainedBox(
-      constraints: BoxConstraints(
-        minHeight: constraints.maxHeight * 0.4,
-        maxHeight: constraints.maxHeight * 0.7,
-      ),
+  Widget _buildComposer(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return AppSurface(
       child: Consumer<QRCodeViewModel>(
         builder: (context, viewModel, child) {
-          return viewModel.isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : Center(
-                  child: viewModel.qrData.isNotEmpty
-                      ? Semantics(
-                          label: AppLocalizations.of(context)!
-                              .qrCodeGenerator_qrCodeSemantic,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Card(
-                              elevation: 8,
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: AspectRatio(
-                                  aspectRatio: 1,
-                                  child: QRcodeDisplay(
-                                    key: ObjectKey(viewModel.qrCodeModel),
-                                    data: viewModel.qrData,
-                                    repaintKey: _repaintKey,
-                                    onLogoTap: _handleRemoveLogo,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              AppSectionHeader(
+                title: l10n.qrCodeGenerator_qrCode,
+                subtitle: l10n.qrCodeGenerator_textFieldHintText,
+              ),
+              if (viewModel.sharedText.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.sm),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Chip(
+                    avatar: const Icon(Icons.ios_share_rounded),
+                    label: Text(l10n.qrCodeGenerator_sharedData),
+                  ),
+                ),
+              ],
+              const SizedBox(height: AppSpacing.md),
+              Semantics(
+                label: l10n.qrCodeGenerator_textSemantic,
+                textField: true,
+                child: QRCodeTextField(
+                  controller: viewModel.controller,
+                  focusNode: viewModel.focusNode,
+                  onPressed: () {
+                    viewModel.clearAll();
+                    viewModel.focusNode.requestFocus();
+                  },
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Semantics(
+                label: l10n.qrCodeGenerator_FabSemantic,
+                button: true,
+                child: FilledButton.icon(
+                  onPressed: viewModel.isLoading
+                      ? null
+                      : () => _handleGenerateQRCode(context),
+                  icon: viewModel.isLoading
+                      ? const SizedBox.square(
+                          dimension: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
                         )
-                      : const SizedBox.shrink(),
-                );
+                      : const Icon(Icons.qr_code_2_rounded),
+                  label: Text(l10n.qrCodeGenerator_FabToolTip),
+                ),
+              ),
+            ],
+          );
         },
+      ),
+    );
+  }
+
+  Widget _buildPreview(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
+    return AppSurface(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          AppSectionHeader(title: l10n.qrCodeGenerator_qrCodeSemantic),
+          const SizedBox(height: AppSpacing.md),
+          Consumer<QRCodeViewModel>(
+            builder: (context, viewModel, child) {
+              if (viewModel.isLoading) {
+                return const SizedBox(
+                  height: 300,
+                  child: AppStateView.loading(),
+                );
+              }
+
+              if (viewModel.qrData.isEmpty) {
+                return SizedBox(
+                  height: 300,
+                  child: AppStateView.empty(
+                    message: l10n.qrCodeGenerator_previewEmptyMsg,
+                    icon: Icons.qr_code_2_rounded,
+                  ),
+                );
+              }
+
+              return Semantics(
+                label: l10n.qrCodeGenerator_qrCodeSemantic,
+                image: true,
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 420),
+                    child: AspectRatio(
+                      aspectRatio: 1,
+                      child: QRcodeDisplay(
+                        key: ObjectKey(viewModel.qrCodeModel),
+                        data: viewModel.qrData,
+                        repaintKey: _repaintKey,
+                        onLogoTap: _handleRemoveLogo,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

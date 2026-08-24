@@ -14,6 +14,7 @@ import 'package:qr_coder/services/auth_service.dart';
 import 'package:qr_coder/viewmodels/barcode_scanner_viewmodel.dart';
 import 'package:qr_coder/views/qr_code_detail_page.dart';
 import 'package:qr_coder/widgets/app_components.dart';
+import 'package:qr_coder/widgets/app_design_tokens.dart';
 import 'package:qr_coder/widgets/scanner_error_widget.dart';
 
 class BarcodeScannerPage extends StatefulWidget {
@@ -59,7 +60,12 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
     return Scaffold(
       appBar: _buildAppBar(context),
       body: Stack(
-        children: [_buildCameraView(context), _buildBottomToggle(context)],
+        fit: StackFit.expand,
+        children: [
+          _buildCameraView(context),
+          _buildScannerGuide(context),
+          _buildResultsAction(context),
+        ],
       ),
     );
   }
@@ -117,13 +123,20 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
   Widget _buildCameraView(BuildContext context) {
     return Consumer<BarcodeScannerViewmodel>(
       builder: (context, viewModel, child) {
+        final scheme = Theme.of(context).colorScheme;
+
         return Stack(
           fit: StackFit.expand,
           children: [
             MobileScanner(
               controller: controller,
               errorBuilder: (context, error) {
-                return ScannerErrorWidget(error: error);
+                return ScannerErrorWidget(
+                  error: error,
+                  onRetry: () {
+                    unawaited(_refreshCamera(viewModel));
+                  },
+                );
               },
               onDetect: (capture) {
                 final hasUsableBarcode = capture.barcodes.any(
@@ -136,9 +149,11 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
               },
             ),
             if (viewModel.isCameraLoading)
-              const ColoredBox(
-                color: Colors.black,
-                child: Center(child: CircularProgressIndicator()),
+              ColoredBox(
+                color: scheme.scrim.withValues(alpha: 0.55),
+                child: Center(
+                  child: CircularProgressIndicator(color: scheme.primary),
+                ),
               ),
           ],
         );
@@ -146,20 +161,85 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
     );
   }
 
-  // Alt sayfa tetikleyicisini oluşturma
-  Widget _buildBottomToggle(BuildContext context) {
-    return Align(
-      alignment: Alignment.bottomCenter,
-      child: GestureDetector(
-        onTap: _toggleBottomSheet,
-        child: Container(
-          width: MediaQuery.of(context).size.width * 0.3,
-          height: MediaQuery.of(context).size.width * 0.01,
-          margin: const EdgeInsets.only(bottom: 15),
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.secondary,
-            borderRadius: BorderRadius.circular(5.0),
-          ),
+  Widget _buildScannerGuide(BuildContext context) {
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    return IgnorePointer(
+      child: SafeArea(
+        minimum: const EdgeInsets.fromLTRB(
+          AppSpacing.md,
+          AppSpacing.md,
+          AppSpacing.md,
+          96,
+        ),
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            var side = constraints.maxWidth;
+            final sideByHeight = constraints.maxHeight * 0.52;
+            if (side > 320) side = 320;
+            if (side > sideByHeight) side = sideByHeight;
+
+            return Stack(
+              fit: StackFit.expand,
+              children: [
+                Align(
+                  alignment: Alignment.topCenter,
+                  child: Material(
+                    color: scheme.surface.withValues(alpha: 0.88),
+                    borderRadius: BorderRadius.circular(AppRadii.control),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.sm,
+                      ),
+                      child: Text(
+                        AppLocalizations.of(context)!
+                            .scannerPage_emptyScannedList,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: scheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+                Center(
+                  child: SizedBox.square(
+                    dimension: side,
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(AppRadii.surface),
+                        border: Border.all(color: scheme.primary, width: 3),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildResultsAction(BuildContext context) {
+    return SafeArea(
+      minimum: const EdgeInsets.all(AppSpacing.md),
+      child: Align(
+        alignment: Alignment.bottomCenter,
+        child: Consumer<BarcodeScannerViewmodel>(
+          builder: (context, viewModel, child) {
+            return FilledButton.tonalIcon(
+              onPressed: _toggleBottomSheet,
+              icon: const Icon(Icons.qr_code_2_rounded),
+              label: Text(
+                '${AppLocalizations.of(context)!.scannerPage_scannedData} '
+                '(${viewModel.barcodes.length})',
+              ),
+            );
+          },
         ),
       ),
     );
@@ -173,9 +253,13 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
     viewModel.isBottomSheetOpen = true;
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFFCDDC39).withValues(alpha: 0.8),
-      constraints: const BoxConstraints(maxHeight: double.infinity),
-      builder: (context) => _buildBottomSheetContent(context, viewModel),
+      isScrollControlled: true,
+      useSafeArea: true,
+      showDragHandle: true,
+      builder: (context) => FractionallySizedBox(
+        heightFactor: 0.72,
+        child: _buildBottomSheetContent(context, viewModel),
+      ),
     ).whenComplete(() {
       viewModel.isBottomSheetOpen = false;
     });
@@ -186,22 +270,36 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
     BuildContext context,
     BarcodeScannerViewmodel viewModel,
   ) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+      padding: const EdgeInsets.fromLTRB(
+        AppSpacing.md,
+        AppSpacing.xs,
+        AppSpacing.md,
+        AppSpacing.md,
+      ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          AppSectionHeader(title: l10n.scannerPage_scannedData),
+          const SizedBox(height: AppSpacing.sm),
           Expanded(child: _buildBarcodesListView()),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              elevation: 10,
-            ),
-            onPressed: viewModel.clearBarcodes,
-            child: Text(
-              AppLocalizations.of(context)!.scannerPage_cleanScannedListBtn,
-              style: const TextStyle(color: Colors.white),
-            ),
+          Consumer<BarcodeScannerViewmodel>(
+            builder: (context, scannerViewModel, child) {
+              if (scannerViewModel.barcodes.isEmpty) {
+                return const SizedBox.shrink();
+              }
+
+              return Padding(
+                padding: const EdgeInsets.only(top: AppSpacing.sm),
+                child: OutlinedButton.icon(
+                  onPressed: scannerViewModel.clearBarcodes,
+                  icon: const Icon(Icons.delete_sweep_outlined),
+                  label: Text(l10n.scannerPage_cleanScannedListBtn),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -213,16 +311,17 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
     return Consumer<BarcodeScannerViewmodel>(
       builder: (context, viewModel, child) {
         if (viewModel.barcodes.isEmpty) {
-          return Center(
-            child: Text(
-              AppLocalizations.of(context)!.scannerPage_emptyScannedList,
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
+          return AppStateView.empty(
+            message: AppLocalizations.of(context)!.scannerPage_emptyScannedList,
+            icon: Icons.qr_code_scanner_rounded,
           );
         }
-        return ListView.builder(
-          padding: const EdgeInsets.all(8.0),
+
+        return ListView.separated(
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
           itemCount: viewModel.barcodes.length,
+          separatorBuilder: (context, index) =>
+              const SizedBox(height: AppSpacing.xs),
           itemBuilder: (context, index) {
             return _buildBarcodeListItem(context, viewModel, index);
           },
@@ -241,19 +340,24 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
     final scannedDataName = l10n.scannerPage_scannedData;
     final savedToListMsg = l10n.scannerPage_savedToListMsg;
 
+    final displayValue =
+        viewModel.barcodes[index].rawValue ?? l10n.scannerPage_unkonwnBarcode;
+
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
-        leading: const Icon(Icons.qr_code_scanner),
-        title: Text(
-          '$scannedDataName:',
-          style: Theme.of(context).textTheme.bodyMedium,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.xs,
         ),
-        subtitle: Text(
-          viewModel.barcodes[index].rawValue ??
-              AppLocalizations.of(context)!.scannerPage_unkonwnBarcode,
+        leading: const Icon(Icons.qr_code_2_rounded),
+        title: Text(
+          displayValue,
+          maxLines: 3,
+          overflow: TextOverflow.ellipsis,
           style: Theme.of(context).textTheme.bodyLarge,
         ),
+        subtitle: Text(scannedDataName),
+        trailing: const Icon(Icons.chevron_right_rounded),
         onTap: () async {
           final barcode = viewModel.barcodes[index];
           final rawValue = BarcodeScannerViewmodel.usableRawValue(barcode);
