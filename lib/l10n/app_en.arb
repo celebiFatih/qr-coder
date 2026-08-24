@@ -183,7 +183,7 @@
     "scannerPage_title": "Barcode Scanner",
     "scannerPage_cleanScannedListBtn": "Clean",
     "scannerPage_emptyScannedList": "Let's scan something!",
-    "scannerPage_scannedData": "Saved QR codes",
+    "scannerPage_scannedData": "Scanned data",
     "scannerPage_unkonwnBarcode": "Unknown Barcode",
     "scannerPage_savedToListMsg": "QR Code saved successfully!",
     "scannerPage_saveErrorMsg": "Failed to save QR Code!",

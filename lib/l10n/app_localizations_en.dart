@@ -423,7 +423,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get scannerPage_emptyScannedList => 'Let\'s scan something!';
 
   @override
-  String get scannerPage_scannedData => 'Saved QR codes';
+  String get scannerPage_scannedData => 'Scanned data';
 
   @override
   String get scannerPage_unkonwnBarcode => 'Unknown Barcode';

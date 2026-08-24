@@ -833,7 +833,7 @@ abstract class AppLocalizations {
   /// No description provided for @scannerPage_scannedData.
   ///
   /// In en, this message translates to:
-  /// **'Saved QR codes'**
+  /// **'Scanned data'**
   String get scannerPage_scannedData;
 
   /// No description provided for @scannerPage_unkonwnBarcode.
