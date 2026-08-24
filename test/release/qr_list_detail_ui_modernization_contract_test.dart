@@ -73,11 +73,8 @@ void main() {
     expect(buildContent, contains('AppSectionHeader('));
     expect(buildContent, isNot(contains('headlineLarge')));
     expect(buildContent, isNot(contains('Colors.blue')));
-    expect(
-      buildContent,
-      contains(
-        'return Linkable(text: data, style: Theme.of(context).textTheme.bodyLarge);',
-      ),
-    );
+    expect(buildContent, contains('return Linkable('));
+    expect(buildContent, contains('textColor: scheme.onSurface'));
+    expect(buildContent, contains('linkColor: scheme.primary'));
   });
 }

@@ -235,6 +235,11 @@
     "settings_accountPrivacyDescription": "Review your account, privacy policy, and account deletion options.",
     "settings_privacyOptions": "Ad privacy options",
     "settings_privacyOptionsDescription": "Review or change the advertising consent choices available for this device.",
+    "accessibility_clearInput": "Clear field",
+    "accessibility_clearForm": "Clear form",
+    "accessibility_showPassword": "Show password",
+    "accessibility_hidePassword": "Hide password",
+    "accessibility_retry": "Try again",
     "navigation_accountMenuSemantic": "Account and navigation menu. Current session: {sessionLabel}",
     "@navigation_accountMenuSemantic": {
         "placeholders": {

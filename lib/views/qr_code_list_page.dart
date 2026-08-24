@@ -593,6 +593,9 @@ class QrCodePreviewImage extends StatelessWidget {
     return QrImageView(
       data: data,
       version: QrVersions.auto,
+      // QR modules must keep a light, neutral canvas in both app themes so
+      // saved-code previews remain readable and scannable in dark mode.
+      backgroundColor: Colors.white,
       padding: const EdgeInsets.all(AppSpacing.xxs),
       errorStateBuilder: (context, error) =>
           const Center(child: Icon(Icons.broken_image_outlined)),

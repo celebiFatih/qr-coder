@@ -89,21 +89,15 @@ class _WrapperState extends State<Wrapper> {
                   '${tokenSnapshot.error}',
                 );
                 return Scaffold(
-                  body: Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          AppLocalizations.of(context)!
-                              .wrapper_LoginPageToolTip,
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 12),
-                        IconButton(
-                          onPressed: _retryVerifiedSession,
-                          icon: const Icon(Icons.refresh),
-                        ),
-                      ],
+                  body: AppStateView.error(
+                    message: AppLocalizations.of(context)!
+                        .wrapper_LoginPageToolTip,
+                    action: FilledButton.tonalIcon(
+                      onPressed: _retryVerifiedSession,
+                      icon: const Icon(Icons.refresh_rounded),
+                      label: Text(
+                        AppLocalizations.of(context)!.accessibility_retry,
+                      ),
                     ),
                   ),
                 );

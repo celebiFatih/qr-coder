@@ -18,6 +18,7 @@ import 'package:qr_coder/views/settings_page.dart';
 import 'package:qr_coder/widgets/wrapper.dart';
 import 'package:qr_coder/views/qr_code_list_page.dart';
 import 'package:qr_coder/widgets/app_components.dart';
+import 'package:qr_coder/widgets/app_accessibility.dart';
 import 'package:qr_coder/widgets/app_design_tokens.dart';
 import 'package:qr_coder/widgets/app_layout.dart';
 import 'package:qr_coder/widgets/app_navigation_menu.dart';
@@ -233,7 +234,8 @@ class _QRCodeGeneratorState extends State<QRCodeGenerator>
             builder: (context, constraints) {
               final isExpanded =
                   AppBreakpoints.classify(constraints.maxWidth) ==
-                  AppWindowSizeClass.expanded;
+                      AppWindowSizeClass.expanded &&
+                  !AppAccessibility.usesLargeText(context);
 
               final composer = _buildComposer(context);
               final preview = _buildPreview(context);

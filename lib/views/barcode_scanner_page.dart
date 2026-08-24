@@ -173,52 +173,60 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
           AppSpacing.md,
           96,
         ),
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            var side = constraints.maxWidth;
-            final sideByHeight = constraints.maxHeight * 0.52;
-            if (side > 320) side = 320;
-            if (side > sideByHeight) side = sideByHeight;
+        child: Column(
+          children: [
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(
+                  maxWidth: AppLayoutMetrics.compactStateMaxWidth,
+                ),
+                child: Material(
+                  color: scheme.surface.withValues(alpha: 0.88),
+                  borderRadius: BorderRadius.circular(AppRadii.control),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.sm,
+                    ),
+                    child: Text(
+                      AppLocalizations.of(context)!
+                          .scannerPage_emptyScannedList,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: scheme.onSurface,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  var side = constraints.maxWidth;
+                  if (side > constraints.maxHeight) {
+                    side = constraints.maxHeight;
+                  }
+                  if (side > 320) side = 320;
 
-            return Stack(
-              fit: StackFit.expand,
-              children: [
-                Align(
-                  alignment: Alignment.topCenter,
-                  child: Material(
-                    color: scheme.surface.withValues(alpha: 0.88),
-                    borderRadius: BorderRadius.circular(AppRadii.control),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.md,
-                        vertical: AppSpacing.sm,
-                      ),
-                      child: Text(
-                        AppLocalizations.of(context)!
-                            .scannerPage_emptyScannedList,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: scheme.onSurface,
-                          fontWeight: FontWeight.w600,
+                  return Center(
+                    child: SizedBox.square(
+                      dimension: side,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(AppRadii.surface),
+                          border: Border.all(color: scheme.primary, width: 3),
                         ),
-                        textAlign: TextAlign.center,
                       ),
                     ),
-                  ),
-                ),
-                Center(
-                  child: SizedBox.square(
-                    dimension: side,
-                    child: DecoratedBox(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(AppRadii.surface),
-                        border: Border.all(color: scheme.primary, width: 3),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            );
-          },
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -7,6 +7,7 @@ import 'package:qr_coder/viewmodels/qr_code_display_viewmodel.dart';
 import 'package:qr_coder/viewmodels/qr_code_viewmodel.dart';
 import 'package:qr_coder/views/qr_code_list_page.dart';
 import 'package:qr_coder/widgets/app_components.dart';
+import 'package:qr_coder/widgets/app_accessibility.dart';
 import 'package:qr_coder/widgets/app_design_tokens.dart';
 import 'package:qr_coder/widgets/app_layout.dart';
 import 'package:qr_coder/widgets/build_content.dart';
@@ -93,7 +94,8 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
             final detailPanel = _buildDetailPanel(context, viewModel);
             final preview = _buildPreview(context);
 
-            if (windowClass == AppWindowSizeClass.expanded) {
+            if (windowClass == AppWindowSizeClass.expanded &&
+                !AppAccessibility.usesLargeText(context)) {
               return Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -199,7 +201,8 @@ class _QRCodeDetailPageState extends State<QRCodeDetailPage> {
         return LayoutBuilder(
           builder: (context, constraints) {
             final stackActions =
-                constraints.maxWidth < AppBreakpoints.mediumWidth;
+                constraints.maxWidth < AppBreakpoints.mediumWidth ||
+                AppAccessibility.usesLargeText(context);
 
             final saveButton = FilledButton.icon(
               onPressed: busy ? null : () => _saveQRCode(context, viewModel),

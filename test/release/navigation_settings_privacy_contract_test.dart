@@ -31,8 +31,8 @@ void main() {
   });
 
   test('settings exposes locale, theme, account and privacy controls', () {
-    expect(settings, contains('SegmentedButton<String>('));
-    expect(settings, contains('SegmentedButton<ThemeMode>('));
+    expect(settings, contains('AppAdaptiveChoiceGroup<String>('));
+    expect(settings, contains('AppAdaptiveChoiceGroup<ThemeMode>('));
     expect(settings, contains('LocaleProvider'));
     expect(settings, contains('ThemeModeProvider'));
     expect(settings, contains('AccountPrivacyPage()'));

@@ -30,7 +30,15 @@ class BuildContent extends StatelessWidget {
     if (_isWifi(data)) {
       return _buildWifi(context, data);
     }
-    return Linkable(text: data, style: Theme.of(context).textTheme.bodyLarge);
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+
+    return Linkable(
+      text: data,
+      style: theme.textTheme.bodyLarge,
+      textColor: scheme.onSurface,
+      linkColor: scheme.primary,
+    );
   }
 
   bool _isWifi(String data) {

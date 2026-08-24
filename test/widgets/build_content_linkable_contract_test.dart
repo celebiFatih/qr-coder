@@ -11,12 +11,10 @@ void main() {
 
   test('non-Wi-Fi QR content keeps Linkable rendering', () {
     expect(source, contains("import 'package:linkable/linkable.dart';"));
-    expect(
-      source,
-      contains(
-        'return Linkable(text: data, style: Theme.of(context).textTheme.bodyLarge);',
-      ),
-    );
+    expect(source, contains('return Linkable('));
+    expect(source, contains('style: theme.textTheme.bodyLarge'));
+    expect(source, contains('textColor: scheme.onSurface'));
+    expect(source, contains('linkColor: scheme.primary'));
   });
 
   test('Wi-Fi QR content bypasses Linkable and keeps dedicated handling', () {

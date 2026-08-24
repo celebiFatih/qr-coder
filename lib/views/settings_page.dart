@@ -100,20 +100,20 @@ class SettingsPage extends StatelessWidget {
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: AppSpacing.sm),
-          SegmentedButton<String>(
-            segments: [
-              ButtonSegment(
+          AppAdaptiveChoiceGroup<String>(
+            options: [
+              AppChoiceOption(
                 value: 'tr',
-                label: Text(l10n.settings_languageTurkish),
+                label: l10n.settings_languageTurkish,
               ),
-              ButtonSegment(
+              AppChoiceOption(
                 value: 'en',
-                label: Text(l10n.settings_languageEnglish),
+                label: l10n.settings_languageEnglish,
               ),
             ],
-            selected: {activeLanguageCode == 'tr' ? 'tr' : 'en'},
-            onSelectionChanged: (selection) {
-              context.read<LocaleProvider>().setLocale(Locale(selection.first));
+            selected: activeLanguageCode == 'tr' ? 'tr' : 'en',
+            onSelected: (languageCode) {
+              context.read<LocaleProvider>().setLocale(Locale(languageCode));
             },
           ),
         ],
@@ -134,28 +134,26 @@ class SettingsPage extends StatelessWidget {
             style: Theme.of(context).textTheme.titleMedium,
           ),
           const SizedBox(height: AppSpacing.sm),
-          SegmentedButton<ThemeMode>(
-            segments: [
-              ButtonSegment(
+          AppAdaptiveChoiceGroup<ThemeMode>(
+            options: [
+              AppChoiceOption(
                 value: ThemeMode.system,
-                icon: const Icon(Icons.brightness_auto_outlined),
-                label: Text(l10n.settings_themeSystem),
+                icon: Icons.brightness_auto_outlined,
+                label: l10n.settings_themeSystem,
               ),
-              ButtonSegment(
+              AppChoiceOption(
                 value: ThemeMode.light,
-                icon: const Icon(Icons.light_mode_outlined),
-                label: Text(l10n.settings_themeLight),
+                icon: Icons.light_mode_outlined,
+                label: l10n.settings_themeLight,
               ),
-              ButtonSegment(
+              AppChoiceOption(
                 value: ThemeMode.dark,
-                icon: const Icon(Icons.dark_mode_outlined),
-                label: Text(l10n.settings_themeDark),
+                icon: Icons.dark_mode_outlined,
+                label: l10n.settings_themeDark,
               ),
             ],
-            selected: {themeModeProvider.themeMode},
-            onSelectionChanged: (selection) {
-              themeModeProvider.setThemeMode(selection.first);
-            },
+            selected: themeModeProvider.themeMode,
+            onSelected: themeModeProvider.setThemeMode,
           ),
         ],
       ),

@@ -240,6 +240,8 @@ class _AccountPrivacyPageState extends State<AccountPrivacyPage> {
       passwordLabel: l10n.accountPrivacy_passwordLabel,
       cancelLabel: l10n.no,
       deleteLabel: l10n.accountPrivacy_deleteConfirmButton,
+      showPasswordLabel: l10n.accessibility_showPassword,
+      hidePasswordLabel: l10n.accessibility_hidePassword,
     );
   }
 

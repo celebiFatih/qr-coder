@@ -597,6 +597,21 @@ class AppLocalizationsEn extends AppLocalizations {
       'Review or change the advertising consent choices available for this device.';
 
   @override
+  String get accessibility_clearInput => 'Clear field';
+
+  @override
+  String get accessibility_clearForm => 'Clear form';
+
+  @override
+  String get accessibility_showPassword => 'Show password';
+
+  @override
+  String get accessibility_hidePassword => 'Hide password';
+
+  @override
+  String get accessibility_retry => 'Try again';
+
+  @override
   String navigation_accountMenuSemantic(String sessionLabel) {
     return 'Account and navigation menu. Current session: $sessionLabel';
   }

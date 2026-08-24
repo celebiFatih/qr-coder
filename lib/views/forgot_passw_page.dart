@@ -136,6 +136,7 @@ class _ForgotPasswPageState extends State<ForgotPasswPage> {
             .forgotPasswordPage_textFieldHintText,
         prefixIcon: const Icon(Icons.email_outlined),
         suffixIcon: IconButton(
+          tooltip: AppLocalizations.of(context)!.accessibility_clearInput,
           icon: const Icon(Icons.close_rounded),
           onPressed: viewModel.isLoading ? null : viewModel.clearAll,
         ),

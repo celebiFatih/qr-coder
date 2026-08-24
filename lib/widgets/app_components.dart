@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:qr_coder/widgets/app_accessibility.dart';
 import 'package:qr_coder/widgets/app_design_tokens.dart';
 
 class AppSectionHeader extends StatelessWidget {
@@ -93,6 +94,79 @@ class AppIconButton extends StatelessWidget {
     }
 
     return button;
+  }
+}
+
+class AppChoiceOption<T> {
+  const AppChoiceOption({required this.value, required this.label, this.icon});
+
+  final T value;
+  final String label;
+  final IconData? icon;
+}
+
+/// Keeps short option sets compact when space allows, but switches to a
+/// vertically readable list for narrow layouts or large accessibility text.
+class AppAdaptiveChoiceGroup<T> extends StatelessWidget {
+  const AppAdaptiveChoiceGroup({
+    super.key,
+    required this.options,
+    required this.selected,
+    required this.onSelected,
+  });
+
+  final List<AppChoiceOption<T>> options;
+  final T selected;
+  final ValueChanged<T> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final useVertical =
+            constraints.maxWidth < AppBreakpoints.mediumWidth ||
+            AppAccessibility.usesLargeText(context);
+
+        if (!useVertical) {
+          return SegmentedButton<T>(
+            segments: [
+              for (final option in options)
+                ButtonSegment<T>(
+                  value: option.value,
+                  icon: option.icon == null ? null : Icon(option.icon),
+                  label: Text(option.label),
+                ),
+            ],
+            selected: {selected},
+            onSelectionChanged: (selection) {
+              if (selection.isNotEmpty) {
+                onSelected(selection.first);
+              }
+            },
+          );
+        }
+
+        return Column(
+          children: [
+            for (var index = 0; index < options.length; index++) ...[
+              if (index > 0) const Divider(height: 1),
+              ListTile(
+                minTileHeight: 56,
+                leading: options[index].icon == null
+                    ? null
+                    : Icon(options[index].icon),
+                title: Text(options[index].label),
+                selected: options[index].value == selected,
+                trailing: options[index].value == selected
+                    ? const Icon(Icons.check_rounded)
+                    : null,
+                onTap: () => onSelected(options[index].value),
+              ),
+            ],
+          ],
+        );
+      },
+    );
   }
 }
 

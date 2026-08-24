@@ -597,6 +597,21 @@ class AppLocalizationsTr extends AppLocalizations {
       'Bu cihaz için sunulan reklam izinlerini görüntüleyin veya değiştirin.';
 
   @override
+  String get accessibility_clearInput => 'Alanı temizle';
+
+  @override
+  String get accessibility_clearForm => 'Formu temizle';
+
+  @override
+  String get accessibility_showPassword => 'Parolayı göster';
+
+  @override
+  String get accessibility_hidePassword => 'Parolayı gizle';
+
+  @override
+  String get accessibility_retry => 'Tekrar dene';
+
+  @override
   String navigation_accountMenuSemantic(String sessionLabel) {
     return 'Hesap ve gezinme menüsü. Geçerli oturum: $sessionLabel';
   }

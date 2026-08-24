@@ -7,6 +7,8 @@ Future<String?> showAccountDeletionPasswordDialog({
   required String passwordLabel,
   required String cancelLabel,
   required String deleteLabel,
+  String? showPasswordLabel,
+  String? hidePasswordLabel,
 }) {
   return showDialog<String>(
     context: context,
@@ -16,6 +18,8 @@ Future<String?> showAccountDeletionPasswordDialog({
       passwordLabel: passwordLabel,
       cancelLabel: cancelLabel,
       deleteLabel: deleteLabel,
+      showPasswordLabel: showPasswordLabel,
+      hidePasswordLabel: hidePasswordLabel,
     ),
   );
 }
@@ -28,6 +32,8 @@ class AccountDeletionPasswordDialog extends StatefulWidget {
     required this.passwordLabel,
     required this.cancelLabel,
     required this.deleteLabel,
+    this.showPasswordLabel,
+    this.hidePasswordLabel,
   });
 
   final String title;
@@ -35,6 +41,8 @@ class AccountDeletionPasswordDialog extends StatefulWidget {
   final String passwordLabel;
   final String cancelLabel;
   final String deleteLabel;
+  final String? showPasswordLabel;
+  final String? hidePasswordLabel;
 
   @override
   State<AccountDeletionPasswordDialog> createState() =>
@@ -89,6 +97,9 @@ class _AccountDeletionPasswordDialogState
                 labelText: widget.passwordLabel,
                 border: const OutlineInputBorder(),
                 suffixIcon: IconButton(
+                  tooltip: _obscurePassword
+                      ? (widget.showPasswordLabel ?? widget.passwordLabel)
+                      : (widget.hidePasswordLabel ?? widget.passwordLabel),
                   onPressed: () {
                     setState(() {
                       _obscurePassword = !_obscurePassword;

@@ -1142,6 +1142,36 @@ abstract class AppLocalizations {
   /// **'Review or change the advertising consent choices available for this device.'**
   String get settings_privacyOptionsDescription;
 
+  /// No description provided for @accessibility_clearInput.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear field'**
+  String get accessibility_clearInput;
+
+  /// No description provided for @accessibility_clearForm.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear form'**
+  String get accessibility_clearForm;
+
+  /// No description provided for @accessibility_showPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get accessibility_showPassword;
+
+  /// No description provided for @accessibility_hidePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get accessibility_hidePassword;
+
+  /// No description provided for @accessibility_retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get accessibility_retry;
+
   /// No description provided for @navigation_accountMenuSemantic.
   ///
   /// In en, this message translates to:

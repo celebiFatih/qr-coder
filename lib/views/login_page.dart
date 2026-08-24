@@ -159,6 +159,7 @@ class _LoginPageState extends State<LoginPage> {
         hintText: AppLocalizations.of(context)!.login_hint_email,
         prefixIcon: const Icon(Icons.email_outlined),
         suffixIcon: IconButton(
+          tooltip: AppLocalizations.of(context)!.accessibility_clearForm,
           icon: const Icon(Icons.close_rounded),
           onPressed: viewModel.isLoading ? null : viewModel.clearLoginForm,
         ),
@@ -186,6 +187,9 @@ class _LoginPageState extends State<LoginPage> {
         hintText: AppLocalizations.of(context)!.login_hint_password,
         prefixIcon: const Icon(Icons.lock_outline_rounded),
         suffixIcon: IconButton(
+          tooltip: viewModel.isPasswordVisible
+              ? AppLocalizations.of(context)!.accessibility_hidePassword
+              : AppLocalizations.of(context)!.accessibility_showPassword,
           icon: Icon(
             viewModel.isPasswordVisible
                 ? Icons.visibility_off_rounded

@@ -235,6 +235,11 @@
     "settings_accountPrivacyDescription": "Hesabınızı, gizlilik politikasını ve hesap silme seçeneklerini yönetin.",
     "settings_privacyOptions": "Reklam gizlilik seçenekleri",
     "settings_privacyOptionsDescription": "Bu cihaz için sunulan reklam izinlerini görüntüleyin veya değiştirin.",
+    "accessibility_clearInput": "Alanı temizle",
+    "accessibility_clearForm": "Formu temizle",
+    "accessibility_showPassword": "Parolayı göster",
+    "accessibility_hidePassword": "Parolayı gizle",
+    "accessibility_retry": "Tekrar dene",
     "navigation_accountMenuSemantic": "Hesap ve gezinme menüsü. Geçerli oturum: {sessionLabel}",
     "@navigation_accountMenuSemantic": {
         "placeholders": {

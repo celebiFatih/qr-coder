@@ -78,7 +78,7 @@ class AppPageScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBar,
-      body: body,
+      body: SafeArea(top: appBar == null, bottom: !showBannerAd, child: body),
       backgroundColor: backgroundColor,
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
       bottomNavigationBar: showBannerAd ? const BannerAdWidget() : null,
