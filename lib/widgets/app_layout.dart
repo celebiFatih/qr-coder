@@ -81,7 +81,9 @@ class AppPageScaffold extends StatelessWidget {
       body: SafeArea(top: appBar == null, bottom: !showBannerAd, child: body),
       backgroundColor: backgroundColor,
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
-      bottomNavigationBar: showBannerAd ? const BannerAdWidget() : null,
+      bottomNavigationBar: showBannerAd
+          ? const SafeArea(top: false, child: BannerAdWidget())
+          : null,
       floatingActionButton: floatingActionButton,
       floatingActionButtonLocation: floatingActionButtonLocation,
     );

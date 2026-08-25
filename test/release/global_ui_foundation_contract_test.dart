@@ -32,6 +32,23 @@ void main() {
     }
   });
 
+  test(
+    'banner slot preserves the system bottom inset even when the ad collapses',
+    () {
+      final layoutSource = File('lib/widgets/app_layout.dart')
+          .readAsStringSync();
+      final bannerSource = File('lib/widgets/banner_ad_widget.dart')
+          .readAsStringSync();
+
+      expect(
+        layoutSource,
+        contains('const SafeArea(top: false, child: BannerAdWidget())'),
+      );
+      expect(bannerSource, isNot(contains('final banner = SafeArea(')));
+      expect(bannerSource, contains('return const SizedBox.shrink();'));
+    },
+  );
+
   test('app bar icon actions use the common accessible icon button', () {
     for (final path in <String>[
       'lib/views/qr_code_generator_page.dart',

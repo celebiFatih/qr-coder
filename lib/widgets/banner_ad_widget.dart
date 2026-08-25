@@ -247,26 +247,21 @@ class _BannerAdWidgetState extends State<BannerAdWidget>
     final adSize = _reservedAdSize;
     final bannerHeight = adSize?.height.toDouble() ?? _fallbackBannerHeight;
 
-    final banner = SafeArea(
-      top: false,
-      child: Container(
-        width: double.infinity,
-        height: bannerHeight + widget.topSpacing,
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(color: Theme.of(context).dividerColor),
-          ),
-        ),
-        padding: EdgeInsets.only(top: widget.topSpacing),
-        alignment: Alignment.bottomCenter,
-        child: adSize != null && _bannerAd != null
-            ? SizedBox(
-                width: adSize.width.toDouble(),
-                height: adSize.height.toDouble(),
-                child: AdWidget(ad: _bannerAd!),
-              )
-            : SizedBox(height: bannerHeight),
+    final banner = Container(
+      width: double.infinity,
+      height: bannerHeight + widget.topSpacing,
+      decoration: BoxDecoration(
+        border: Border(top: BorderSide(color: Theme.of(context).dividerColor)),
       ),
+      padding: EdgeInsets.only(top: widget.topSpacing),
+      alignment: Alignment.bottomCenter,
+      child: adSize != null && _bannerAd != null
+          ? SizedBox(
+              width: adSize.width.toDouble(),
+              height: adSize.height.toDouble(),
+              child: AdWidget(ad: _bannerAd!),
+            )
+          : SizedBox(height: bannerHeight),
     );
 
     // Offstage prevents painting and hit-testing, but keeps the loaded
