@@ -175,26 +175,18 @@ class QRCodeListPage extends StatefulWidget {
     final scheme = Theme.of(context).colorScheme;
 
     return Container(
-      width: 64,
-      height: 64,
+      width: 58,
+      height: 58,
       alignment: Alignment.center,
+      padding: const EdgeInsets.all(5),
       decoration: BoxDecoration(
-        color: scheme.surfaceContainerHighest,
-        border: Border.all(color: scheme.outlineVariant),
-        borderRadius: BorderRadius.circular(AppRadii.control),
+        color: Colors.white,
+        border: Border.all(color: scheme.tertiary, width: 1.5),
+        borderRadius: BorderRadius.circular(12),
       ),
-      child: SizedBox.square(
-        dimension: 52,
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: ColoredBox(
-            color: Colors.white,
-            child: Padding(
-              padding: const EdgeInsets.all(AppSpacing.xxs),
-              child: QrCodePreviewImage(data: qrCode.data),
-            ),
-          ),
-        ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(7),
+        child: QrCodePreviewImage(data: qrCode.data),
       ),
     );
   }

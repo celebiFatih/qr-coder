@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:qr_coder/services/ad_consent_service.dart';
+import 'package:qr_coder/services/ad_runtime_config.dart';
 
 /// Policy-safe, bottom-anchored AdMob banner.
 ///
@@ -133,18 +134,25 @@ class _BannerAdWidgetState extends State<BannerAdWidget>
     }
 
     if (size == null) {
-      debugPrint('BannerAd: anchored adaptive ad size could not be resolved.');
+      debugPrint('BannerAd: fixed banner size could not be resolved.');
       return;
     }
 
     final configuredAdUnitId = dotenv.env['BANNER_AD_UNIT_ID']?.trim() ?? '';
 
-    final adUnitId = !kReleaseMode ? _testAdUnitId() : configuredAdUnitId;
+    final adUnitId = AdRuntimeConfig.useTestAds
+        ? _testAdUnitId()
+        : configuredAdUnitId;
 
-    if (!kReleaseMode) {
+    if (AdRuntimeConfig.useTestAds) {
       debugPrint(
         'BannerAd test: loading fixed ${size.width}x${size.height} banner.',
       );
+    }
+
+    if (adUnitId.isEmpty) {
+      debugPrint('BannerAd: BANNER_AD_UNIT_ID is empty.');
+      return;
     }
 
     final oldBanner = _bannerAd;
@@ -158,11 +166,6 @@ class _BannerAdWidgetState extends State<BannerAdWidget>
 
     oldBanner?.dispose();
     oldLoadingBanner?.dispose();
-
-    if (adUnitId.isEmpty) {
-      debugPrint('BannerAd: BANNER_AD_UNIT_ID is empty.');
-      return;
-    }
 
     late final BannerAd bannerAd;
     bannerAd = BannerAd(
@@ -195,6 +198,7 @@ class _BannerAdWidgetState extends State<BannerAdWidget>
                 _loadingBannerAd = null;
               }
               _bannerAd = null;
+              _reservedAdSize = null;
             });
           }
 
@@ -229,7 +233,10 @@ class _BannerAdWidgetState extends State<BannerAdWidget>
 
   @override
   Widget build(BuildContext context) {
-    if (!_consentService.canRequestAds) {
+    if (!_consentService.canRequestAds ||
+        (_reservedAdSize == null &&
+            _bannerAd == null &&
+            _loadingBannerAd == null)) {
       return const SizedBox.shrink();
     }
 

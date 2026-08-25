@@ -57,11 +57,15 @@ void main() {
     expect(scannerPage, contains('await _startCamera(provider);'));
   });
 
-  test('scanner detection path keeps unusable raw values out', () {
+  test('scanner detection path keeps unusable raw values out without auto-opening results', () {
     expect(scannerPage, contains('BarcodeScannerViewmodel.hasUsableRawValue'));
     expect(
       scannerPage,
       contains('BarcodeScannerViewmodel.usableRawValue(barcode)'),
+    );
+    expect(
+      scannerPage,
+      isNot(contains('_showBottomSheet(context, viewModel);')),
     );
   });
 }

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:qr_coder/services/ad_consent_service.dart';
+import 'package:qr_coder/services/ad_runtime_config.dart';
 
 class RewardedAdService {
   RewardedAdService({String? addUnitId, AdConsentService? consentService})
@@ -42,10 +43,10 @@ class RewardedAdService {
   /// meaningful.
   bool get isConfigured => _addUnitId.isNotEmpty;
 
-  bool get _hasUsableAdUnit => !kReleaseMode || isConfigured;
+  bool get _hasUsableAdUnit => AdRuntimeConfig.useTestAds || isConfigured;
 
   String get _effectiveAdUnitId {
-    if (!kReleaseMode) {
+    if (AdRuntimeConfig.useTestAds) {
       return defaultTargetPlatform == TargetPlatform.iOS
           ? _iosTestAdUnitId
           : _androidTestAdUnitId;
@@ -100,7 +101,7 @@ class RewardedAdService {
     final generation = ++_loadGeneration;
     final adUnitId = _effectiveAdUnitId;
 
-    if (!kReleaseMode) {
+    if (AdRuntimeConfig.useTestAds) {
       debugPrint('Rewarded test: loading Google sample rewarded ad unit.');
     }
 

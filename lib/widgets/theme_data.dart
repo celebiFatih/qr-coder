@@ -3,7 +3,7 @@ import 'package:qr_coder/widgets/app_design_tokens.dart';
 
 class AppTheme {
   static const Color _seedColor = Color(0xFF673AB7);
-  static const Color _mintSeedColor = Color(0xFF00A884);
+  static const Color _accentSeedColor = Color(0xFFCDDC39);
 
   static ThemeData get lightTheme => _buildTheme(Brightness.light);
 
@@ -14,19 +14,19 @@ class AppTheme {
       seedColor: _seedColor,
       brightness: brightness,
     );
-    final mintScheme = ColorScheme.fromSeed(
-      seedColor: _mintSeedColor,
+    final accentScheme = ColorScheme.fromSeed(
+      seedColor: _accentSeedColor,
       brightness: brightness,
     );
 
-    // Purple remains the primary brand/action color. Mint is reserved for
-    // semantic positive/verified/scanner accents instead of tinting every
-    // control, which keeps Material 3 hierarchy while restoring brand identity.
+    // Purple remains the primary brand/action color. The secondary brand
+    // family is derived from the app's original Material Lime 500 accent
+    // (#CDDC39), but Material 3 tonal roles keep text/icon contrast accessible.
     final scheme = baseScheme.copyWith(
-      tertiary: mintScheme.primary,
-      onTertiary: mintScheme.onPrimary,
-      tertiaryContainer: mintScheme.primaryContainer,
-      onTertiaryContainer: mintScheme.onPrimaryContainer,
+      tertiary: accentScheme.primary,
+      onTertiary: accentScheme.onPrimary,
+      tertiaryContainer: accentScheme.primaryContainer,
+      onTertiaryContainer: accentScheme.onPrimaryContainer,
     );
 
     final base = ThemeData(

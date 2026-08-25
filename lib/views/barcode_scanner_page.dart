@@ -139,12 +139,13 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
                 );
               },
               onDetect: (capture) {
-                final hasUsableBarcode = capture.barcodes.any(
+                // The controller stream owns list updates. Detection must not
+                // steal focus by opening a modal sheet on the first scan; the
+                // user opens results explicitly from the persistent count button.
+                if (!capture.barcodes.any(
                   BarcodeScannerViewmodel.hasUsableRawValue,
-                );
-
-                if (hasUsableBarcode && !viewModel.isBottomSheetOpen) {
-                  _showBottomSheet(context, viewModel);
+                )) {
+                  return;
                 }
               },
             ),
@@ -275,12 +276,12 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
       builder: (context) {
         final availableHeight = MediaQuery.sizeOf(context).height;
         final initialSize = AppBreakpoints.isShortViewport(availableHeight)
-            ? 0.88
-            : 0.64;
+            ? 0.76
+            : 0.56;
 
         return DraggableScrollableSheet(
           expand: false,
-          minChildSize: 0.42,
+          minChildSize: 0.38,
           initialChildSize: initialSize,
           maxChildSize: 0.94,
           builder: (context, scrollController) =>

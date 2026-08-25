@@ -108,4 +108,21 @@ void main() {
       expect(properties, contains('android.newDsl=false'));
     },
   );
+  test(
+    'release smoke can opt into Google sample ads without changing production',
+    () {
+      final runtimeConfig = File('lib/services/ad_runtime_config.dart')
+          .readAsStringSync();
+      final banner = File('lib/widgets/banner_ad_widget.dart')
+          .readAsStringSync();
+      final rewarded = File('lib/widgets/rewarded_add_service.dart')
+          .readAsStringSync();
+
+      expect(runtimeConfig, contains("'ADS_TEST_MODE'"));
+      expect(runtimeConfig, contains('defaultValue: false'));
+      expect(banner, contains('AdRuntimeConfig.useTestAds'));
+      expect(rewarded, contains('AdRuntimeConfig.useTestAds'));
+      expect(banner, contains('_reservedAdSize = null'));
+    },
+  );
 }
