@@ -13,7 +13,8 @@ import 'package:qr_coder/services/ad_consent_service.dart';
 ///   )
 ///
 /// The widget:
-/// - uses an anchored adaptive banner size,
+/// - uses the universal 320x50 fixed banner so compact screens keep more
+///   content visible without relying on deprecated anchored-adaptive APIs,
 /// - reserves a dedicated non-content area for the ad,
 /// - keeps a small non-clickable separation above the ad,
 /// - visually hides the ad while a dialog/bottom sheet is covering the route,
@@ -35,12 +36,12 @@ class _BannerAdWidgetState extends State<BannerAdWidget>
     with WidgetsBindingObserver {
   static const double _fallbackBannerHeight = 50.0;
 
-  // Current Google-provided sample IDs for anchored adaptive banners.
-  // Non-release builds use these; release builds use BANNER_AD_UNIT_ID.
-  static const String _androidTestAdUnitId =
-      'ca-app-pub-3940256099942544/9214589741';
-  static const String _iosTestAdUnitId =
-      'ca-app-pub-3940256099942544/2435281174';
+  // Current Google-provided sample fixed-banner IDs.
+  // Release builds always use BANNER_AD_UNIT_ID.
+  static const String _androidFixedTestAdUnitId =
+      'ca-app-pub-3940256099942544/6300978111';
+  static const String _iosFixedTestAdUnitId =
+      'ca-app-pub-3940256099942544/2934735716';
 
   BannerAd? _bannerAd;
   BannerAd? _loadingBannerAd;
@@ -116,14 +117,14 @@ class _BannerAdWidgetState extends State<BannerAdWidget>
     });
   }
 
-  Future<void> _loadBannerForWidth(int width) async {
+  void _loadBannerForWidth(int width) {
     if (!_consentService.canRequestAds) {
       return;
     }
 
     final generation = ++_loadGeneration;
 
-    final size = await AdSize.getLargeAnchoredAdaptiveBannerAdSize(width);
+    final size = _resolveAdSize(width);
 
     if (!mounted ||
         generation != _loadGeneration ||
@@ -138,15 +139,11 @@ class _BannerAdWidgetState extends State<BannerAdWidget>
 
     final configuredAdUnitId = dotenv.env['BANNER_AD_UNIT_ID']?.trim() ?? '';
 
-    final adUnitId = !kReleaseMode
-        ? (defaultTargetPlatform == TargetPlatform.iOS
-              ? _iosTestAdUnitId
-              : _androidTestAdUnitId)
-        : configuredAdUnitId;
+    final adUnitId = !kReleaseMode ? _testAdUnitId() : configuredAdUnitId;
 
     if (!kReleaseMode) {
       debugPrint(
-        'BannerAd test: loading Google sample anchored-adaptive banner.',
+        'BannerAd test: loading fixed ${size.width}x${size.height} banner.',
       );
     }
 
@@ -208,6 +205,16 @@ class _BannerAdWidgetState extends State<BannerAdWidget>
 
     _loadingBannerAd = bannerAd;
     bannerAd.load();
+  }
+
+  String _testAdUnitId() {
+    return defaultTargetPlatform == TargetPlatform.iOS
+        ? _iosFixedTestAdUnitId
+        : _androidFixedTestAdUnitId;
+  }
+
+  AdSize? _resolveAdSize(int width) {
+    return width >= AdSize.banner.width ? AdSize.banner : null;
   }
 
   @override

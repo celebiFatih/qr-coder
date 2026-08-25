@@ -56,7 +56,9 @@ class SettingsPage extends StatelessWidget {
         children: [
           Icon(
             signedIn ? Icons.cloud_done_outlined : Icons.person_outline_rounded,
-            color: theme.colorScheme.primary,
+            color: signedIn
+                ? theme.colorScheme.tertiary
+                : theme.colorScheme.primary,
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(

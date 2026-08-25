@@ -218,7 +218,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
                       child: DecoratedBox(
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(AppRadii.surface),
-                          border: Border.all(color: scheme.primary, width: 3),
+                          border: Border.all(color: scheme.tertiary, width: 3),
                         ),
                       ),
                     ),
@@ -240,6 +240,14 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
         child: Consumer<BarcodeScannerViewmodel>(
           builder: (context, viewModel, child) {
             return FilledButton.tonalIcon(
+              style: FilledButton.styleFrom(
+                backgroundColor: Theme.of(context)
+                    .colorScheme
+                    .tertiaryContainer,
+                foregroundColor: Theme.of(context)
+                    .colorScheme
+                    .onTertiaryContainer,
+              ),
               onPressed: _toggleBottomSheet,
               icon: const Icon(Icons.qr_code_2_rounded),
               label: Text(
@@ -264,10 +272,21 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
       isScrollControlled: true,
       useSafeArea: true,
       showDragHandle: true,
-      builder: (context) => FractionallySizedBox(
-        heightFactor: 0.72,
-        child: _buildBottomSheetContent(context, viewModel),
-      ),
+      builder: (context) {
+        final availableHeight = MediaQuery.sizeOf(context).height;
+        final initialSize = AppBreakpoints.isShortViewport(availableHeight)
+            ? 0.88
+            : 0.64;
+
+        return DraggableScrollableSheet(
+          expand: false,
+          minChildSize: 0.42,
+          initialChildSize: initialSize,
+          maxChildSize: 0.94,
+          builder: (context, scrollController) =>
+              _buildBottomSheetContent(context, viewModel, scrollController),
+        );
+      },
     ).whenComplete(() {
       viewModel.isBottomSheetOpen = false;
     });
@@ -277,6 +296,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
   Widget _buildBottomSheetContent(
     BuildContext context,
     BarcodeScannerViewmodel viewModel,
+    ScrollController scrollController,
   ) {
     final l10n = AppLocalizations.of(context)!;
 
@@ -292,22 +312,23 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
         children: [
           AppSectionHeader(title: l10n.scannerPage_scannedData),
           const SizedBox(height: AppSpacing.sm),
-          Expanded(child: _buildBarcodesListView()),
-          Consumer<BarcodeScannerViewmodel>(
-            builder: (context, scannerViewModel, child) {
-              if (scannerViewModel.barcodes.isEmpty) {
-                return const SizedBox.shrink();
-              }
+          Expanded(child: _buildBarcodesListView(scrollController)),
+          SafeArea(
+            top: false,
+            minimum: const EdgeInsets.only(top: AppSpacing.sm),
+            child: Consumer<BarcodeScannerViewmodel>(
+              builder: (context, scannerViewModel, child) {
+                if (scannerViewModel.barcodes.isEmpty) {
+                  return const SizedBox.shrink();
+                }
 
-              return Padding(
-                padding: const EdgeInsets.only(top: AppSpacing.sm),
-                child: OutlinedButton.icon(
+                return OutlinedButton.icon(
                   onPressed: scannerViewModel.clearBarcodes,
                   icon: const Icon(Icons.delete_sweep_outlined),
                   label: Text(l10n.scannerPage_cleanScannedListBtn),
-                ),
-              );
-            },
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -315,17 +336,27 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage>
   }
 
   // Barkod listeleme görünümü oluşturma
-  Widget _buildBarcodesListView() {
+  Widget _buildBarcodesListView(ScrollController scrollController) {
     return Consumer<BarcodeScannerViewmodel>(
       builder: (context, viewModel, child) {
         if (viewModel.barcodes.isEmpty) {
-          return AppStateView.empty(
-            message: AppLocalizations.of(context)!.scannerPage_emptyScannedList,
-            icon: Icons.qr_code_scanner_rounded,
+          return CustomScrollView(
+            controller: scrollController,
+            slivers: [
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: AppStateView.empty(
+                  message: AppLocalizations.of(context)!
+                      .scannerPage_emptyScannedList,
+                  icon: Icons.qr_code_scanner_rounded,
+                ),
+              ),
+            ],
           );
         }
 
         return ListView.separated(
+          controller: scrollController,
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
           itemCount: viewModel.barcodes.length,
           separatorBuilder: (context, index) =>

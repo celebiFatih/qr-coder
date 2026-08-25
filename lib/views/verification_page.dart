@@ -164,7 +164,7 @@ class _VerificationPageState extends State<VerificationPage>
             if (viewModel.emailVerified)
               Icon(
                 Icons.verified_rounded,
-                color: theme.colorScheme.primary,
+                color: theme.colorScheme.tertiary,
                 size: 32,
               )
             else

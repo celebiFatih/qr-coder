@@ -61,13 +61,21 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final viewModel = context.watch<LoginPageViewmodel>();
+    final mediaQuery = MediaQuery.of(context);
+    final usableHeight =
+        mediaQuery.size.height -
+        mediaQuery.padding.top -
+        mediaQuery.padding.bottom;
+    final isShortViewport = AppBreakpoints.isShortViewport(usableHeight);
 
     return AppPageScaffold(
       body: Form(
         key: _formKey,
         child: AppAuthPageFrame(
           child: AppSurface(
-            padding: const EdgeInsets.all(AppSpacing.lg),
+            padding: EdgeInsets.all(
+              isShortViewport ? AppSpacing.md : AppSpacing.lg,
+            ),
             child: AutofillGroup(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -75,10 +83,14 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   _buildLanguageChoice(context),
                   const SizedBox(height: AppSpacing.xs),
-                  _buildHeader(context),
-                  const SizedBox(height: AppSpacing.lg),
+                  _buildHeader(context, compact: isShortViewport),
+                  SizedBox(
+                    height: isShortViewport ? AppSpacing.md : AppSpacing.lg,
+                  ),
                   _buildEmailField(viewModel, context),
-                  const SizedBox(height: AppSpacing.md),
+                  SizedBox(
+                    height: isShortViewport ? AppSpacing.sm : AppSpacing.md,
+                  ),
                   _buildPasswordField(context, viewModel),
                   if (!viewModel.isLogin)
                     Align(
@@ -88,9 +100,13 @@ class _LoginPageState extends State<LoginPage> {
                   else
                     const SizedBox(height: AppSpacing.xs),
                   _buildRememberMeCheckbox(context, viewModel),
-                  const SizedBox(height: AppSpacing.md),
+                  SizedBox(
+                    height: isShortViewport ? AppSpacing.sm : AppSpacing.md,
+                  ),
                   _buildSubmitButton(context, viewModel),
-                  const SizedBox(height: AppSpacing.sm),
+                  SizedBox(
+                    height: isShortViewport ? AppSpacing.xs : AppSpacing.sm,
+                  ),
                   _buildLoginOrRegisterToggle(context, viewModel),
                   const SizedBox(height: AppSpacing.xs),
                   _buildGuestAccessButton(context, viewModel),
@@ -121,13 +137,13 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
+  Widget _buildHeader(BuildContext context, {required bool compact}) {
     final theme = Theme.of(context);
 
     return Column(
       children: [
-        Image.asset('assets/img/logo.png', width: 72),
-        const SizedBox(height: AppSpacing.md),
+        Image.asset('assets/img/logo.png', width: compact ? 56 : 72),
+        SizedBox(height: compact ? AppSpacing.sm : AppSpacing.md),
         Text(
           AppLocalizations.of(context)!.login_WelcomeText,
           style: theme.textTheme.headlineMedium,

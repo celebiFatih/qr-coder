@@ -3,22 +3,39 @@ import 'package:qr_coder/widgets/app_design_tokens.dart';
 
 class AppTheme {
   static const Color _seedColor = Color(0xFF673AB7);
+  static const Color _mintSeedColor = Color(0xFF00A884);
 
   static ThemeData get lightTheme => _buildTheme(Brightness.light);
 
   static ThemeData get darkTheme => _buildTheme(Brightness.dark);
 
   static ThemeData _buildTheme(Brightness brightness) {
-    final scheme = ColorScheme.fromSeed(
+    final baseScheme = ColorScheme.fromSeed(
       seedColor: _seedColor,
       brightness: brightness,
+    );
+    final mintScheme = ColorScheme.fromSeed(
+      seedColor: _mintSeedColor,
+      brightness: brightness,
+    );
+
+    // Purple remains the primary brand/action color. Mint is reserved for
+    // semantic positive/verified/scanner accents instead of tinting every
+    // control, which keeps Material 3 hierarchy while restoring brand identity.
+    final scheme = baseScheme.copyWith(
+      tertiary: mintScheme.primary,
+      onTertiary: mintScheme.onPrimary,
+      tertiaryContainer: mintScheme.primaryContainer,
+      onTertiaryContainer: mintScheme.onPrimaryContainer,
     );
 
     final base = ThemeData(
       useMaterial3: true,
       brightness: brightness,
       colorScheme: scheme,
-      scaffoldBackgroundColor: scheme.surface,
+      // A tonal container background reduces the stark white feel in light
+      // mode while preserving semantic ColorScheme-driven surfaces.
+      scaffoldBackgroundColor: scheme.surfaceContainerLow,
       materialTapTargetSize: MaterialTapTargetSize.padded,
       visualDensity: VisualDensity.standard,
     );
@@ -46,7 +63,7 @@ class AppTheme {
     return base.copyWith(
       textTheme: textTheme,
       appBarTheme: AppBarThemeData(
-        backgroundColor: scheme.surface,
+        backgroundColor: scheme.surfaceContainerLow,
         foregroundColor: scheme.onSurface,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
@@ -58,7 +75,7 @@ class AppTheme {
         ),
       ),
       cardTheme: CardThemeData(
-        color: scheme.surfaceContainerLow,
+        color: scheme.surfaceContainer,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         margin: EdgeInsets.zero,
@@ -68,7 +85,7 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationThemeData(
         filled: true,
-        fillColor: scheme.surfaceContainerHighest.withValues(alpha: 0.6),
+        fillColor: scheme.surfaceContainerHighest.withValues(alpha: 0.72),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
           vertical: AppSpacing.md,
@@ -150,7 +167,7 @@ class AppTheme {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
       bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: scheme.surfaceContainerLow,
+        backgroundColor: scheme.surfaceContainer,
         surfaceTintColor: Colors.transparent,
         showDragHandle: true,
         shape: const RoundedRectangleBorder(

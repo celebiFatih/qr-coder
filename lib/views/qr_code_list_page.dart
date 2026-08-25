@@ -11,6 +11,7 @@ import 'package:qr_coder/views/qr_code_detail_page.dart';
 import 'package:qr_coder/widgets/app_components.dart';
 import 'package:qr_coder/widgets/app_design_tokens.dart';
 import 'package:qr_coder/widgets/app_layout.dart';
+import 'package:qr_coder/widgets/app_motion.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 enum _QrCodeListItemAction { edit, delete }
@@ -176,13 +177,25 @@ class QRCodeListPage extends StatefulWidget {
     return Container(
       width: 64,
       height: 64,
-      padding: const EdgeInsets.all(AppSpacing.xxs),
+      alignment: Alignment.center,
       decoration: BoxDecoration(
         color: scheme.surfaceContainerHighest,
         border: Border.all(color: scheme.outlineVariant),
         borderRadius: BorderRadius.circular(AppRadii.control),
       ),
-      child: QrCodePreviewImage(data: qrCode.data),
+      child: SizedBox.square(
+        dimension: 52,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: ColoredBox(
+            color: Colors.white,
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.xxs),
+              child: QrCodePreviewImage(data: qrCode.data),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -240,66 +253,86 @@ class _QRCodeListPageState extends State<QRCodeListPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return AppBar(
-      title: _selectionMode
-          ? Consumer<QrCodeListPageViewmodel>(
-              builder: (context, vm, child) => Text(
-                l10n.qrCodeList_selectedCount(vm.selectedQRCodes.length),
-              ),
-            )
-          : Text(l10n.qrCodeList_title),
-      actions: _selectionMode
-          ? [
-              AppIconButton(
-                tooltip: l10n.qrCodeList_selectAllBtn,
-                onPressed: viewModel.toggleSelectAllQRCodes,
-                icon: const Icon(Icons.select_all_rounded),
-              ),
-              Consumer<QrCodeListPageViewmodel>(
-                builder: (context, vm, child) => AppIconButton(
-                  tooltip: l10n.qrCodeList_deleteSelectedBtn,
-                  onPressed: vm.selectedQRCodes.isEmpty
-                      ? null
-                      : () => _deleteSelected(context, vm),
-                  icon: const Icon(Icons.delete_sweep_outlined),
-                ),
-              ),
-              AppIconButton(
-                tooltip: l10n.qrCodeList_exitSelectionBtn,
-                onPressed: () => _exitSelectionMode(viewModel),
-                icon: const Icon(Icons.close_rounded),
-              ),
-            ]
-          : [
-              AppIconButton(
-                tooltip: l10n.qrCodeList_selectBtn,
-                onPressed: _enterSelectionMode,
-                icon: const Icon(Icons.checklist_rounded),
-              ),
-              MenuAnchor(
-                menuChildren: [
-                  MenuItemButton(
-                    onPressed: () => _deleteAll(context, viewModel),
-                    leadingIcon: Icon(
-                      Icons.delete_forever_outlined,
-                      color: Theme.of(context).colorScheme.error,
+      title: AnimatedSwitcher(
+        duration: AppMotion.short(context),
+        switchInCurve: AppMotion.standardCurve,
+        switchOutCurve: AppMotion.standardCurve,
+        child: KeyedSubtree(
+          key: ValueKey(_selectionMode),
+          child: _selectionMode
+              ? Consumer<QrCodeListPageViewmodel>(
+                  builder: (context, vm, child) => Text(
+                    l10n.qrCodeList_selectedCount(vm.selectedQRCodes.length),
+                  ),
+                )
+              : Text(l10n.qrCodeList_title),
+        ),
+      ),
+      actions: [
+        AnimatedSwitcher(
+          duration: AppMotion.short(context),
+          switchInCurve: AppMotion.standardCurve,
+          switchOutCurve: AppMotion.standardCurve,
+          child: Row(
+            key: ValueKey(_selectionMode),
+            mainAxisSize: MainAxisSize.min,
+            children: _selectionMode
+                ? [
+                    AppIconButton(
+                      tooltip: l10n.qrCodeList_selectAllBtn,
+                      onPressed: viewModel.toggleSelectAllQRCodes,
+                      icon: const Icon(Icons.select_all_rounded),
                     ),
-                    child: Text(
-                      l10n.qrCodeList_deleteAllBtn,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
+                    Consumer<QrCodeListPageViewmodel>(
+                      builder: (context, vm, child) => AppIconButton(
+                        tooltip: l10n.qrCodeList_deleteSelectedBtn,
+                        onPressed: vm.selectedQRCodes.isEmpty
+                            ? null
+                            : () => _deleteSelected(context, vm),
+                        icon: const Icon(Icons.delete_sweep_outlined),
                       ),
                     ),
-                  ),
-                ],
-                builder: (context, controller, child) => AppIconButton(
-                  tooltip: MaterialLocalizations.of(context).moreButtonTooltip,
-                  onPressed: controller.isOpen
-                      ? controller.close
-                      : controller.open,
-                  icon: const Icon(Icons.more_vert_rounded),
-                ),
-              ),
-            ],
+                    AppIconButton(
+                      tooltip: l10n.qrCodeList_exitSelectionBtn,
+                      onPressed: () => _exitSelectionMode(viewModel),
+                      icon: const Icon(Icons.close_rounded),
+                    ),
+                  ]
+                : [
+                    AppIconButton(
+                      tooltip: l10n.qrCodeList_selectBtn,
+                      onPressed: _enterSelectionMode,
+                      icon: const Icon(Icons.checklist_rounded),
+                    ),
+                    MenuAnchor(
+                      menuChildren: [
+                        MenuItemButton(
+                          onPressed: () => _deleteAll(context, viewModel),
+                          leadingIcon: Icon(
+                            Icons.delete_forever_outlined,
+                            color: Theme.of(context).colorScheme.error,
+                          ),
+                          child: Text(
+                            l10n.qrCodeList_deleteAllBtn,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                          ),
+                        ),
+                      ],
+                      builder: (context, controller, child) => AppIconButton(
+                        tooltip: MaterialLocalizations.of(context)
+                            .moreButtonTooltip,
+                        onPressed: controller.isOpen
+                            ? controller.close
+                            : controller.open,
+                        icon: const Icon(Icons.more_vert_rounded),
+                      ),
+                    ),
+                  ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -596,7 +629,7 @@ class QrCodePreviewImage extends StatelessWidget {
       // QR modules must keep a light, neutral canvas in both app themes so
       // saved-code previews remain readable and scannable in dark mode.
       backgroundColor: Colors.white,
-      padding: const EdgeInsets.all(AppSpacing.xxs),
+      padding: EdgeInsets.zero,
       errorStateBuilder: (context, error) =>
           const Center(child: Icon(Icons.broken_image_outlined)),
     );

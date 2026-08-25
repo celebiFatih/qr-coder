@@ -49,6 +49,7 @@ class AppNavigationMenu extends StatelessWidget {
             isSignedIn
                 ? Icons.cloud_done_outlined
                 : Icons.account_circle_outlined,
+            color: isSignedIn ? Theme.of(context).colorScheme.tertiary : null,
           ),
         );
       },

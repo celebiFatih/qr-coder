@@ -23,7 +23,12 @@ class AppAuthPageFrame extends StatelessWidget {
               : MediaQuery.sizeOf(context).width;
           final sizeClass = AppBreakpoints.classify(width);
           final horizontal = AppLayoutMetrics.horizontalPaddingForWidth(width);
-          final top = sizeClass == AppWindowSizeClass.compact
+          final isShortViewport =
+              constraints.hasBoundedHeight &&
+              AppBreakpoints.isShortViewport(constraints.maxHeight);
+          final top = isShortViewport
+              ? AppSpacing.md
+              : sizeClass == AppWindowSizeClass.compact
               ? AppSpacing.lg
               : AppSpacing.xl;
 

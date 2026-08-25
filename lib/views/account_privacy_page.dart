@@ -79,7 +79,9 @@ class _AccountPrivacyPageState extends State<AccountPrivacyPage> {
         children: [
           DecoratedBox(
             decoration: BoxDecoration(
-              color: theme.colorScheme.primaryContainer,
+              color: user == null
+                  ? theme.colorScheme.primaryContainer
+                  : theme.colorScheme.tertiaryContainer,
               shape: BoxShape.circle,
             ),
             child: Padding(
@@ -88,7 +90,9 @@ class _AccountPrivacyPageState extends State<AccountPrivacyPage> {
                 user == null
                     ? Icons.person_outline_rounded
                     : Icons.cloud_done_outlined,
-                color: theme.colorScheme.onPrimaryContainer,
+                color: user == null
+                    ? theme.colorScheme.onPrimaryContainer
+                    : theme.colorScheme.onTertiaryContainer,
               ),
             ),
           ),

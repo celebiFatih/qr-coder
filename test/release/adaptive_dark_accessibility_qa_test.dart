@@ -100,6 +100,10 @@ void main() {
         _contrastRatio(scheme.onErrorContainer, scheme.errorContainer),
         greaterThanOrEqualTo(4.5),
       );
+      expect(
+        _contrastRatio(scheme.onTertiaryContainer, scheme.tertiaryContainer),
+        greaterThanOrEqualTo(4.5),
+      );
     }
   });
 

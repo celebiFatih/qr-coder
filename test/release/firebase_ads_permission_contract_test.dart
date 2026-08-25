@@ -25,7 +25,7 @@ void main() {
     final repository = File('lib/repository/firebase_qrcode_repository.dart')
         .readAsStringSync();
 
-    expect(repository, contains("database.child('users/\$uid/qrcodes')"));
+    expect(repository, contains(r"database.child('users/$uid/qrcodes')"));
     expect(
       repository,
       contains(
@@ -51,17 +51,27 @@ void main() {
     expect(rewarded, contains('_consentService.canRequestAds'));
   });
 
-  test('banner uses the current large anchored adaptive size API', () {
-    final banner = File('lib/widgets/banner_ad_widget.dart').readAsStringSync();
+  test(
+    'banner uses universal fixed 320x50 size without deprecated adaptive APIs',
+    () {
+      final banner = File('lib/widgets/banner_ad_widget.dart')
+          .readAsStringSync();
 
-    expect(banner, contains('AdSize.getLargeAnchoredAdaptiveBannerAdSize('));
-    expect(
-      banner,
-      isNot(
-        contains('AdSize.getCurrentOrientationAnchoredAdaptiveBannerAdSize('),
-      ),
-    );
-  });
+      expect(
+        banner,
+        contains('width >= AdSize.banner.width ? AdSize.banner : null'),
+      );
+      expect(
+        banner,
+        contains('static const double _fallbackBannerHeight = 50.0'),
+      );
+      expect(
+        banner,
+        isNot(contains('getCurrentOrientationAnchoredAdaptiveBannerAdSize')),
+      );
+      expect(banner, isNot(contains('getLargeAnchoredAdaptiveBannerAdSize')));
+    },
+  );
 
   test('legacy storage permission remains limited to Android 9 and older', () {
     final manifest = File('android/app/src/main/AndroidManifest.xml')

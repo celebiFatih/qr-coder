@@ -5,6 +5,9 @@ class AppBreakpoints {
 
   static const double mediumWidth = 600;
   static const double expandedWidth = 840;
+  static const double shortViewportHeight = 760;
+
+  static bool isShortViewport(double height) => height < shortViewportHeight;
 
   static AppWindowSizeClass classify(double width) {
     if (width < mediumWidth) {
